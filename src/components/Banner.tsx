@@ -1,0 +1,181 @@
+import type { ReactNode } from 'react'
+import type { StyleDesc } from '@gpuix/react'
+import { useAdwaita, type AdwaitaColors } from '../theme/adwaita'
+import { T } from './common'
+import { Button } from './Button'
+import { Icon, type IconName } from './icons'
+
+export type BannerTone = 'info' | 'warning' | 'error' | 'success'
+
+/**
+ * A shadcn-style `variant` alias for `tone`: `default` → `info`,
+ * `destructive` → `error`. `tone` remains the adwaita-native vocabulary.
+ */
+export type BannerVariant = 'default' | 'destructive'
+
+/** Resolve a shadcn `variant` alias to an adwaita `tone`. */
+function variantToTone(variant: BannerVariant): BannerTone {
+  return variant === 'destructive' ? 'error' : 'info'
+}
+
+export interface BannerProps {
+  title: string
+  body?: string
+  tone?: BannerTone
+  /** shadcn alias for `tone` (`default` → info, `destructive` → error). */
+  variant?: BannerVariant
+  actionLabel?: string
+  onAction?: () => void
+  onClose?: () => void
+  /** When true the action button drops below the title (Adwaita's narrow layout). */
+  narrow?: boolean
+  style?: Partial<StyleDesc>
+}
+
+/** Tinted colours + icon for a banner tone. */
+interface BannerToneTheme {
+  bg: string
+  fg: string
+  icon: IconName
+}
+
+/** Resolve the tint, foreground and icon for a banner tone. */
+function resolveToneTheme(tone: BannerTone, colors: AdwaitaColors): BannerToneTheme {
+  switch (tone) {
+    case 'warning':
+      return { bg: colors.warningTint, fg: colors.warning, icon: 'warning' }
+    case 'error':
+      return { bg: colors.destructiveTint, fg: colors.destructive, icon: 'alert' }
+    case 'success':
+      return { bg: colors.successTint, fg: colors.success, icon: 'success' }
+    default:
+      return { bg: colors.accentTint, fg: colors.accent, icon: 'info' }
+  }
+}
+
+/** Title + optional body text, with the tone icon leading. */
+function BannerBody({ title, body, tone }: { title: string; body?: string; tone: BannerToneTheme }) {
+  const t = useAdwaita()
+  const { colors } = t
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexGrow: 1, minWidth: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Icon name={tone.icon} size={18} color={tone.fg} />
+        <T size="body" weight={700} color={colors.fg}>
+          {title}
+        </T>
+      </div>
+      {body ? (
+        <T size="caption" color={colors.dim_fg}>
+          {body}
+        </T>
+      ) : null}
+    </div>
+  )
+}
+
+/** 24×24 fully-round close button. */
+function BannerClose({ onClick }: { onClick: () => void }) {
+  const t = useAdwaita()
+  const { colors } = t
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        hover: { backgroundColor: 'rgba(0,0,0,0.08)' },
+      }}
+    >
+      <Icon name="close" size={16} color={colors.dim_fg} />
+    </div>
+  )
+}
+
+export interface BannerTitleProps {
+  children: ReactNode
+  style?: Partial<StyleDesc>
+}
+
+/** A banner heading (thin compound export for shadcn-parity layouts). */
+export function BannerTitle({ children, style }: BannerTitleProps) {
+  const t = useAdwaita()
+  return (
+    <T size="body" weight={700} color={t.colors.fg} style={style}>
+      {children}
+    </T>
+  )
+}
+
+export interface BannerDescriptionProps {
+  children: ReactNode
+  style?: Partial<StyleDesc>
+}
+
+/** A banner body/description line (thin compound export). */
+export function BannerDescription({ children, style }: BannerDescriptionProps) {
+  const t = useAdwaita()
+  return (
+    <T size="caption" color={t.colors.dim_fg} style={style}>
+      {children}
+    </T>
+  )
+}
+
+/** Tinted Adwaita banner strip with an optional action and close button. */
+export function Banner({
+  title,
+  body,
+  tone,
+  variant,
+  actionLabel,
+  onAction,
+  onClose,
+  narrow,
+  style,
+}: BannerProps) {
+  const t = useAdwaita()
+  const resolvedTone = tone ?? (variant ? variantToTone(variant) : 'info')
+  const toneTheme = resolveToneTheme(resolvedTone, t.colors)
+  const close = onClose ? <BannerClose onClick={onClose} /> : null
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: narrow ? 'column' : 'row',
+        alignItems: narrow ? 'stretch' : 'center',
+        gap: 8,
+        padding: 12,
+        borderRadius: 10,
+        backgroundColor: toneTheme.bg,
+        ...style,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 8,
+          flexGrow: 1,
+          minWidth: 0,
+        }}
+      >
+        <BannerBody title={title} body={body} tone={toneTheme} />
+        {!narrow ? close : null}
+      </div>
+      {narrow ? close : null}
+      {actionLabel ? (
+        <div style={{ display: 'flex', justifyContent: narrow ? 'flex-start' : 'flex-end' }}>
+          <Button variant="text" label={actionLabel} onClick={onAction} />
+        </div>
+      ) : null}
+    </div>
+  )
+}

@@ -1,0 +1,109 @@
+import type { ReactNode } from 'react'
+import type { StyleDesc } from '@gpuix/react'
+import { useAdwaita } from '../theme/adwaita'
+import { CodeChip, T } from './common'
+
+export interface HeadingProps {
+  level?: 1 | 2 | 3 | 4 | 5 | 6
+  children: ReactNode
+  style?: Partial<StyleDesc>
+}
+
+/**
+ * A heading that maps heading levels to Adwaita type scale:
+ * 1→title1, 2→title2, 3→title3, 4→title4, 5→body, 6→body.
+ */
+export function Heading({ level = 2, children, style }: HeadingProps) {
+  const t = useAdwaita()
+  const { colors, typography } = t
+
+  const sizes: Record<number, number> = {
+    1: typography.title1,
+    2: typography.title2,
+    3: typography.title3,
+    4: typography.title4,
+    5: typography.body,
+    6: typography.body,
+  }
+
+  return (
+    <T size="title2" color={colors.fg} weight={700} style={{ fontSize: sizes[level], ...style }}>
+      {children}
+    </T>
+  )
+}
+
+export interface ParagraphProps {
+  children: ReactNode
+  dim?: boolean
+  style?: Partial<StyleDesc>
+}
+
+/** A body-size paragraph. `dim` uses the secondary foreground colour. */
+export function Paragraph({ children, dim, style }: ParagraphProps) {
+  const t = useAdwaita()
+  return (
+    <T size="body" color={dim ? t.colors.dim_fg : t.colors.fg} style={style}>
+      {children}
+    </T>
+  )
+}
+
+export interface SmallProps {
+  children: ReactNode
+  style?: Partial<StyleDesc>
+}
+
+/** Caption-size dim text. */
+export function Small({ children, style }: SmallProps) {
+  const t = useAdwaita()
+  return (
+    <T size="caption" color={t.colors.dim_fg} style={style}>
+      {children}
+    </T>
+  )
+}
+
+export interface BlockquoteProps {
+  children: ReactNode
+  style?: Partial<StyleDesc>
+}
+
+/** A dimmed quote block with a 3px left accent border. */
+export function Blockquote({ children, style }: BlockquoteProps) {
+  const t = useAdwaita()
+  const { colors } = t
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 4,
+        padding: 12,
+        borderLeftWidth: 3,
+        borderColor: colors.accent,
+        backgroundColor: colors.button_bg,
+        borderRadius: 4,
+        ...style,
+      }}
+    >
+      <T size="body" color={colors.dim_fg} style={{ whiteSpace: 'normal' }}>
+        {children}
+      </T>
+    </div>
+  )
+}
+
+export interface InlineCodeProps {
+  children: ReactNode
+  style?: Partial<StyleDesc>
+}
+
+/** Inline monospace code: button_bg background, 1px border, radius 4, padding 2. */
+export function InlineCode({ children, style }: InlineCodeProps) {
+  return (
+    <CodeChip padding={2} style={style}>
+      {children}
+    </CodeChip>
+  )
+}

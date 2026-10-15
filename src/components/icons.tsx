@@ -1,0 +1,128 @@
+import type { StyleDesc } from '@gpuix/react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  Bell,
+  Bookmark,
+  Check,
+  Circle,
+  CircleAlert,
+  CircleCheck,
+  CircleDashed,
+  CircleDot,
+  ChevronDown,
+  ChevronRight,
+  ChevronsUpDown,
+  Clock,
+  Eye,
+  FileText,
+  Folder,
+  Footprints,
+  GitBranch,
+  GitPullRequest,
+  Home,
+  Inbox,
+  Info,
+  Layers,
+  LayoutGrid,
+  List,
+  ListOrdered,
+  Menu,
+  MessageSquare,
+  Minus,
+  Moon,
+  PanelLeft,
+  Pause,
+  Play,
+  Plus,
+  RefreshCw,
+  Search,
+  Settings,
+  Sparkles,
+  Trash2,
+  Sun,
+  SunMoon,
+  Timer,
+  TriangleAlert,
+  User,
+  UserRound,
+  X,
+} from 'lucide-static'
+
+/**
+ * Curated lucide icons as raw SVG strings. Lucide icons are stroke-based with
+ * `stroke="currentColor"`, so GPUix tints them through `style.color`.
+ */
+export const ICONS = {
+  close: X,
+  plus: Plus,
+  minus: Minus,
+  chevronDown: ChevronDown,
+  chevronRight: ChevronRight,
+  chevronsUpDown: ChevronsUpDown,
+  info: Info,
+  warning: TriangleAlert,
+  alert: CircleAlert,
+  success: CircleCheck,
+  check: Check,
+  circle: Circle,
+  circleDashed: CircleDashed,
+  circleDot: CircleDot,
+  settings: Settings,
+  user: User,
+  userRound: UserRound,
+  search: Search,
+  home: Home,
+  grid: LayoutGrid,
+  list: List,
+  listOrdered: ListOrdered,
+  panel: PanelLeft,
+  clock: Clock,
+  timer: Timer,
+  sparkles: Sparkles,
+  sun: Sun,
+  moon: Moon,
+  sunMoon: SunMoon,
+  fileText: FileText,
+  folder: Folder,
+  inbox: Inbox,
+  eye: Eye,
+  layers: Layers,
+  gitBranch: GitBranch,
+  gitPullRequest: GitPullRequest,
+  pause: Pause,
+  play: Play,
+  arrowLeft: ArrowLeft,
+  arrowRight: ArrowRight,
+  menu: Menu,
+  messageSquare: MessageSquare,
+  bookmark: Bookmark,
+  bell: Bell,
+  footprints: Footprints,
+  refresh: RefreshCw,
+  trash: Trash2,
+} as const
+
+export type IconName = keyof typeof ICONS
+
+export interface IconProps {
+  name: IconName
+  size?: number
+  color: string
+  style?: Partial<StyleDesc>
+}
+
+/**
+ * A lucide icon, tinted via `color`, sized in px.
+ *
+ * Rendered as an `<img>` with a colour-baked SVG data-URI: lucide stroke icons
+ * use `stroke="currentColor"`, so we substitute the requested `color` into the
+ * markup before encoding. An `<img>` rasterises portably across both the GPUix
+ * native runtime and the static takumi renderer (GPUix's `<svg source>` element
+ * is not rasterised by takumi, which made every icon invisible in PNGs).
+ */
+export function Icon({ name, size = 16, color, style }: IconProps) {
+  const svg = ICONS[name].replace(/currentColor/g, color)
+  const src = `data:image/svg+xml,${encodeURIComponent(svg)}`
+  return <img src={src} style={{ width: size, height: size, flexShrink: 0, ...style }} />
+}

@@ -1,0 +1,415 @@
+import { Children, useState, type ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita, hexToRgba } from "../theme/adwaita";
+import { T } from "./common";
+import { Icon, type IconName } from "./icons";
+import { Switch } from "./Switch";
+import { Entry } from "./Entry";
+
+/** Adwaita `boxed-list`: a rounded, bordered group that stacks rows with hairlines. */
+export function BoxedList({
+  children,
+  style,
+}: {
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
+}) {
+  const t = useAdwaita();
+  const items = Children.toArray(children);
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: t.colors.border,
+        backgroundColor: t.colors.view_bg,
+        overflow: "hidden",
+        ...style,
+      }}
+    >
+      {items.map((child, i) => (
+        <div
+          key={i}
+          style={{
+            borderBottomWidth: i < items.length - 1 ? 1 : 0,
+            borderColor: t.colors.border,
+          }}
+        >
+          {child}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+interface RowShellProps {
+  title: string;
+  subtitle?: string;
+  prefix?: ReactNode;
+  suffix?: ReactNode;
+  onClick?: () => void;
+  height?: number;
+}
+
+/** Shared row layout: prefix + title/subtitle + suffix, hover highlight. */
+function RowShell({
+  title,
+  subtitle,
+  prefix,
+  suffix,
+  onClick,
+  height,
+}: RowShellProps) {
+  const t = useAdwaita();
+  const { colors } = t;
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 12,
+        minHeight: height ?? 44,
+        paddingLeft: 12,
+        paddingRight: 12,
+        cursor: onClick ? "pointer" : "default",
+        hover: onClick
+          ? {
+              backgroundColor: hexToRgba(
+                colors.fg,
+                t.scheme === "dark" ? 0.06 : 0.04,
+              ),
+            }
+          : undefined,
+      }}
+    >
+      {prefix}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          minWidth: 0,
+        }}
+      >
+        <T size="body" color={colors.fg} style={{ lineHeight: 15 }}>
+          {title}
+        </T>
+        {subtitle ? (
+          <T size="caption" color={colors.dim_fg} style={{ lineHeight: 15 }}>
+            {subtitle}
+          </T>
+        ) : null}
+      </div>
+      {suffix}
+    </div>
+  );
+}
+
+/* ── ActionRow ─────────────────────────────────────────────────────────── */
+
+export interface ActionRowProps {
+  title: string;
+  subtitle?: string;
+  prefix?: IconName;
+  suffix?: IconName;
+  onClick?: () => void;
+}
+
+/** Title + subtitle with optional prefix/suffix icons. */
+export function ActionRow({
+  title,
+  subtitle,
+  prefix,
+  suffix,
+  onClick,
+}: ActionRowProps) {
+  const t = useAdwaita();
+  const { colors } = t;
+  return (
+    <RowShell
+      title={title}
+      subtitle={subtitle}
+      onClick={onClick}
+      prefix={
+        prefix ? (
+          <Icon name={prefix} size={18} color={colors.dim_fg} />
+        ) : undefined
+      }
+      suffix={
+        suffix ? (
+          <Icon name={suffix} size={18} color={colors.dim_fg} />
+        ) : undefined
+      }
+    />
+  );
+}
+
+/* ── EntryRow ──────────────────────────────────────────────────────────── */
+
+export interface EntryRowProps {
+  title: string;
+  value?: string;
+  placeholder?: string;
+  onChange?: (value: string) => void;
+}
+
+/** A row with an inline text entry on the right. */
+export function EntryRow({
+  title,
+  value,
+  placeholder,
+  onChange,
+}: EntryRowProps) {
+  return (
+    <RowShell
+      title={title}
+      suffix={
+        <Entry
+          value={value}
+          placeholder={placeholder}
+          onChange={onChange}
+          style={{
+            width: 160,
+            flexGrow: 0,
+            minHeight: 30,
+            paddingLeft: 8,
+            paddingRight: 8,
+          }}
+        />
+      }
+    />
+  );
+}
+
+/* ── SwitchRow ─────────────────────────────────────────────────────────── */
+
+export interface SwitchRowProps {
+  title: string;
+  subtitle?: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+/** A row with a toggle switch on the right. */
+export function SwitchRow({
+  title,
+  subtitle,
+  checked,
+  onChange,
+}: SwitchRowProps) {
+  return (
+    <RowShell
+      title={title}
+      subtitle={subtitle}
+      suffix={<Switch checked={checked} onChange={onChange} />}
+    />
+  );
+}
+
+/* ── SpinRow ───────────────────────────────────────────────────────────── */
+
+export interface SpinRowProps {
+  title: string;
+  value: number;
+  min?: number;
+  max?: number;
+  step?: number;
+  onChange: (value: number) => void;
+}
+
+/** A numeric stepper row (− value +). */
+export function SpinRow({
+  title,
+  value,
+  min = 0,
+  max = 99,
+  step = 1,
+  onChange,
+}: SpinRowProps) {
+  const t = useAdwaita();
+  const { colors } = t;
+  const stepBtn = (dir: -1 | 1, disabled: boolean) => (
+    <div
+      onClick={
+        disabled
+          ? undefined
+          : () => onChange(Math.min(max, Math.max(min, value + dir * step)))
+      }
+      style={{
+        width: 28,
+        height: 28,
+        borderRadius: 8,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: colors.button_bg,
+        cursor: disabled ? "default" : "pointer",
+        opacity: disabled ? 0.4 : 1,
+        hover: disabled ? undefined : { backgroundColor: colors.button_hover },
+      }}
+    >
+      <Icon name={dir === 1 ? "plus" : "minus"} size={16} color={colors.fg} />
+    </div>
+  );
+  return (
+    <RowShell
+      title={title}
+      suffix={
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          {stepBtn(-1, value <= min)}
+          <T
+            size="body"
+            weight={600}
+            color={colors.fg}
+            style={{ minWidth: 20, textAlign: "center" }}
+          >
+            {String(value)}
+          </T>
+          {stepBtn(1, value >= max)}
+        </div>
+      }
+    />
+  );
+}
+
+/* ── ComboRow ──────────────────────────────────────────────────────────── */
+
+export interface ComboRowProps {
+  title: string;
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+}
+
+/** A dropdown row: a pill showing the current value + chevron (click cycles). */
+export function ComboRow({ title, value, options, onChange }: ComboRowProps) {
+  const t = useAdwaita();
+  const { colors } = t;
+  const cycle = () => {
+    const i = options.indexOf(value);
+    const next = options[(i + 1) % options.length];
+    onChange(next);
+  };
+  return (
+    <RowShell
+      title={title}
+      suffix={
+        <div
+          onClick={cycle}
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            minHeight: 30,
+            paddingLeft: 10,
+            paddingRight: 8,
+            borderRadius: 8,
+            backgroundColor: colors.button_bg,
+            cursor: "pointer",
+            hover: { backgroundColor: colors.button_hover },
+          }}
+        >
+          <T size="body" color={colors.fg}>
+            {value}
+          </T>
+          <Icon name="chevronDown" size={16} color={colors.dim_fg} />
+        </div>
+      }
+    />
+  );
+}
+
+/* ── ExpanderRow ───────────────────────────────────────────────────────── */
+
+export interface ExpanderRowProps {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+}
+
+/** A collapsible row: chevron toggles the revealed content below. */
+export function ExpanderRow({ title, subtitle, children }: ExpanderRowProps) {
+  const t = useAdwaita();
+  const { colors } = t;
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <RowShell
+        title={title}
+        subtitle={subtitle}
+        onClick={() => setOpen((o) => !o)}
+        suffix={<Icon name="chevronDown" size={18} color={colors.dim_fg} />}
+      />
+      {open ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            padding: 12,
+            paddingTop: 0,
+          }}
+        >
+          {children}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/* ── ButtonRow ─────────────────────────────────────────────────────────── */
+
+export interface ButtonRowProps {
+  title: string;
+  label: string;
+  destructive?: boolean;
+  onClick?: () => void;
+}
+
+/** A button-styled row (whole row is the button), optionally destructive. */
+export function ButtonRow({
+  title,
+  label,
+  destructive,
+  onClick,
+}: ButtonRowProps) {
+  const t = useAdwaita();
+  const { colors } = t;
+  const fg = destructive ? colors.destructive : colors.accent;
+  const hoverBg = destructive ? colors.destructiveTint : colors.button_hover;
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        minHeight: 44,
+        paddingLeft: 12,
+        paddingRight: 12,
+        cursor: "pointer",
+        hover: { backgroundColor: hoverBg },
+      }}
+    >
+      <T size="body" color={colors.fg}>
+        {title}
+      </T>
+      <T size="body" weight={600} color={fg}>
+        {label}
+      </T>
+    </div>
+  );
+}

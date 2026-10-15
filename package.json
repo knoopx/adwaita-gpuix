@@ -1,0 +1,26 @@
+{
+  "name": "adwaita-gpuix",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "render:pngs": "bun scripts/render-pngs.tsx"
+  },
+  "dependencies": {
+    "@gpuix/native": "0.10.0",
+    "@gpuix/react": "0.10.0",
+    "lucide-static": "^1.57.0",
+    "react": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/react-reconciler": "0.31.0",
+    "react-dom": "^19.3.1",
+    "takumi-js": "^2.16.2",
+    "typescript": "^5.3.0"
+  }
+}
