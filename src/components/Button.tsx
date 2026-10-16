@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita, hexToRgba, shade, type AdwaitaTheme } from '../theme/adwaita'
+import { useAdwaita, hexToRgba, shade, isDarkScheme, type AdwaitaTheme } from '../theme/adwaita'
 import { T } from './common'
 import { Icon, type IconName } from './icons'
 
@@ -63,7 +63,7 @@ function resolveVariantTheme(variant: ButtonVariant, t: AdwaitaTheme): ButtonVar
         bg: 'transparent',
         fg: colors.accent,
         hoverBg: colors.accentTint,
-        activeBg: hexToRgba(colors.accent, scheme === 'dark' ? 0.3 : 0.2),
+        activeBg: hexToRgba(colors.accent, isDarkScheme(scheme) ? 0.3 : 0.2),
         border: 'transparent',
       }
     case 'icon':

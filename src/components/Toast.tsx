@@ -1,5 +1,5 @@
 import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
+import { useAdwaita, isDarkScheme } from '../theme/adwaita'
 import { T } from './common'
 import { Button } from './Button'
 import { Icon, type IconName } from './icons'
@@ -47,7 +47,7 @@ export function Toast({ message, actionLabel, onAction, type = 'default', onDism
         paddingLeft: 14,
         paddingRight: 14,
         borderRadius: 999,
-        backgroundColor: t.scheme === 'dark' ? '#565656' : '#333333',
+        backgroundColor: isDarkScheme(t.scheme) ? '#565656' : '#333333',
         ...style,
       }}
     >

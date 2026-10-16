@@ -1,6 +1,6 @@
 import { createContext, useContext, useRef, useState, type ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
+import { useAdwaita, isDarkScheme } from '../theme/adwaita'
 import { T } from './common'
 
 /* ── Types ────────────────────────────────────────────────────────────── */
@@ -131,7 +131,7 @@ export function TooltipContent({ children, side, sideOffset = 4, style }: Toolti
   const effectiveSide = side ?? ctx.side
   if (!ctx.open) return null
   const t = useAdwaita()
-  const pillBg = t.scheme === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.7)'
+  const pillBg = isDarkScheme(t.scheme) ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.7)'
   const arrowSvg =
     '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><rect x="3" y="3" width="6" height="6" rx="1" transform="rotate(45 6 6)" fill="' +
     pillBg +

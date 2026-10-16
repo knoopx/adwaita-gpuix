@@ -1,5 +1,5 @@
 import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita, hexToRgba } from '../theme/adwaita'
+import { useAdwaita, hexToRgba, isDarkScheme } from '../theme/adwaita'
 import { T } from './common'
 import { Icon, type IconName } from './icons'
 
@@ -36,7 +36,7 @@ export function ToggleGroup(props: ToggleGroupProps) {
   const t = useAdwaita()
   const { colors, radii } = t
   const { options, spacing = 2, variant = 'default', size = 'default', style } = props
-  const activeBg = t.scheme === 'dark' ? '#565656' : colors.view_bg
+  const activeBg = isDarkScheme(t.scheme) ? '#565656' : colors.view_bg
   const outline = variant === 'outline'
   const minHeight = SEG_MIN_HEIGHT[size]
 

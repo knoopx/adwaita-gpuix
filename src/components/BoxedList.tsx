@@ -1,6 +1,6 @@
 import { Children, useState, type ReactNode } from "react";
 import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba } from "../theme/adwaita";
+import { useAdwaita, hexToRgba, isDarkScheme } from "../theme/adwaita";
 import { T } from "./common";
 import { Icon, type IconName } from "./icons";
 import { Switch } from "./Switch";
@@ -80,7 +80,7 @@ function RowShell({
           ? {
               backgroundColor: hexToRgba(
                 colors.fg,
-                t.scheme === "dark" ? 0.06 : 0.04,
+                isDarkScheme(t.scheme) ? 0.06 : 0.04,
               ),
             }
           : undefined,

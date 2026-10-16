@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita, hexToRgba } from '../theme/adwaita'
+import { useAdwaita, hexToRgba, isDarkScheme } from '../theme/adwaita'
 import { T } from './common'
 import { Icon, type IconName } from './icons'
 
@@ -162,7 +162,7 @@ function TabShell({
         ...(vertical
           ? { borderRightWidth: selected ? 3 : 0, borderColor: colors.accent }
           : {}),
-        hover: { backgroundColor: hexToRgba(colors.fg, t.scheme === 'dark' ? 0.06 : 0.04) },
+        hover: { backgroundColor: hexToRgba(colors.fg, isDarkScheme(t.scheme) ? 0.06 : 0.04) },
         ...style,
       }}
     >

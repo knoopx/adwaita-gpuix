@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita, hexToRgba, type AdwaitaTheme } from '../theme/adwaita'
+import { useAdwaita, hexToRgba, isDarkScheme, type AdwaitaTheme } from '../theme/adwaita'
 import { Icon, type IconName } from './icons'
 
 export type TextSize = 'title1' | 'title2' | 'title3' | 'title4' | 'body' | 'caption'
@@ -570,7 +570,7 @@ export function Scrim({
         left: 0,
         width: '100%',
         height: '100%',
-        backgroundColor: t.scheme === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)',
+        backgroundColor: isDarkScheme(t.scheme) ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)',
         pointerEvents: 'auto',
         ...style,
       }}
