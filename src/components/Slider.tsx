@@ -33,6 +33,14 @@ const THUMB = 18
  * is correct in any layout (the old absolute-coordinate math broke anywhere
  * the slider was not at x=0).
  *
+ * All mouse handlers live on the **container** only. The track line, fill,
+ * and thumbs are each `position: 'absolute'` + filled, so each would block
+ * hits behind it by default and swallow `mousedown`/`mousemove`/`mouseUp`
+ * (the drag only worked when the pointer was over the container's bare area).
+ * Marking all of them `pointerEvents: 'none'` makes the container the sole
+ * hit target in the slider box, so it receives the whole gesture — grabbing a
+ * thumb and dragging works identically to dragging the track.
+ *
  * `orientation` swaps the axes (vertical uses `row-resize`). `defaultValue`
  * gives an uncontrolled mode. Arrow keys step the value on the focused track.
  */
@@ -134,18 +142,22 @@ export function Slider({
     ...(vertical
       ? { width: CROSS, height: trackSize }
       : { width: trackSize, height: CROSS }),
-    cursor: disabled ? 'default' : vertical ? 'row-resize' : 'pointer',
+    cursor: disabled ? 'default' : vertical ? 'row-resize' : 'grab',
     opacity: disabled ? 0.5 : 1,
     ...style,
   }
 
+  // The track line, fill, and thumbs are all positioned + filled, so each
+  // blocks hits behind it by default. Mark them all pointerEvents:'none' so
+  // every mouse event in the container falls through to the container itself
+  // (the only hit target that owns the drag handlers).
   const trackLineStyle: Partial<StyleDesc> = vertical
-    ? { position: 'absolute', left: 8, top: 0, width: 4, height: trackSize, borderRadius: 2, backgroundColor: colors.button_active }
-    : { position: 'absolute', top: 8, left: 0, width: trackSize, height: 4, borderRadius: 2, backgroundColor: colors.button_active }
+    ? { position: 'absolute', left: 8, top: 0, width: 4, height: trackSize, borderRadius: 2, backgroundColor: colors.button_active, pointerEvents: 'none' }
+    : { position: 'absolute', top: 8, left: 0, width: trackSize, height: 4, borderRadius: 2, backgroundColor: colors.button_active, pointerEvents: 'none' }
 
   const fillStyle: Partial<StyleDesc> = vertical
-    ? { position: 'absolute', left: 8, top: 0, width: 4, height: fillPct, borderRadius: 2, backgroundColor: colors.accent }
-    : { position: 'absolute', top: 8, left: 0, width: fillPct, height: 4, borderRadius: 2, backgroundColor: colors.accent }
+    ? { position: 'absolute', left: 8, top: 0, width: 4, height: fillPct, borderRadius: 2, backgroundColor: colors.accent, pointerEvents: 'none' }
+    : { position: 'absolute', top: 8, left: 0, width: fillPct, height: 4, borderRadius: 2, backgroundColor: colors.accent, pointerEvents: 'none' }
 
   const thumbStyle = (v: number): Partial<StyleDesc> => {
     const p = Math.round(pct(v))
@@ -161,7 +173,9 @@ export function Slider({
       borderWidth: 2,
       borderColor: '#ffffff',
       boxShadow: { offsetX: 0, offsetY: 1, blurRadius: 2, spreadRadius: 0, color: 'rgba(0,0,0,0.2)' },
-      cursor: disabled ? 'default' : 'grab',
+      // Never the hit target: let mousedown/mousemove/mouseup fall through to
+      // the container so the drag works when the pointer is over a thumb.
+      pointerEvents: 'none',
     }
     return vertical ? { ...base, left: 1, top: p - THUMB / 2 } : { ...base, top: 1, left: p - THUMB / 2 }
   }
