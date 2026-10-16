@@ -30,10 +30,34 @@ export function HeaderBar({ title, left, right, style }: HeaderBarProps) {
         ...style,
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, minWidth: 80 }}>
+      {/* Three equal zones (flex: 1 each) so the centre zone is truly
+          centred in the bar regardless of left/right content width. */}
+      <div
+        style={{
+          flexGrow: 1,
+          flexShrink: 1,
+          flexBasis: 0,
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          gap: 8,
+        }}
+      >
         {left}
       </div>
-      <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div
+        style={{
+          flexGrow: 1,
+          flexShrink: 1,
+          flexBasis: 0,
+          minWidth: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         {typeof title === 'string' ? (
           <T size="title3" weight={700} color={colors.fg}>
             {title}
@@ -44,16 +68,59 @@ export function HeaderBar({ title, left, right, style }: HeaderBarProps) {
       </div>
       <div
         style={{
+          flexGrow: 1,
+          flexShrink: 1,
+          flexBasis: 0,
+          minWidth: 0,
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'flex-end',
           gap: 8,
-          minWidth: 80,
         }}
       >
         {right}
       </div>
     </div>
   )
+}
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+import { Button } from './Button'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const HeaderBarShot: ComponentShot = {
+  name: 'HeaderBar',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Title" col>
+        <ShotItem label="string title">
+          <HeaderBar title="Projects" left={<Button variant="icon" icon="panel" onClick={() => {}} />} right={<Button variant="icon" icon="settings" onClick={() => {}} />} />
+        </ShotItem>
+        <ShotItem label="node title (rendered as-is)">
+          <HeaderBar title={<T size="title3" weight={700}>My node title</T>} />
+        </ShotItem>
+      </Row>
+      <Row label="Slots" col>
+        <ShotItem label="left + right slots">
+          <HeaderBar title="Projects" left={<Button variant="icon" icon="panel" onClick={() => {}} />} right={<Button variant="icon" icon="settings" onClick={() => {}} />} />
+        </ShotItem>
+        <ShotItem label="bare (no slots)">
+          <HeaderBar title="Projects" />
+        </ShotItem>
+      </Row>
+    </div>
+  ),
 }

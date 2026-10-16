@@ -184,3 +184,62 @@ export function CardAction({ children, style }: CardActionProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+import { Button } from './Button'
+import { Badge } from './Badge'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const CardShot: ComponentShot = {
+  name: 'Card',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Variants" col>
+        <ShotItem label="Card (title prop)">
+          <Card title="Simple card">
+            <T>Card body content.</T>
+          </Card>
+        </ShotItem>
+        <ShotItem label="Card (compound sub-parts + action)">
+          <Card>
+            <CardHeader>
+              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <CardTitle>Card title</CardTitle>
+                  <CardDescription>A short description of the card.</CardDescription>
+                </div>
+                <CardAction><Badge>New</Badge></CardAction>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <T>Card body content goes here.</T>
+            </CardContent>
+            <CardFooter>
+              <Button label="Action" onClick={() => {}} />
+              <Button variant="secondary" label="Details" onClick={() => {}} />
+            </CardFooter>
+          </Card>
+        </ShotItem>
+        <ShotItem label="Frame (plain surface)">
+          <Frame>
+            <div style={{ padding: 16 }}>
+              <T>Frame content.</T>
+            </div>
+          </Frame>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

@@ -422,3 +422,78 @@ function MultiLineChart({
     </ChartFrame>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ChartShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+const SINGLE_DATA: ChartDataPoint[] = [
+  { label: 'Mon', value: 12 },
+  { label: 'Tue', value: 28 },
+  { label: 'Wed', value: 18 },
+  { label: 'Thu', value: 35 },
+  { label: 'Fri', value: 22 },
+]
+
+const MULTI_DATA: ChartSeriesPoint[] = [
+  { label: 'Mon', values: [{ name: 'A', value: 12 }, { name: 'B', value: 22 }, { name: 'C', value: 8 }] },
+  { label: 'Tue', values: [{ name: 'A', value: 28 }, { name: 'B', value: 18 }, { name: 'C', value: 30 }] },
+  { label: 'Wed', values: [{ name: 'A', value: 18 }, { name: 'B', value: 32 }, { name: 'C', value: 14 }] },
+  { label: 'Thu', values: [{ name: 'A', value: 35 }, { name: 'B', value: 12 }, { name: 'C', value: 26 }] },
+  { label: 'Fri', values: [{ name: 'A', value: 22 }, { name: 'B', value: 26 }, { name: 'C', value: 18 }] },
+]
+
+export const ChartShot: ComponentShot = {
+  name: 'Chart',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Bar" col>
+        <ChartShotItem label="single series (default accent colour)">
+          <Chart data={SINGLE_DATA} type="bar" height={110} />
+        </ChartShotItem>
+        <ChartShotItem label="single series · custom color">
+          <Chart data={SINGLE_DATA} type="bar" height={110} color="#e5a50a" />
+        </ChartShotItem>
+        <ChartShotItem label="multi-series (default palette) + legend">
+          <Chart data={MULTI_DATA} type="bar" height={110} />
+          <ChartLegend
+            items={[
+              { name: 'A', color: '#3584e4' },
+              { name: 'B', color: '#2ec275' },
+              { name: 'C', color: '#e5a50a' },
+            ]}
+          />
+        </ChartShotItem>
+      </Row>
+      <Row label="Line" col>
+        <ChartShotItem label="single series (default accent colour)">
+          <Chart data={SINGLE_DATA} type="line" height={110} />
+        </ChartShotItem>
+        <ChartShotItem label="single series · custom color">
+          <Chart data={SINGLE_DATA} type="line" height={110} color="#e5a50a" />
+        </ChartShotItem>
+        <ChartShotItem label="multi-series (default palette) + legend">
+          <Chart data={MULTI_DATA} type="line" height={110} />
+          <ChartLegend
+            items={[
+              { name: 'A', color: '#3584e4' },
+              { name: 'B', color: '#2ec275' },
+              { name: 'C', color: '#e5a50a' },
+            ]}
+          />
+        </ChartShotItem>
+      </Row>
+    </div>
+  ),
+}

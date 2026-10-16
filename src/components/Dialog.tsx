@@ -207,11 +207,24 @@ export function DialogClose({ children, style }: DialogCloseProps) {
 
 /* ── Showcase ─────────────────────────────────────────────────────────── */
 
-/** Full Dialog montage for static renders / playground (closed trigger +
- *  open panel contained in a bounded stage). */
-export function DialogShowcase(): ReactNode {
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
   return (
-    <Row label="Dialog" col>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** Full Dialog shot for static renders / playground: closed trigger +
+ *  open panel variants (auto close button / custom DialogClose), each
+ *  contained in a bounded stage. */
+export function DialogShowcase(): ReactNode {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
       <Row label="Closed trigger">
         <Dialog open={false} onOpenChange={noop}>
           <DialogTrigger>
@@ -219,23 +232,52 @@ export function DialogShowcase(): ReactNode {
           </DialogTrigger>
         </Dialog>
       </Row>
-      <Row label="Open content">
-        <FloatingStage>
-          <Dialog open={true} onOpenChange={noop} contained>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Dialog title</DialogTitle>
-                <DialogDescription>A description of what this dialog is about.</DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button label="Cancel" onClick={noop} />
-                <Button variant="destructive" label="Delete" onClick={noop} />
-                <Button variant="suggested" label="Save" onClick={noop} />
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </FloatingStage>
+      <Row label="Open content" col>
+        <ShotItem label="header + title + description + footer (auto close button)">
+          <FloatingStage width={480} height={190}>
+            <Dialog open={true} onOpenChange={noop} contained>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Dialog title</DialogTitle>
+                  <DialogDescription>A description of what this dialog is about.</DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button label="Cancel" onClick={noop} />
+                  <Button variant="destructive" label="Delete" onClick={noop} />
+                  <Button variant="suggested" label="Save" onClick={noop} />
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </FloatingStage>
+        </ShotItem>
+        <ShotItem label="showCloseButton=false + custom DialogClose in the footer">
+          <FloatingStage width={480} height={190}>
+            <Dialog open={true} onOpenChange={noop} contained>
+              <DialogContent showCloseButton={false}>
+                <DialogHeader>
+                  <DialogTitle>Custom close</DialogTitle>
+                  <DialogDescription>The auto close button is disabled; the footer carries a DialogClose.</DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose>
+                    <T size="caption" color={t.colors.dim_fg}>Close</T>
+                  </DialogClose>
+                  <Button label="Cancel" onClick={noop} />
+                  <Button variant="suggested" label="Save" onClick={noop} />
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </FloatingStage>
+        </ShotItem>
       </Row>
-    </Row>
+    </div>
   )
+}
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+
+export const DialogShot: ComponentShot = {
+  name: 'Dialog',
+  el: <DialogShowcase />,
 }

@@ -196,3 +196,52 @@ export function CarouselItem({ children, width = 200, style }: CarouselItemProps
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row, T } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const CarouselShot: ComponentShot = {
+  name: 'Carousel',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Default window (visible=3, 5 items)" col>
+        <ShotItem label="start — prev disabled, next enabled">
+          <Carousel visible={3}>
+            <CarouselItem><T>Card 1</T></CarouselItem>
+            <CarouselItem><T>Card 2</T></CarouselItem>
+            <CarouselItem><T>Card 3</T></CarouselItem>
+            <CarouselItem><T>Card 4</T></CarouselItem>
+            <CarouselItem><T>Card 5</T></CarouselItem>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </ShotItem>
+      </Row>
+      <Row label="Custom window (visible=2, item width 160)" col>
+        <ShotItem label="narrower window">
+          <Carousel visible={2}>
+            <CarouselItem width={160}><T>Card 1</T></CarouselItem>
+            <CarouselItem width={160}><T>Card 2</T></CarouselItem>
+            <CarouselItem width={160}><T>Card 3</T></CarouselItem>
+            <CarouselItem width={160}><T>Card 4</T></CarouselItem>
+            <CarouselItem width={160}><T>Card 5</T></CarouselItem>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

@@ -47,3 +47,40 @@ export function StatusPage({ icon = 'sparkles', title, description, children, st
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+import { Spinner } from './Spinner'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const StatusPageShot: ComponentShot = {
+  name: 'StatusPage',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Variants" col>
+        <ShotItem label="icon + title + description">
+          <StatusPage icon="sparkles" title="Nothing here yet" description="Your workspace is empty. Create your first item to get started." />
+        </ShotItem>
+        <ShotItem label="with content (children)">
+          <StatusPage icon="clock" title="Loading" description="Please wait while we fetch your data…">
+            <Spinner size={32} />
+          </StatusPage>
+        </ShotItem>
+        <ShotItem label="title only">
+          <StatusPage icon="search" title="No results" />
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

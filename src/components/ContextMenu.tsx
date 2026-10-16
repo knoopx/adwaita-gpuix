@@ -1,5 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import type { StyleDesc, EventPayload } from '@gpuix/react'
+import { useAdwaita } from '../theme/adwaita'
 import { FloatingPanel, MenuRow, MenuIndicator, MenuShortcut, MenuLabel, MenuSeparator, MenuGroup, MenuRadioGroupShell, MenuSub, MenuSubTrigger, MenuSubContent, makeMenuRadioItem } from './common'
 import { type IconName } from './icons'
 
@@ -224,4 +225,84 @@ export function ContextMenuSubTrigger({ label, icon, style }: ContextMenuSubTrig
 /** The anchored panel of a sub-menu, shown only while the sub is open. */
 export function ContextMenuSubContent({ children, style }: ContextMenuSubContentProps) {
   return <MenuSubContent style={style}>{children}</MenuSubContent>
+}
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { T, Row, FloatingStage } from './common'
+import { buildTheme } from '../theme/adwaita'
+
+/** A captioned shot item: a small dim caption above the item. */
+function CtxMenuShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** The full open context menu: every row kind the API exposes
+ *  (label, items, disabled, checkbox checked/unchecked, radio group, sub-trigger). */
+function CtxMenuFull() {
+  return (
+    <ContextMenu open={true} onOpenChange={() => {}}>
+      <ContextMenuContent>
+        <ContextMenuLabel>Selection</ContextMenuLabel>
+        <ContextMenuItem label="Copy" icon="list" />
+        <ContextMenuItem label="Paste" icon="plus" />
+        <ContextMenuItem label="Delete" icon="trash" disabled />
+        <ContextMenuSeparator />
+        <ContextMenuGroup>
+          <ContextMenuItem label="Cut" icon="minus" />
+        </ContextMenuGroup>
+        <ContextMenuCheckboxItem label="Show hidden" checked={true} onCheckedChange={() => {}} />
+        <ContextMenuCheckboxItem label="Wrap lines" checked={false} onCheckedChange={() => {}} />
+        <ContextMenuRadioGroup defaultValue="a">
+          <ContextMenuRadioItem label="Small" value="a" />
+          <ContextMenuRadioItem label="Large" value="b" />
+        </ContextMenuRadioGroup>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger label="Submenu" icon="chevronRight" />
+          <ContextMenuSubContent>
+            <ContextMenuItem label="Sub item" />
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+      </ContextMenuContent>
+    </ContextMenu>
+  )
+}
+
+export const ContextMenuShot: ComponentShot = {
+  name: 'ContextMenu',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Trigger area (closed — right-click to open)">
+        <ContextMenu open={false} onOpenChange={() => {}}>
+          <ContextMenuTrigger>
+            <div
+              style={{
+                padding: 16,
+                borderRadius: 8,
+                borderColor: buildTheme('dark', 'blue').colors.border,
+                borderWidth: 1,
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <T>Right-click me</T>
+            </div>
+          </ContextMenuTrigger>
+        </ContextMenu>
+      </Row>
+      <Row label="Open · all row kinds" col>
+        <FloatingStage width={480} height={300}>
+          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
+            <CtxMenuFull />
+          </div>
+        </FloatingStage>
+      </Row>
+    </div>
+  ),
 }

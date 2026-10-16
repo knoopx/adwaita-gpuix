@@ -334,3 +334,77 @@ export function Tabs({
 
 /** Alias of Tabs (tab strip / tab bar are used interchangeably). */
 export const TabBar = Tabs
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const TabsShot: ComponentShot = {
+  name: 'Tabs',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Data-driven (horizontal)" col>
+        <ShotItem label="selected + closable + icon">
+          <Tabs
+            items={[
+              { id: 'a', label: 'General', icon: 'settings' },
+              { id: 'b', label: 'Files', icon: 'list', closable: true },
+              { id: 'c', label: 'Advanced', icon: 'grid' },
+            ]}
+            value="a"
+            onSelect={() => {}}
+            onClose={() => {}}
+          />
+        </ShotItem>
+        <ShotItem label="uncontrolled (defaultValue)">
+          <Tabs
+            items={[{ id: 'x', label: 'One' }, { id: 'y', label: 'Two' }]}
+            defaultValue="y"
+            onSelect={() => {}}
+          />
+        </ShotItem>
+      </Row>
+      <Row label="Orientation: vertical" col>
+        <ShotItem label="right-edge indicator">
+          <Tabs
+            orientation="vertical"
+            items={[
+              { id: 'a', label: 'General' },
+              { id: 'b', label: 'Files' },
+              { id: 'c', label: 'Advanced' },
+            ]}
+            value="b"
+            onSelect={() => {}}
+          />
+        </ShotItem>
+      </Row>
+      <Row label="Compound (TabsList / TabsTrigger / TabsContent)" col>
+        <ShotItem label="controlled value">
+          <Tabs value="a" onSelect={() => {}}>
+            <TabsList>
+              <TabsTrigger value="a">Account</TabsTrigger>
+              <TabsTrigger value="b">Password</TabsTrigger>
+            </TabsList>
+            <TabsContent value="a">
+              <T>Account panel content.</T>
+            </TabsContent>
+            <TabsContent value="b">
+              <T>Password panel content.</T>
+            </TabsContent>
+          </Tabs>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

@@ -106,3 +106,51 @@ export function RadioGroupItem({ value, disabled, label, style }: RadioGroupItem
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const RadioGroupShot: ComponentShot = {
+  name: 'RadioGroup',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label={'Selection (controlled, value="b")'}>
+        <ShotItem label="group">
+          <RadioGroup value="b" onValueChange={() => {}}>
+            <RadioGroupItem value="a" label="Option A" />
+            <RadioGroupItem value="b" label="Option B (selected)" />
+            <RadioGroupItem value="c" label="Option C" />
+          </RadioGroup>
+        </ShotItem>
+      </Row>
+      <Row label="Disabled item">
+        <ShotItem label="group">
+          <RadioGroup value="a" onValueChange={() => {}}>
+            <RadioGroupItem value="a" label="Selected" />
+            <RadioGroupItem value="b" label="Disabled" disabled />
+          </RadioGroup>
+        </ShotItem>
+      </Row>
+      <Row label={'Uncontrolled (defaultValue="c")'}>
+        <ShotItem label="group">
+          <RadioGroup defaultValue="c" onValueChange={() => {}}>
+            <RadioGroupItem value="a" label="Option A" />
+            <RadioGroupItem value="c" label="Option C (default selected)" />
+          </RadioGroup>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

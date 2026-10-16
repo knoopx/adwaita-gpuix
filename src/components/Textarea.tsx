@@ -40,3 +40,41 @@ export function Textarea({ value, onChange, placeholder, rows = 3, disabled, aut
     />
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import type { ReactNode } from 'react'
+import { Row, T } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const TextareaShot: ComponentShot = {
+  name: 'Textarea',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="States" col>
+        <ShotItem label="placeholder">
+          <Textarea placeholder="Type a message…" />
+        </ShotItem>
+        <ShotItem label="with value (rows=3)">
+          <Textarea value="A multi-line text area with some content." rows={3} />
+        </ShotItem>
+        <ShotItem label="taller (rows=5)">
+          <Textarea value="A taller text area driven by the rows prop." rows={5} />
+        </ShotItem>
+        <ShotItem label="disabled">
+          <Textarea value="Read-only content." disabled />
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

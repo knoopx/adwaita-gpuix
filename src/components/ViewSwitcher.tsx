@@ -68,3 +68,52 @@ export function ViewSwitcher({ items, value, onChange, showLabels = true, style 
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ReactNode } from 'react'
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const ViewSwitcherShot: ComponentShot = {
+  name: 'ViewSwitcher',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Variants">
+        <ShotItem label="labeled (default, value=grid)">
+          <ViewSwitcher
+            items={[
+              { id: 'l', label: 'List', icon: 'list' },
+              { id: 'g', label: 'Grid', icon: 'grid' },
+              { id: 'p', label: 'Panel', icon: 'panel' },
+            ]}
+            value="g"
+            onChange={() => {}}
+          />
+        </ShotItem>
+        <ShotItem label="icon-only (showLabels=false)">
+          <ViewSwitcher
+            items={[
+              { id: 'l', label: 'List', icon: 'list' },
+              { id: 'g', label: 'Grid', icon: 'grid' },
+              { id: 'p', label: 'Panel', icon: 'panel' },
+            ]}
+            value="l"
+            showLabels={false}
+            onChange={() => {}}
+          />
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

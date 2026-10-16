@@ -107,3 +107,57 @@ export function InlineCode({ children, style }: InlineCodeProps) {
     </CodeChip>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const TypographyShot: ComponentShot = {
+  name: 'Typography',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Headings (levels 1–6)" col>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <Heading level={1}>Heading 1</Heading>
+          <Heading level={2}>Heading 2</Heading>
+          <Heading level={3}>Heading 3</Heading>
+          <Heading level={4}>Heading 4</Heading>
+          <Heading level={5}>Heading 5</Heading>
+          <Heading level={6}>Heading 6</Heading>
+        </div>
+      </Row>
+      <Row label="Body" col>
+        <ShotItem label="paragraph">
+          <Paragraph>A paragraph of body text.</Paragraph>
+        </ShotItem>
+        <ShotItem label="paragraph (dim)">
+          <Paragraph dim>A dim paragraph of body text.</Paragraph>
+        </ShotItem>
+        <ShotItem label="small">
+          <Small>A small caption-sized line of text.</Small>
+        </ShotItem>
+      </Row>
+      <Row label="Quote & inline code" col>
+        <ShotItem label="blockquote">
+          <Blockquote>A blockquote of wise words, quoted from the source.</Blockquote>
+        </ShotItem>
+        <ShotItem label="inline code">
+          <Paragraph>
+            A paragraph with <InlineCode>inline code</InlineCode> in the middle.
+          </Paragraph>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

@@ -191,3 +191,59 @@ export function AvatarGroupCount({ count, size = 32, style }: AvatarGroupCountPr
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import { AVATAR_IMG, type ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const AvatarShot: ComponentShot = {
+  name: 'Avatar',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Sizes">
+        <ShotItem label="24"><Avatar name="Ada Lovelace" size={24} /></ShotItem>
+        <ShotItem label="32"><Avatar name="Grace Hopper" size={32} /></ShotItem>
+        <ShotItem label="48"><Avatar name="Alan Turing" size={48} /></ShotItem>
+        <ShotItem label="64"><Avatar name="Katherine J." size={64} /></ShotItem>
+      </Row>
+      <Row label="Photo + badge" col>
+        <ShotItem label="src (photo)">
+          <Avatar name="Photo User" size={48} src={AVATAR_IMG} />
+        </ShotItem>
+        <ShotItem label="with badge (default)">
+          <div style={{ position: 'relative', width: 48, height: 48 }}>
+            <Avatar name="Ada Lovelace" size={48} />
+            <AvatarBadge />
+          </div>
+        </ShotItem>
+        <ShotItem label="with badge (custom colour)">
+          <div style={{ position: 'relative', width: 48, height: 48 }}>
+            <Avatar name="Grace Hopper" size={48} />
+            <AvatarBadge color="#2ec27e" size={14} />
+          </div>
+        </ShotItem>
+      </Row>
+      <Row label="Group" col>
+        <ShotItem label="overlap stack + count">
+          <AvatarGroup size={32} overlap={8}>
+            <Avatar name="Ada Lovelace" size={32} />
+            <Avatar name="Alan Turing" size={32} />
+            <Avatar name="Grace Hopper" size={32} />
+            <AvatarGroupCount count={4} size={32} />
+          </AvatarGroup>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

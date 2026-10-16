@@ -113,3 +113,47 @@ export function NativeSelect({ value, options, groups, onChange, style }: Native
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import { LEVELS, type ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const NativeSelectShot: ComponentShot = {
+  name: 'NativeSelect',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="States" col>
+        <ShotItem label="selected (Medium)">
+          <NativeSelect value="medium" options={LEVELS} onChange={() => {}} />
+        </ShotItem>
+        <ShotItem label="unselected (placeholder)">
+          <NativeSelect value="" options={LEVELS} onChange={() => {}} />
+        </ShotItem>
+      </Row>
+      <Row label="Grouped options" col>
+        <ShotItem label="groups">
+          <NativeSelect
+            value="medium"
+            options={LEVELS}
+            groups={[
+              { label: 'Performance', options: LEVELS.slice(0, 2) },
+              { label: 'Quality', options: LEVELS.slice(2) },
+            ]}
+            onChange={() => {}}
+          />
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

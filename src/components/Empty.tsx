@@ -135,3 +135,58 @@ export function EmptyAction({ children, style }: EmptyActionProps) {
     <div style={{ display: 'flex', flexDirection: 'row', gap: 8, ...style }}>{children}</div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { buildTheme } from '../theme/adwaita'
+import { Row } from './common'
+import { Button } from './Button'
+import { Icon } from './icons'
+
+/** A dim sparkles icon (the empty-state media). */
+function SparklesIcon() {
+  return <Icon name="sparkles" size={24} color={buildTheme('dark', 'blue').colors.dim_fg} />
+}
+
+export const EmptyShot: ComponentShot = {
+  name: 'Empty',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Full (media + title + description + content + action)" col>
+        <Empty>
+          <EmptyMedia>
+            <SparklesIcon />
+          </EmptyMedia>
+          <EmptyTitle>No items</EmptyTitle>
+          <EmptyDescription>You have nothing to show yet.</EmptyDescription>
+          <EmptyContent>
+            <EmptyAction>
+              <Button label="Add item" onClick={() => {}} />
+              <Button variant="suggested" label="Import" onClick={() => {}} />
+            </EmptyAction>
+          </EmptyContent>
+        </Empty>
+      </Row>
+      <Row label="Header + action (grouped)" col>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia>
+              <SparklesIcon />
+            </EmptyMedia>
+            <EmptyTitle>Nothing here</EmptyTitle>
+            <EmptyDescription>Grouped header keeps media, title and description centred.</EmptyDescription>
+          </EmptyHeader>
+          <EmptyAction>
+            <Button label="Primary" onClick={() => {}} />
+            <Button variant="suggested" label="Secondary" onClick={() => {}} />
+          </EmptyAction>
+        </Empty>
+      </Row>
+      <Row label="Minimal (title only)" col>
+        <Empty>
+          <EmptyTitle>Empty</EmptyTitle>
+        </Empty>
+      </Row>
+    </div>
+  ),
+}

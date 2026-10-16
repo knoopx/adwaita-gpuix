@@ -76,3 +76,42 @@ export function Toast({ message, actionLabel, onAction, type = 'default', onDism
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import type { ReactNode } from 'react'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const ToastShot: ComponentShot = {
+  name: 'Toast',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Types" col>
+        <ShotItem label="default (no icon)"><Toast message="File saved" /></ShotItem>
+        <ShotItem label="success"><Toast message="File saved" type="success" /></ShotItem>
+        <ShotItem label="info"><Toast message="New message from Ada" type="info" /></ShotItem>
+        <ShotItem label="warning"><Toast message="Disk almost full" type="warning" /></ShotItem>
+        <ShotItem label="error"><Toast message="Upload failed" type="error" /></ShotItem>
+        <ShotItem label="loading"><Toast message="Uploading…" type="loading" /></ShotItem>
+      </Row>
+      <Row label="Action + dismiss" col>
+        <ShotItem label="with action"><Toast message="File deleted" actionLabel="Undo" onAction={() => {}} /></ShotItem>
+        <ShotItem label="with dismiss"><Toast message="Copied to clipboard" onDismiss={() => {}} /></ShotItem>
+        <ShotItem label="full (type + action + dismiss)">
+          <Toast message="File saved" type="success" actionLabel="Undo" onAction={() => {}} onDismiss={() => {}} />
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

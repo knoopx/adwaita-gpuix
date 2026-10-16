@@ -1,5 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
+import { useAdwaita } from '../theme/adwaita'
 import { FloatingPanel } from './common'
 
 /* ── Types ────────────────────────────────────────────────────────────── */
@@ -66,4 +67,96 @@ export function HoverCardContent({ children, side = 'bottom', sideOffset = 8, st
       {children}
     </FloatingPanel>
   )
+}
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { T, Row, FloatingStage } from './common'
+import { Button } from './Button'
+import { Icon } from './icons'
+
+/** A captioned shot item: a small dim caption above the item. */
+function HoverCardShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** A compact open hover card: trigger button + anchored content on a side. */
+function SideHoverCard({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'; text: string }) {
+  return (
+    <HoverCard open={true} onOpenChange={() => {}}>
+      <HoverCardTrigger>
+        <Button label={side} onClick={() => {}} />
+      </HoverCardTrigger>
+      <HoverCardContent side={side}>
+        <T size="caption">{text}</T>
+      </HoverCardContent>
+    </HoverCard>
+  )
+}
+
+/** The rich hover-card body (icon + title + text). */
+function HoverCardRichBody() {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+      <Icon name="user" size={20} color={t.colors.dim_fg} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <T size="body" weight={600}>Ada Lovelace</T>
+        <T size="caption" color={t.colors.dim_fg}>Hover card with icon + title + text.</T>
+      </div>
+    </div>
+  )
+}
+
+export const HoverCardShot: ComponentShot = {
+  name: 'HoverCard',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Closed trigger">
+        <HoverCard open={false} onOpenChange={() => {}}>
+          <HoverCardTrigger>
+            <Button label="Hover" onClick={() => {}} />
+          </HoverCardTrigger>
+        </HoverCard>
+      </Row>
+      <Row label="Open · sides (side prop, anchored in a stage)" col>
+        <FloatingStage width={480} height={120}>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: 16, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <HoverCardShotItem label="side=top">
+              <SideHoverCard side="top" text="Above the trigger" />
+            </HoverCardShotItem>
+            <HoverCardShotItem label="side=right">
+              <SideHoverCard side="right" text="Right of the trigger" />
+            </HoverCardShotItem>
+            <HoverCardShotItem label="side=bottom">
+              <SideHoverCard side="bottom" text="Below the trigger" />
+            </HoverCardShotItem>
+            <HoverCardShotItem label="side=left">
+              <SideHoverCard side="left" text="Left of the trigger" />
+            </HoverCardShotItem>
+          </div>
+        </FloatingStage>
+      </Row>
+      <Row label="Open · rich content" col>
+        <FloatingStage width={480} height={140}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <HoverCard open={true} onOpenChange={() => {}}>
+              <HoverCardTrigger>
+                <Button label="Hover card" onClick={() => {}} />
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <HoverCardRichBody />
+              </HoverCardContent>
+            </HoverCard>
+          </div>
+        </FloatingStage>
+      </Row>
+    </div>
+  ),
 }

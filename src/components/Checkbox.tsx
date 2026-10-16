@@ -95,3 +95,43 @@ export function Checkbox({ checked = false, onCheckedChange, disabled, label, st
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import type { ReactNode } from 'react'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const CheckboxShot: ComponentShot = {
+  name: 'Checkbox',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Checked states">
+        <ShotItem label="unchecked"><Checkbox checked={false} onCheckedChange={() => {}} /></ShotItem>
+        <ShotItem label="checked"><Checkbox checked onCheckedChange={() => {}} /></ShotItem>
+        <ShotItem label="indeterminate"><Checkbox checked="indeterminate" onCheckedChange={() => {}} /></ShotItem>
+      </Row>
+      <Row label="Disabled">
+        <ShotItem label="disabled (unchecked)"><Checkbox checked={false} onCheckedChange={() => {}} disabled /></ShotItem>
+        <ShotItem label="disabled (checked)"><Checkbox checked onCheckedChange={() => {}} disabled /></ShotItem>
+        <ShotItem label="disabled (indeterminate)"><Checkbox checked="indeterminate" onCheckedChange={() => {}} disabled /></ShotItem>
+      </Row>
+      <Row label="With label">
+        <ShotItem label="unchecked"><Checkbox checked={false} onCheckedChange={() => {}} label="Unchecked" /></ShotItem>
+        <ShotItem label="checked"><Checkbox checked onCheckedChange={() => {}} label="Checked" /></ShotItem>
+        <ShotItem label="indeterminate"><Checkbox checked="indeterminate" onCheckedChange={() => {}} label="Indeterminate" /></ShotItem>
+        <ShotItem label="disabled"><Checkbox checked onCheckedChange={() => {}} disabled label="Disabled" /></ShotItem>
+      </Row>
+    </div>
+  ),
+}

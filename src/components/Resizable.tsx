@@ -252,3 +252,82 @@ export function Resizable({ children, style, initialLeftWidth = 300 }: Resizable
     </ResizablePanelGroup>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row, T } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** A tinted pane body (theme colour needs a hook, so it is a component). */
+function Pane({ label, height = 64 }: { label: string; height?: number }) {
+  const t = useAdwaita()
+  return (
+    <div
+      style={{
+        width: '100%',
+        height,
+        backgroundColor: t.colors.accentTint,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <T>{label}</T>
+    </div>
+  )
+}
+
+export const ResizableShot: ComponentShot = {
+  name: 'Resizable',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Horizontal group (3 panels + 2 handles)" col>
+        <ShotItem label="drag the handles">
+          <ResizablePanelGroup orientation="horizontal">
+            <ResizablePanel defaultSize={180} min={80} max={300}>
+              <Pane label="Left" />
+            </ResizablePanel>
+            <ResizableHandle panel={0} />
+            <ResizablePanel defaultSize={140} min={60} max={240}>
+              <Pane label="Middle" />
+            </ResizablePanel>
+            <ResizableHandle panel={1} />
+            <ResizablePanel>
+              <Pane label="Right (flexible)" />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </ShotItem>
+      </Row>
+      <Row label="Vertical group (2 panels + 1 handle)" col>
+        <ShotItem label="row-resize handles">
+          <ResizablePanelGroup orientation="vertical">
+            <ResizablePanel defaultSize={56} min={32} max={120}>
+              <Pane label="Top" height={48} />
+            </ResizablePanel>
+            <ResizableHandle panel={0} />
+            <ResizablePanel defaultSize={56} min={32} max={120}>
+              <Pane label="Bottom" height={48} />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </ShotItem>
+      </Row>
+      <Row label="Legacy Resizable (initialLeftWidth=200)" col>
+        <ShotItem label="left pane + flexible right pane">
+          <Resizable initialLeftWidth={200}>
+            <Pane label="Left pane" height={96} />
+          </Resizable>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

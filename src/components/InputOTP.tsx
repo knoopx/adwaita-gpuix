@@ -139,3 +139,59 @@ export function InputOTPSeparator({ style }: InputOTPSeparatorProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const InputOTPShot: ComponentShot = {
+  name: 'InputOTP',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="States" col>
+        <ShotItem label="empty (length 4)">
+          <InputOTP length={4} value="" onChange={() => {}} />
+        </ShotItem>
+        <ShotItem label="partially filled (accent caret slot)">
+          <InputOTP length={4} value="25" onChange={() => {}} />
+        </ShotItem>
+        <ShotItem label="complete (onComplete fired)">
+          <InputOTP length={4} value="2580" onChange={() => {}} onComplete={() => {}} />
+        </ShotItem>
+        <ShotItem label="disabled">
+          <InputOTP length={4} value="12" onChange={() => {}} disabled />
+        </ShotItem>
+      </Row>
+      <Row label="Slot states">
+        <ShotItem label="empty"><InputOTPSlot index={0} /></ShotItem>
+        <ShotItem label="filled"><InputOTPSlot index={1} char="2" filled /></ShotItem>
+        <ShotItem label="active (caret)"><InputOTPSlot index={2} active /></ShotItem>
+        <ShotItem label="disabled"><InputOTPSlot index={3} char="9" filled disabled /></ShotItem>
+      </Row>
+      <Row label="Grouped (two groups + separator)">
+        <ShotItem label="grouped">
+          <InputOTPGroup>
+            <InputOTPSlot index={0} char="2" filled />
+            <InputOTPSlot index={1} char="5" filled />
+            <InputOTPSlot index={2} char="8" filled />
+            <InputOTPSeparator />
+            <InputOTPSlot index={3} char="0" filled />
+            <InputOTPSlot index={4} active />
+            <InputOTPSlot index={5} />
+          </InputOTPGroup>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

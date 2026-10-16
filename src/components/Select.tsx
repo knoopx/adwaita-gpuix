@@ -204,3 +204,163 @@ export function SelectSeparator({ style }: SelectSeparatorProps) {
     />
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import { LEVELS, type ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/**
+ * A left-aligned fixed-width stage that contains one open Select. In static
+ * renders the anchored `<SelectContent>` panel flows beside its trigger (it
+ * cannot overlap it), so a bounded 240px wrapper keeps the trigger + panel
+ * adjacent and fully inside the 560px shot canvas.
+ */
+function SelectStage({ width = 240, children }: { width?: number; children: ReactNode }) {
+  return <div style={{ width }}>{children}</div>
+}
+
+/** A theme-coloured `SelectValue` label (GPUI text does not inherit colour). */
+function ShotSelectValue({ text, dim = false }: { text: string; dim?: boolean }) {
+  const t = useAdwaita()
+  return (
+    <SelectValue>
+      <T size="body" color={dim ? t.colors.dim_fg : t.colors.fg}>
+        {text}
+      </T>
+    </SelectValue>
+  )
+}
+
+/** A theme-coloured `SelectValue` placeholder (dim, like an unselected field). */
+function ShotSelectValuePlaceholder() {
+  const t = useAdwaita()
+  return <SelectValue placeholder={<T size="body" color={t.colors.dim_fg}>Select…</T>} />
+}
+
+export const SelectShot: ComponentShot = {
+  name: 'Select',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Trigger (sizes + states)">
+        <ShotItem label="default (34px)">
+          <Select value="medium" items={LEVELS} onValueChange={() => {}}>
+            <SelectTrigger>
+              <ShotSelectValue text="Medium" />
+            </SelectTrigger>
+          </Select>
+        </ShotItem>
+        <ShotItem label="sm (28px)">
+          <Select value="high" items={LEVELS} onValueChange={() => {}}>
+            <SelectTrigger size="sm">
+              <ShotSelectValue text="High" />
+            </SelectTrigger>
+          </Select>
+        </ShotItem>
+        <ShotItem label="placeholder">
+          <Select items={LEVELS} onValueChange={() => {}}>
+            <SelectTrigger>
+              <ShotSelectValuePlaceholder />
+            </SelectTrigger>
+          </Select>
+        </ShotItem>
+        <ShotItem label="disabled">
+          <Select value="low" items={LEVELS} disabled onValueChange={() => {}}>
+            <SelectTrigger disabled>
+              <ShotSelectValue text="Low" dim />
+            </SelectTrigger>
+          </Select>
+        </ShotItem>
+      </Row>
+      <Row label="Open dropdown" col>
+        <ShotItem label="groups + separator + disabled item">
+          <SelectStage>
+            <Select open value="medium" items={LEVELS} onValueChange={() => {}}>
+              <SelectTrigger>
+                <ShotSelectValue text="Medium" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Fruits</SelectLabel>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                </SelectGroup>
+                <SelectSeparator />
+                <SelectGroup>
+                  <SelectLabel>More</SelectLabel>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="off" disabled>Disabled</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </SelectStage>
+        </ShotItem>
+        <ShotItem label="virtual list (virtual-list rows)">
+          <SelectStage>
+            <Select open value="medium" items={LEVELS} onValueChange={() => {}}>
+              <SelectTrigger>
+                <ShotSelectValue text="Medium" />
+              </SelectTrigger>
+              <SelectContent virtual>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+              </SelectContent>
+            </Select>
+          </SelectStage>
+        </ShotItem>
+      </Row>
+      <Row label="Content sides (side prop)" col>
+        <ShotItem label="side=top">
+          <SelectStage>
+            <Select open value="low" items={LEVELS} onValueChange={() => {}}>
+              <SelectTrigger>
+                <ShotSelectValue text="Low" />
+              </SelectTrigger>
+              <SelectContent side="top">
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+              </SelectContent>
+            </Select>
+          </SelectStage>
+        </ShotItem>
+        <ShotItem label="side=right">
+          <SelectStage>
+            <Select open value="low" items={LEVELS} onValueChange={() => {}}>
+              <SelectTrigger>
+                <ShotSelectValue text="Low" />
+              </SelectTrigger>
+              <SelectContent side="right">
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+              </SelectContent>
+            </Select>
+          </SelectStage>
+        </ShotItem>
+        <ShotItem label="side=left">
+          <SelectStage>
+            <Select open value="low" items={LEVELS} onValueChange={() => {}}>
+              <SelectTrigger>
+                <ShotSelectValue text="Low" />
+              </SelectTrigger>
+              <SelectContent side="left">
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+              </SelectContent>
+            </Select>
+          </SelectStage>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

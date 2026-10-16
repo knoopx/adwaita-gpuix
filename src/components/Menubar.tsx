@@ -230,3 +230,77 @@ export function MenubarSubContent({ children, style }: MenubarSubContentProps) {
 export function MenubarShortcut({ children, style }: MenubarShortcutProps) {
   return <MenuShortcut style={style}>{children}</MenuShortcut>
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A bordered card frame for the standalone content block. */
+function MenubarContentFrame({ children }: { children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        padding: 4,
+        borderRadius: t.radii.card,
+        borderWidth: 1,
+        borderColor: t.colors.border,
+        backgroundColor: t.colors.view_bg,
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+export const MenubarShot: ComponentShot = {
+  name: 'Menubar',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Bar (popdowns closed — open state is internal)">
+        <Menubar>
+          <MenubarMenu label="File">
+            <MenubarContent>
+              <MenubarItem label="New file" icon="plus" shortcut="Ctrl+N" />
+            </MenubarContent>
+          </MenubarMenu>
+          <MenubarTrigger label="Edit">
+            <MenubarContent>
+              <MenubarItem label="Cut" icon="minus" />
+            </MenubarContent>
+          </MenubarTrigger>
+          <MenubarTrigger label="View">
+            <MenubarContent>
+              <MenubarItem label="Zoom in" icon="plus" />
+            </MenubarContent>
+          </MenubarTrigger>
+        </Menubar>
+      </Row>
+      <Row label="Content · item variants (static block)" col>
+        <MenubarContentFrame>
+          <MenubarContent>
+            <MenubarLabel>Editing</MenubarLabel>
+            <MenubarItem label="Cut" icon="minus" shortcut="Ctrl+X" />
+            <MenubarItem label="Copy" icon="plus" />
+            <MenubarItem label="Indented row" icon="list" inset />
+            <MenubarItem label="Delete" icon="trash" variant="destructive" />
+            <MenubarSeparator />
+            <MenubarCheckboxItem label="Show hidden" checked={true} onCheckedChange={() => {}} />
+            <MenubarRadioGroup defaultValue="dark">
+              <MenubarRadioItem label="Light theme" value="light" />
+              <MenubarRadioItem label="Dark theme" value="dark" />
+            </MenubarRadioGroup>
+            <MenubarSub>
+              <MenubarSubTrigger label="Submenu" icon="chevronRight" />
+              <MenubarSubContent>
+                <MenubarItem label="Sub item" />
+              </MenubarSubContent>
+            </MenubarSub>
+          </MenubarContent>
+        </MenubarContentFrame>
+      </Row>
+    </div>
+  ),
+}

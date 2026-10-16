@@ -85,3 +85,46 @@ export function KbdGroup({ children, style }: KbdGroupProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const KbdShot: ComponentShot = {
+  name: 'Kbd',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Single key">
+        <ShotItem label="⌘"><Kbd>⌘</Kbd></ShotItem>
+        <ShotItem label="K"><Kbd>K</Kbd></ShotItem>
+        <ShotItem label="Enter"><Kbd>Enter</Kbd></ShotItem>
+      </Row>
+      <Row label="Groups" col>
+        <ShotItem label="two-key combo (KbdGroup)">
+          <KbdGroup>
+            <Kbd>⌘</Kbd>
+            <Kbd>K</Kbd>
+          </KbdGroup>
+        </ShotItem>
+        <ShotItem label="three-key combo (KbdGroup)">
+          <KbdGroup>
+            <Kbd>Ctrl</Kbd>
+            <Kbd>Shift</Kbd>
+            <Kbd>Enter</Kbd>
+          </KbdGroup>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

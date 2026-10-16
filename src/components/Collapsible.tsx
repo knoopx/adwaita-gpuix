@@ -107,3 +107,63 @@ export function CollapsibleContent({ children, open, style }: CollapsibleContent
     </AnimatePresence>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { useAdwaita } from '../theme/adwaita'
+import { Row, T } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** A bordered frame around a collapsible instance (so open/closed are distinguishable). */
+function CollapsibleFrame({ children }: { children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, borderWidth: 1, borderColor: t.colors.border, borderRadius: 8, padding: 8 }}>
+      {children}
+    </div>
+  )
+}
+
+export const CollapsibleShot: ComponentShot = {
+  name: 'Collapsible',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="States">
+        <ShotItem label="open (content visible)">
+          <CollapsibleFrame>
+            <Collapsible open onOpenChange={() => {}}>
+              <CollapsibleTrigger open>
+                <T>Open section</T>
+              </CollapsibleTrigger>
+              <CollapsibleContent open>
+                <T>Content is visible (chevron rotated).</T>
+              </CollapsibleContent>
+            </Collapsible>
+          </CollapsibleFrame>
+        </ShotItem>
+        <ShotItem label="closed (content hidden)">
+          <CollapsibleFrame>
+            <Collapsible open={false} onOpenChange={() => {}}>
+              <CollapsibleTrigger>
+                <T>Closed section</T>
+              </CollapsibleTrigger>
+              <CollapsibleContent open={false}>
+                <T>Hidden content — not rendered.</T>
+              </CollapsibleContent>
+            </Collapsible>
+          </CollapsibleFrame>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

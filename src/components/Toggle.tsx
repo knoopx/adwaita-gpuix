@@ -65,3 +65,59 @@ export function Toggle({ pressed, onPressed, variant = 'default', size = 'defaul
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const ToggleShot: ComponentShot = {
+  name: 'Toggle',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="States (default variant)">
+        <ShotItem label="unpressed">
+          <Toggle pressed={false} onPressed={() => {}}>Bold</Toggle>
+        </ShotItem>
+        <ShotItem label="pressed">
+          <Toggle pressed onPressed={() => {}}>Bold</Toggle>
+        </ShotItem>
+      </Row>
+      <Row label="Variants" col>
+        <ShotItem label="default (unpressed)">
+          <Toggle pressed={false} variant="default" onPressed={() => {}}>Default</Toggle>
+        </ShotItem>
+        <ShotItem label="default (pressed)">
+          <Toggle pressed variant="default" onPressed={() => {}}>Default</Toggle>
+        </ShotItem>
+        <ShotItem label="outline (unpressed — flat, transparent)">
+          <Toggle pressed={false} variant="outline" onPressed={() => {}}>Outline</Toggle>
+        </ShotItem>
+        <ShotItem label="outline (pressed — accentTint)">
+          <Toggle pressed variant="outline" onPressed={() => {}}>Outline</Toggle>
+        </ShotItem>
+      </Row>
+      <Row label="Sizes">
+        <ShotItem label="sm (28px)">
+          <Toggle pressed={false} size="sm" onPressed={() => {}}>Sm</Toggle>
+        </ShotItem>
+        <ShotItem label="default (32px)">
+          <Toggle pressed={false} size="default" onPressed={() => {}}>Default</Toggle>
+        </ShotItem>
+        <ShotItem label="lg (40px)">
+          <Toggle pressed={false} size="lg" onPressed={() => {}}>Large</Toggle>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

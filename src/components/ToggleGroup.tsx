@@ -104,3 +104,53 @@ export function ToggleGroup(props: ToggleGroupProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import type { ReactNode } from 'react'
+import { Row } from './common'
+
+const SHOT_OPTS = [
+  { id: 'day', label: 'Day' },
+  { id: 'week', label: 'Week' },
+  { id: 'month', label: 'Month' },
+]
+
+const SHOT_ICON_OPTS: { id: string; icon: IconName }[] = [
+  { id: 'list', icon: 'list' },
+  { id: 'grid', icon: 'grid' },
+  { id: 'panel', icon: 'panel' },
+]
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const ToggleGroupShot: ComponentShot = {
+  name: 'ToggleGroup',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Variants" col>
+        <ShotItem label="default"><ToggleGroup options={SHOT_OPTS} value="week" onChange={() => {}} /></ShotItem>
+        <ShotItem label="outline"><ToggleGroup options={SHOT_OPTS} variant="outline" value="day" onChange={() => {}} /></ShotItem>
+      </Row>
+      <Row label="Sizes" col>
+        <ShotItem label="sm (24)"><ToggleGroup options={SHOT_OPTS} size="sm" value="day" onChange={() => {}} /></ShotItem>
+        <ShotItem label="default (28)"><ToggleGroup options={SHOT_OPTS} value="week" onChange={() => {}} /></ShotItem>
+        <ShotItem label="lg (36)"><ToggleGroup options={SHOT_OPTS} size="lg" value="month" onChange={() => {}} /></ShotItem>
+      </Row>
+      <Row label="Options & selection" col>
+        <ShotItem label="icon options"><ToggleGroup options={SHOT_ICON_OPTS} value="grid" onChange={() => {}} /></ShotItem>
+        <ShotItem label="multiple (multi-select)"><ToggleGroup multiple options={SHOT_OPTS} value={['day', 'month']} onChange={() => {}} /></ShotItem>
+        <ShotItem label="none selected"><ToggleGroup options={SHOT_OPTS} value="" onChange={() => {}} /></ShotItem>
+      </Row>
+    </div>
+  ),
+}

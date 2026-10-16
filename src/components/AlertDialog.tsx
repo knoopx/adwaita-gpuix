@@ -27,7 +27,7 @@ export interface AlertDialogProps {
    * Overlay mode. When `open` is provided the dialog renders as an overlay —
    * scrim + centered panel with click-outside dismiss (via `OverlayShell`)
    * and Escape-only keyboard dismissal. When omitted the dialog renders as
-   * an inline card (the legacy flat rendering, kept for static montages).
+   * an inline card (the legacy flat rendering, kept for static renders).
    */
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -299,3 +299,88 @@ export function AlertDialogCancel({ label, onClick, disabled, children, style }:
 
 /** Alias of AlertDialog (libadwaita names both dialog flavours similarly). */
 export const MessageDialog = AlertDialog
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+import { Icon } from './icons'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const AlertDialogShot: ComponentShot = {
+  name: 'AlertDialog',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Flat (actions[])" col>
+        <ShotItem label="destructive + default actions">
+          <AlertDialog
+            heading="Delete item?"
+            body="This action cannot be undone."
+            actions={[
+              { label: 'Delete', variant: 'destructive', onClick: () => {} },
+              { label: 'Cancel', variant: 'default', onClick: () => {} },
+            ]}
+          />
+        </ShotItem>
+        <ShotItem label="suggested action, size sm">
+          <AlertDialog
+            size="sm"
+            heading="Heads up"
+            body="A plain message dialog."
+            actions={[{ label: 'OK', variant: 'suggested', onClick: () => {} }]}
+          />
+        </ShotItem>
+      </Row>
+      <Row label="Media" col>
+        <ShotItem label="with media (size default)">
+          <AlertDialog
+            media={<Icon name="warning" size={32} color="#e5a50a" />}
+            heading="Storage full"
+            body="Free up space to continue syncing."
+            actions={[{ label: 'Open settings', variant: 'suggested', onClick: () => {} }]}
+          />
+        </ShotItem>
+      </Row>
+      <Row label="Compound" col>
+        <ShotItem label="Header / Footer / Action / Cancel">
+          <AlertDialog>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete item?</AlertDialogTitle>
+              <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction label="Delete" variant="destructive" />
+              <AlertDialogCancel label="Cancel" />
+            </AlertDialogFooter>
+          </AlertDialog>
+        </ShotItem>
+        <ShotItem label="disabled actions">
+          <AlertDialog heading="Confirm" body="Both actions are disabled.">
+            <AlertDialogFooter>
+              <AlertDialogAction label="Confirm" disabled />
+              <AlertDialogCancel label="Cancel" disabled />
+            </AlertDialogFooter>
+          </AlertDialog>
+        </ShotItem>
+      </Row>
+      <Row label="MessageDialog (alias)" col>
+        <ShotItem label="alias of AlertDialog">
+          <MessageDialog
+            heading="Heads up"
+            body="A plain message dialog."
+            actions={[{ label: 'OK', variant: 'suggested', onClick: () => {} }]}
+          />
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

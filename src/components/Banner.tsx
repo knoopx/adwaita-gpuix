@@ -179,3 +179,44 @@ export function Banner({
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const BannerShot: ComponentShot = {
+  name: 'Banner',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Tones" col>
+        <ShotItem label="info"><Banner title="New version available" body="A stable release is ready to install." tone="info" onClose={() => {}} /></ShotItem>
+        <ShotItem label="warning"><Banner title="Storage almost full" body="You have used 95% of your quota." tone="warning" onClose={() => {}} /></ShotItem>
+        <ShotItem label="error"><Banner title="Sync failed" body="Could not reach the server." tone="error" onClose={() => {}} /></ShotItem>
+        <ShotItem label="success"><Banner title="All caught up" body="Your changes are synced." tone="success" onClose={() => {}} /></ShotItem>
+      </Row>
+      <Row label="Variant aliases" col>
+        <ShotItem label="default → info"><Banner title="Default variant" body="The shadcn default alias." variant="default" onClose={() => {}} /></ShotItem>
+        <ShotItem label="destructive → error"><Banner title="Destructive variant" body="The shadcn destructive alias." variant="destructive" onClose={() => {}} /></ShotItem>
+      </Row>
+      <Row label="Layouts" col>
+        <ShotItem label="action + close">
+          <Banner title="Update ready" body="A new version is waiting." tone="info" actionLabel="Update" onAction={() => {}} onClose={() => {}} />
+        </ShotItem>
+        <ShotItem label="narrow (action drops below)">
+          <Banner title="Update ready" body="A new version is waiting." tone="info" actionLabel="Update" onAction={() => {}} onClose={() => {}} narrow />
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

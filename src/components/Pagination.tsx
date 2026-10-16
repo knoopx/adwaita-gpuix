@@ -263,3 +263,60 @@ export function PaginationEllipsis({ style }: PaginationEllipsisProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const PaginationShot: ComponentShot = {
+  name: 'Pagination',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Data-driven (page, pages)" col>
+        <ShotItem label="first page — prev disabled">
+          <Pagination page={1} pages={8} onPageChange={() => {}} />
+        </ShotItem>
+        <ShotItem label="middle — ellipsis both sides">
+          <Pagination page={4} pages={8} onPageChange={() => {}} />
+        </ShotItem>
+        <ShotItem label="last page — next disabled">
+          <Pagination page={8} pages={8} onPageChange={() => {}} />
+        </ShotItem>
+        <ShotItem label="≤5 pages — no ellipsis">
+          <Pagination page={2} pages={4} onPageChange={() => {}} />
+        </ShotItem>
+      </Row>
+      <Row label="Compound (content / item / link / nav / ellipsis)" col>
+        <ShotItem label="active link + disabled prev">
+          <PaginationContent>
+            <PaginationPrevious disabled />
+            <PaginationItem>
+              <PaginationLink>1</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink active>2</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink>5</PaginationLink>
+            </PaginationItem>
+            <PaginationNext />
+          </PaginationContent>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

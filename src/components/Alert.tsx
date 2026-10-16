@@ -94,3 +94,52 @@ export function AlertDescription({ children, style }: AlertDescriptionProps) {
     </T>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const AlertShot: ComponentShot = {
+  name: 'Alert',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Variants (icon + title + description)" col>
+        <ShotItem label="default (accent tint, info icon)">
+          <Alert>
+            <AlertTitle>Heads up</AlertTitle>
+            <AlertDescription>A standard informational alert.</AlertDescription>
+          </Alert>
+        </ShotItem>
+        <ShotItem label="success (success tint)">
+          <Alert variant="success">
+            <AlertTitle>Success</AlertTitle>
+            <AlertDescription>Everything worked as expected.</AlertDescription>
+          </Alert>
+        </ShotItem>
+        <ShotItem label="warning (warning tint)">
+          <Alert variant="warning">
+            <AlertTitle>Warning</AlertTitle>
+            <AlertDescription>Something needs your attention.</AlertDescription>
+          </Alert>
+        </ShotItem>
+        <ShotItem label="destructive (destructive tint)">
+          <Alert variant="destructive">
+            <AlertTitle>Danger</AlertTitle>
+            <AlertDescription>Something went wrong.</AlertDescription>
+          </Alert>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

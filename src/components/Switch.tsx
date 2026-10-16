@@ -42,3 +42,33 @@ export function Switch({ checked, onChange, disabled, style }: SwitchProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import type { ReactNode } from 'react'
+import { Row, T } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const SwitchShot: ComponentShot = {
+  name: 'Switch',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="States">
+        <ShotItem label="off"><Switch checked={false} onChange={() => {}} /></ShotItem>
+        <ShotItem label="on"><Switch checked={true} onChange={() => {}} /></ShotItem>
+        <ShotItem label="disabled (off)"><Switch checked={false} disabled onChange={() => {}} /></ShotItem>
+        <ShotItem label="disabled (on)"><Switch checked={true} disabled onChange={() => {}} /></ShotItem>
+      </Row>
+    </div>
+  ),
+}

@@ -75,3 +75,34 @@ export function Badge({ variant = 'default', children, style }: BadgeProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const BadgeShot: ComponentShot = {
+  name: 'Badge',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Variants">
+        <ShotItem label="default"><Badge>New</Badge></ShotItem>
+        <ShotItem label="secondary"><Badge variant="secondary">Secondary</Badge></ShotItem>
+        <ShotItem label="destructive"><Badge variant="destructive">Destructive</Badge></ShotItem>
+        <ShotItem label="success"><Badge variant="success">Success</Badge></ShotItem>
+        <ShotItem label="warning"><Badge variant="warning">Warning</Badge></ShotItem>
+        <ShotItem label="outline"><Badge variant="outline">Outline</Badge></ShotItem>
+      </Row>
+    </div>
+  ),
+}

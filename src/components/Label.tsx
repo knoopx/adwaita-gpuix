@@ -24,3 +24,30 @@ export function Label({ children, disabled, style }: LabelProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const LabelShot: ComponentShot = {
+  name: 'Label',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="States">
+        <ShotItem label="default"><Label>Email</Label></ShotItem>
+        <ShotItem label="disabled (dimmed, matches a disabled control)"><Label disabled>Email</Label></ShotItem>
+      </Row>
+    </div>
+  ),
+}

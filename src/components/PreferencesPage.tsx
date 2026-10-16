@@ -58,3 +58,35 @@ export function PreferencesPage({ children, style }: PreferencesPageProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+import { ActionRow, ButtonRow, ComboRow, EntryRow, ExpanderRow, SpinRow, SwitchRow } from './BoxedList'
+
+export const PreferencesPageShot: ComponentShot = {
+  name: 'PreferencesPage',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="All row kinds (two groups)" col>
+        <PreferencesPage>
+          <PreferencesGroup title="General">
+            <SwitchRow title="Enable sounds" checked={true} onChange={() => {}} />
+            <SwitchRow title="Do not disturb" checked={false} onChange={() => {}} />
+            <ActionRow title="Reset settings" subtitle="Restore the defaults" prefix="settings" suffix="chevronDown" onClick={() => {}} />
+            <EntryRow title="Display name" value="Ada" />
+          </PreferencesGroup>
+          <PreferencesGroup title="Appearance">
+            <SpinRow title="Zoom" value={100} min={50} max={200} step={10} onChange={() => {}} />
+            <ComboRow title="Theme" value="Auto" options={['Auto', 'Light', 'Dark']} onChange={() => {}} />
+            <ButtonRow title="Sign out" label="Sign out" onClick={() => {}} />
+            <ButtonRow title="Delete account" label="Delete" destructive onClick={() => {}} />
+            <ExpanderRow title="Advanced" subtitle="Show advanced options">
+              <T>Advanced options are revealed here.</T>
+            </ExpanderRow>
+          </PreferencesGroup>
+        </PreferencesPage>
+      </Row>
+    </div>
+  ),
+}

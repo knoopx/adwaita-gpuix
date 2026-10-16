@@ -166,3 +166,78 @@ export function InputGroupTextarea({ value, onChange, placeholder, rows, style }
     />
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+import { Icon } from './icons'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** A dim 14px icon for the button-addon examples (theme colour needs a hook). */
+function AddonIcon({ name }: { name: 'search' | 'plus' }) {
+  const t = useAdwaita()
+  return <Icon name={name} size={14} color={t.colors.dim_fg} />
+}
+
+export const InputGroupShot: ComponentShot = {
+  name: 'InputGroup',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Alignments" col>
+        <ShotItem label="row (default) — prefix + suffix addons">
+          <InputGroup>
+            <InputGroupAddon>@</InputGroupAddon>
+            <InputGroupInput value="username" />
+            <InputGroupAddon>.com</InputGroupAddon>
+          </InputGroup>
+        </ShotItem>
+        <ShotItem label="block-start (addon first)">
+          <InputGroup align="block-start">
+            <InputGroupAddon>€</InputGroupAddon>
+            <InputGroupInput value="1 250.00" />
+          </InputGroup>
+        </ShotItem>
+        <ShotItem label="block-end (addon last)">
+          <InputGroup align="block-end">
+            <InputGroupInput value="kg" placeholder="Weight" />
+            <InputGroupAddon>unit</InputGroupAddon>
+          </InputGroup>
+        </ShotItem>
+      </Row>
+      <Row label="Addon kinds" col>
+        <ShotItem label="button addon (icon)">
+          <InputGroup>
+            <InputGroupInput placeholder="Search…" type="search" />
+            <InputGroupButton>
+              <AddonIcon name="search" />
+            </InputGroupButton>
+          </InputGroup>
+        </ShotItem>
+        <ShotItem label="text addon">
+          <InputGroup>
+            <InputGroupInput placeholder="Amount" />
+            <InputGroupText>EUR</InputGroupText>
+          </InputGroup>
+        </ShotItem>
+        <ShotItem label="textarea (rows=2)">
+          <InputGroup>
+            <InputGroupTextarea placeholder="Message…" rows={2} />
+            <InputGroupButton>
+              <AddonIcon name="plus" />
+            </InputGroupButton>
+          </InputGroup>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

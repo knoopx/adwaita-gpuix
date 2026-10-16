@@ -109,3 +109,115 @@ export function Toaster({ toasts = [], position = 'bottom-left', onDismiss, styl
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import type { ReactNode } from 'react'
+import { useAdwaita } from '../theme/adwaita'
+import { FloatingStage, T, Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** A bounded app-window stage holding a positioned Toaster stack. */
+function ToastStage({
+  toasts,
+  position = 'bottom-left',
+  width = 360,
+  height = 160,
+  captionPos = 'top-left',
+}: {
+  toasts: { message: string; type?: ToastType; actionLabel?: string }[]
+  position?: ToasterPosition
+  width?: number
+  height?: number
+  captionPos?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+}) {
+  const t = useAdwaita()
+  const { colors } = t
+  const captionStyle: StyleDesc = {
+    position: 'absolute',
+    ...(captionPos === 'top-right'
+      ? { top: 8, right: 12 }
+      : captionPos === 'bottom-left'
+        ? { bottom: 8, left: 12 }
+        : captionPos === 'bottom-right'
+          ? { bottom: 8, right: 12 }
+          : { top: 8, left: 12 }),
+  }
+  return (
+    <FloatingStage width={width} height={height}>
+      <div style={captionStyle}>
+        <T size="caption" color={colors.dim_fg}>App window</T>
+      </div>
+      <Toaster
+        toasts={toasts.map((toast, i) => ({ id: `shot-${i}`, ...toast }))}
+        position={position}
+        onDismiss={() => {}}
+      />
+    </FloatingStage>
+  )
+}
+
+export const ToasterShot: ComponentShot = {
+  name: 'Toaster',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Toast types (leading icon)" col>
+        <ShotItem label="default / success / warning / error / loading">
+          <ToastStage
+            width={420}
+            height={248}
+            captionPos="top-right"
+            toasts={[
+              { message: 'File saved' },
+              { message: 'Build succeeded', type: 'success' },
+              { message: 'Disk almost full', type: 'warning' },
+              { message: 'Upload failed', type: 'error' },
+              { message: 'Uploading…', type: 'loading' },
+            ]}
+          />
+        </ShotItem>
+      </Row>
+      <Row label="Action + dismiss" col>
+        <ShotItem label="action button + close icon">
+          <ToastStage
+            width={300}
+            height={120}
+            captionPos="top-right"
+            toasts={[
+              { message: 'File deleted', actionLabel: 'Undo' },
+              { message: 'Copied to clipboard' },
+            ]}
+          />
+        </ShotItem>
+      </Row>
+      <Row label="Positions (2×2 grid)" col>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: 16 }}>
+          <ShotItem label="bottom-left (default)">
+            <ToastStage width={250} height={120} toasts={[{ message: 'Saved' }]} />
+          </ShotItem>
+          <ShotItem label="bottom-right">
+            <ToastStage width={250} height={120} position="bottom-right" toasts={[{ message: 'Saved', type: 'success' }]} />
+          </ShotItem>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: 16 }}>
+          <ShotItem label="top-left">
+            <ToastStage width={250} height={120} position="top-left" captionPos="bottom-right" toasts={[{ message: 'Saved', type: 'info' }]} />
+          </ShotItem>
+          <ShotItem label="top-right">
+            <ToastStage width={250} height={120} position="top-right" captionPos="bottom-left" toasts={[{ message: 'Saved', type: 'warning' }]} />
+          </ShotItem>
+        </div>
+      </Row>
+    </div>
+  ),
+}

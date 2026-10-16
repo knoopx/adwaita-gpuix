@@ -413,3 +413,87 @@ export function ButtonRow({
     </div>
   );
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from "../../scripts/shot";
+import { Row } from "./common";
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita();
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  );
+}
+
+export const BoxedListShot: ComponentShot = {
+  name: "BoxedList",
+  el: (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, width: 528 }}>
+      <Row label="ActionRow" col>
+        <ShotItem label="with prefix + suffix icons">
+          <BoxedList>
+            <ActionRow title="Open settings" subtitle="Configure the application" prefix="settings" suffix="chevronDown" onClick={() => {}} />
+          </BoxedList>
+        </ShotItem>
+        <ShotItem label="plain (no icons)">
+          <BoxedList>
+            <ActionRow title="Open settings" subtitle="Configure the application" onClick={() => {}} />
+          </BoxedList>
+        </ShotItem>
+      </Row>
+      <Row label="EntryRow" col>
+        <ShotItem label="with value">
+          <BoxedList><EntryRow title="Display name" value="Ada Lovelace" /></BoxedList>
+        </ShotItem>
+        <ShotItem label="placeholder (empty)">
+          <BoxedList><EntryRow title="Display name" placeholder="Type here…" /></BoxedList>
+        </ShotItem>
+      </Row>
+      <Row label="SwitchRow" col>
+        <ShotItem label="on">
+          <BoxedList><SwitchRow title="Notifications" subtitle="Show badges" checked={true} onChange={() => {}} /></BoxedList>
+        </ShotItem>
+        <ShotItem label="off">
+          <BoxedList><SwitchRow title="Notifications" checked={false} onChange={() => {}} /></BoxedList>
+        </ShotItem>
+      </Row>
+      <Row label="SpinRow" col>
+        <ShotItem label="mid range">
+          <BoxedList><SpinRow title="Volume" value={40} onChange={() => {}} /></BoxedList>
+        </ShotItem>
+        <ShotItem label="at min (− disabled)">
+          <BoxedList><SpinRow title="Volume" value={0} onChange={() => {}} /></BoxedList>
+        </ShotItem>
+        <ShotItem label="at max (+ disabled)">
+          <BoxedList><SpinRow title="Volume" value={99} onChange={() => {}} /></BoxedList>
+        </ShotItem>
+      </Row>
+      <Row label="ComboRow" col>
+        <ShotItem label="cycling pill">
+          <BoxedList><ComboRow title="Language" value="English" options={['English', 'Español', 'Français']} onChange={() => {}} /></BoxedList>
+        </ShotItem>
+      </Row>
+      <Row label="ExpanderRow" col>
+        <ShotItem label="collapsed (expanded is internal state)">
+          <BoxedList>
+            <ExpanderRow title="Advanced" subtitle="More options">
+              <T>Advanced details revealed here.</T>
+            </ExpanderRow>
+          </BoxedList>
+        </ShotItem>
+      </Row>
+      <Row label="ButtonRow" col>
+        <ShotItem label="accent">
+          <BoxedList><ButtonRow title="Share project" label="Share" onClick={() => {}} /></BoxedList>
+        </ShotItem>
+        <ShotItem label="destructive">
+          <BoxedList><ButtonRow title="Delete project" label="Delete" destructive onClick={() => {}} /></BoxedList>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+};

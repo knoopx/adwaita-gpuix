@@ -206,3 +206,76 @@ export function FieldSeparator({ children, style }: FieldSeparatorProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+import { Input } from './Input'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const FieldShot: ComponentShot = {
+  name: 'Field',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Vertical (default)" col>
+        <ShotItem label="label + control + description + error">
+          <Field>
+            <FieldLabel>Username</FieldLabel>
+            <FieldContent>
+              <Input value="ada" />
+            </FieldContent>
+            <FieldDescription>Your public display name.</FieldDescription>
+            <FieldError>This field is required.</FieldError>
+          </Field>
+        </ShotItem>
+      </Row>
+      <Row label="Horizontal">
+        <ShotItem label="label left, control right">
+          <Field orientation="horizontal">
+            <FieldLabel>Email</FieldLabel>
+            <FieldContent>
+              <Input placeholder="you@example.com" />
+            </FieldContent>
+          </Field>
+        </ShotItem>
+      </Row>
+      <Row label="FieldSet + Legend" col>
+        <ShotItem label="grouped fields (title + multi-error)">
+          <FieldSet>
+            <FieldLegend>Profile</FieldLegend>
+            <FieldGroup>
+              <Field>
+                <FieldTitle>Display name</FieldTitle>
+                <FieldContent>
+                  <Input value="Ada Lovelace" />
+                </FieldContent>
+                <FieldError errors={[{ message: 'Must be at least 3 characters' }, { message: 'Cannot contain spaces' }]} />
+              </Field>
+              <Field>
+                <FieldTitle>Bio</FieldTitle>
+                <FieldContent>
+                  <Input placeholder="Short bio" />
+                </FieldContent>
+                <FieldError errors={[{ message: 'Single error from the errors list' }]} />
+              </Field>
+            </FieldGroup>
+          </FieldSet>
+        </ShotItem>
+      </Row>
+      <Row label="Separators">
+        <ShotItem label="labelled"><FieldSeparator>or</FieldSeparator></ShotItem>
+        <ShotItem label="unlabelled"><FieldSeparator /></ShotItem>
+      </Row>
+    </div>
+  ),
+}

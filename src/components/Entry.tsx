@@ -46,3 +46,42 @@ export function Entry({ value, placeholder, type = 'text', disabled, invalid, on
     />
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import type { ReactNode } from 'react'
+import { useAdwaita } from '../theme/adwaita'
+import { Row, T } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const EntryShot: ComponentShot = {
+  name: 'Entry',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="States" col>
+        <ShotItem label="placeholder"><Entry placeholder="Type here…" /></ShotItem>
+        <ShotItem label="with value"><Entry value="Hello world" /></ShotItem>
+        <ShotItem label="invalid"><Entry value="invalid value" invalid /></ShotItem>
+        <ShotItem label="disabled"><Entry value="Read only" disabled /></ShotItem>
+      </Row>
+      <Row label="Types (GPUix has no input type — all render plain text)" col>
+        <ShotItem label="text"><Entry type="text" placeholder="Plain text" /></ShotItem>
+        <ShotItem label="password"><Entry type="password" placeholder="••••••••" /></ShotItem>
+        <ShotItem label="email"><Entry type="email" placeholder="you@example.com" /></ShotItem>
+        <ShotItem label="number"><Entry type="number" placeholder="42" /></ShotItem>
+        <ShotItem label="search"><Entry type="search" placeholder="Search…" /></ShotItem>
+        <ShotItem label="url"><Entry type="url" placeholder="https://…" /></ShotItem>
+      </Row>
+    </div>
+  ),
+}

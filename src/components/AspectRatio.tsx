@@ -56,3 +56,69 @@ export function AspectRatio({ ratio, width, height, children, style }: AspectRat
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { buildTheme } from '../theme/adwaita'
+import { T, Row } from './common'
+
+/** A tinted fill box with a centred ratio label. */
+function FillBox({ label, height }: { label: string; height?: number }) {
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: height ?? '100%',
+        backgroundColor: buildTheme('dark', 'blue').colors.accentTint,
+        borderRadius: 8,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <T>{label}</T>
+    </div>
+  )
+}
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={buildTheme('dark', 'blue').colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const AspectRatioShot: ComponentShot = {
+  name: 'AspectRatio',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="By width (16:9, width=400)" col>
+        <AspectRatio ratio={16 / 9} width={400}>
+          <FillBox label="16 : 9" />
+        </AspectRatio>
+      </Row>
+      <Row label="By height · fixed · fills parent" col>
+        <ShotItem label="By height (16:9, height=90 → width 160)">
+          <AspectRatio ratio={16 / 9} height={90}>
+            <FillBox label="16 : 9" />
+          </AspectRatio>
+        </ShotItem>
+        <ShotItem label="Fixed width+height (120×68)">
+          <AspectRatio ratio={16 / 9} width={120} height={68}>
+            <FillBox label="120×68" />
+          </AspectRatio>
+        </ShotItem>
+        <ShotItem label="Fills parent (width 100%, parent 180px)">
+          <div style={{ width: 180 }}>
+            <AspectRatio ratio={16 / 9}>
+              <FillBox label="16 : 9" height={100} />
+            </AspectRatio>
+          </div>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

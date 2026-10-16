@@ -164,3 +164,85 @@ export function TooltipContent({ children, side, sideOffset = 4, style }: Toolti
     </anchored>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+import { Button } from './Button'
+
+/** A captioned shot item: a small dim caption above the item. */
+function TooltipShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** An open tooltip on a given side (the `side` prop on the root). */
+function SideTooltip({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'; text: string }) {
+  return (
+    <TooltipProvider>
+      <Tooltip open side={side}>
+        <TooltipTrigger>
+          <Button label={side} onClick={() => {}} />
+        </TooltipTrigger>
+        <TooltipContent>{text}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
+
+export const TooltipShot: ComponentShot = {
+  name: 'Tooltip',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Closed (open=false)">
+        <TooltipProvider delayDuration={300}>
+          <Tooltip open={false}>
+            <TooltipTrigger>
+              <Button label="No tooltip" onClick={() => {}} />
+            </TooltipTrigger>
+            <TooltipContent>Hidden</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </Row>
+      <Row label="Open · sides (side prop)" col>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: 24, alignItems: 'center' }}>
+          <TooltipShotItem label="side=top">
+            <SideTooltip side="top" text="Tooltip above" />
+          </TooltipShotItem>
+          <TooltipShotItem label="side=right">
+            <SideTooltip side="right" text="Tooltip right" />
+          </TooltipShotItem>
+          <TooltipShotItem label="side=bottom">
+            <SideTooltip side="bottom" text="Tooltip below" />
+          </TooltipShotItem>
+          <TooltipShotItem label="side=left">
+            <SideTooltip side="left" text="Tooltip left" />
+          </TooltipShotItem>
+        </div>
+      </Row>
+      <Row label="Content-side override (TooltipContent side)" col>
+        <TooltipProvider>
+          <Tooltip open>
+            <TooltipTrigger>
+              <Button label="Content side" onClick={() => {}} />
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Content-side override</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </Row>
+      <Row label="Uncontrolled (defaultOpen)" col>
+        <Tooltip defaultOpen>
+          <TooltipTrigger>
+            <Button label="Default open" onClick={() => {}} />
+          </TooltipTrigger>
+          <TooltipContent>Uncontrolled open state</TooltipContent>
+        </Tooltip>
+      </Row>
+    </div>
+  ),
+}

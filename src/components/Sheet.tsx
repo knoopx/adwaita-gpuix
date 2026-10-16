@@ -2,6 +2,7 @@ import { createContext, useContext, type ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
 import { useAdwaita } from '../theme/adwaita'
 import { T, Row, FloatingStage, OverlayShell, OverlayPanel, CloseButton, OverlayFooter } from './common'
+import { Button } from './Button'
 
 export type SheetSide = 'bottom' | 'left' | 'right' | 'top'
 
@@ -254,26 +255,99 @@ export function SheetClose({ children, style }: SheetCloseProps) {
 
 const noop = () => {}
 
-/** Full Sheet montage for static renders / playground (closed + open
- *  left-side panel contained in a bounded stage). */
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** The shared open-sheet body: header (title + close), content, footer. */
+function SheetBody({ title }: { title: string }) {
+  return (
+    <SheetContent>
+      <SheetHeader>
+        <SheetTitle>{title}</SheetTitle>
+        <SheetClose />
+      </SheetHeader>
+      <T>Sheet content goes here.</T>
+      <SheetFooter>
+        <Button label="Close" onClick={noop} />
+      </SheetFooter>
+    </SheetContent>
+  )
+}
+
+/** Full Sheet shot for static renders / playground: closed (renders
+ *  nothing) + all four `side` variants + the showCloseButton=false
+ *  custom-close variant, each contained in a bounded stage. */
 export function SheetShowcase(): ReactNode {
   return (
-    <Row label="Sheet" col>
-      <Row label="Closed">
-        <Sheet open={false} onOpenChange={noop} side="left" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Closed (open=false renders nothing)">
+        <Sheet open={false} onOpenChange={noop} side="left">
+          <SheetTrigger>
+            <Button label="Open sheet" onClick={noop} />
+          </SheetTrigger>
+        </Sheet>
       </Row>
-      <Row label="Open">
-        <FloatingStage>
-          <Sheet open={true} onOpenChange={noop} side="left" contained>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Sheet title</SheetTitle>
-              </SheetHeader>
-              <T>Sheet content goes here.</T>
-            </SheetContent>
-          </Sheet>
-        </FloatingStage>
+      <Row label="Open · sides (side prop, contained in a stage)" col>
+        <ShotItem label="side=left">
+          <FloatingStage width={360} height={150}>
+            <Sheet open={true} onOpenChange={noop} side="left" contained>
+              <SheetBody title="Left sheet" />
+            </Sheet>
+          </FloatingStage>
+        </ShotItem>
+        <ShotItem label="side=right">
+          <FloatingStage width={360} height={150}>
+            <Sheet open={true} onOpenChange={noop} side="right" contained>
+              <SheetBody title="Right sheet" />
+            </Sheet>
+          </FloatingStage>
+        </ShotItem>
+        <ShotItem label="side=top">
+          <FloatingStage width={360} height={150}>
+            <Sheet open={true} onOpenChange={noop} side="top" contained>
+              <SheetBody title="Top sheet" />
+            </Sheet>
+          </FloatingStage>
+        </ShotItem>
+        <ShotItem label="side=bottom">
+          <FloatingStage width={360} height={150}>
+            <Sheet open={true} onOpenChange={noop} side="bottom" contained>
+              <SheetBody title="Bottom sheet" />
+            </Sheet>
+          </FloatingStage>
+        </ShotItem>
       </Row>
-    </Row>
+      <Row label="Content variants" col>
+        <ShotItem label="showCloseButton=false + custom SheetClose in the header">
+          <FloatingStage width={360} height={150}>
+            <Sheet open={true} onOpenChange={noop} side="right" contained>
+              <SheetContent showCloseButton={false}>
+                <SheetHeader>
+                  <SheetTitle>No auto close</SheetTitle>
+                  <SheetClose />
+                </SheetHeader>
+                <T>The auto close button is disabled; the header carries a SheetClose.</T>
+              </SheetContent>
+            </Sheet>
+          </FloatingStage>
+        </ShotItem>
+      </Row>
+    </div>
   )
+}
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+
+export const SheetShot: ComponentShot = {
+  name: 'Sheet',
+  el: <SheetShowcase />,
 }

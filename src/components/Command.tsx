@@ -222,3 +222,68 @@ export function CommandDialog({ open, onOpenChange, contained, children, style }
     </Dialog>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row, FloatingStage } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function CommandShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const CommandShot: ComponentShot = {
+  name: 'Command',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Open palette · item states" col>
+        <CommandShotItem label="groups + items (shortcut / selected / search terms) + separator">
+          <Command>
+            <CommandInput placeholder="Type a command…" />
+            <CommandList>
+              <CommandGroup label="General">
+                <CommandItem label="New file" shortcut="Ctrl+N" onSelect={() => {}} />
+                <CommandItem label="Open file" shortcut="Ctrl+O" selected onSelect={() => {}} />
+                <CommandItem label="Search files" searchTerms="find locate" onSelect={() => {}} />
+              </CommandGroup>
+              <CommandSeparator />
+              <CommandGroup label="Actions">
+                <CommandItem label="Delete" onSelect={() => {}} />
+                <CommandItem label="Rename" onSelect={() => {}} />
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </CommandShotItem>
+        <CommandShotItem label="empty state">
+          <Command>
+            <CommandInput placeholder="Type a command…" />
+            <CommandList>
+              <CommandEmpty />
+            </CommandList>
+          </Command>
+        </CommandShotItem>
+      </Row>
+      <Row label="Command dialog (contained, in a stage)" col>
+        <FloatingStage width={480} height={220}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <CommandDialog open={true} onOpenChange={() => {}} contained>
+              <CommandInput placeholder="Type a command…" />
+              <CommandList>
+                <CommandGroup label="General">
+                  <CommandItem label="New file" shortcut="Ctrl+N" onSelect={() => {}} />
+                  <CommandItem label="Open file" shortcut="Ctrl+O" selected onSelect={() => {}} />
+                </CommandGroup>
+              </CommandList>
+            </CommandDialog>
+          </div>
+        </FloatingStage>
+      </Row>
+    </div>
+  ),
+}

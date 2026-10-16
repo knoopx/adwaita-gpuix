@@ -207,3 +207,84 @@ export function TableCaption({ children, style }: TableCaptionProps) {
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const TableShot: ComponentShot = {
+  name: 'Table',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Header + body + footer" col>
+        <ShotItem label="full table">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>Ada</TableCell>
+                <TableCell>ada@example.com</TableCell>
+                <TableCell>Admin</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Grace</TableCell>
+                <TableCell>grace@example.com</TableCell>
+                <TableCell>Editor</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>Alan</TableCell>
+                <TableCell>alan@example.com</TableCell>
+                <TableCell>Viewer</TableCell>
+              </TableRow>
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TableFootCell>Total</TableFootCell>
+                <TableFootCell>—</TableFootCell>
+                <TableFootCell>3 users</TableFootCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </ShotItem>
+      </Row>
+      <Row label="Caption">
+        <ShotItem label="caption below the table">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Key</TableHead>
+                  <TableHead>Value</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell>Theme</TableCell>
+                  <TableCell>Dark</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+            <TableCaption>Settings summary — 1 row.</TableCaption>
+          </div>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

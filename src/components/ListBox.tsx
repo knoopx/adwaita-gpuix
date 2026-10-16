@@ -186,3 +186,44 @@ export function ListBoxItem({ value, disabled, children, style }: ListBoxItemPro
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ListBoxShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const ListBoxShot: ComponentShot = {
+  name: 'ListBox',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Selection modes">
+        <ListBoxShotItem label="single (selected b, disabled d)">
+          <ListBox value="b" onValueChange={() => {}} style={{ width: 240 }}>
+            <ListBoxItem value="a">First item</ListBoxItem>
+            <ListBoxItem value="b">Second item (selected)</ListBoxItem>
+            <ListBoxItem value="c">Third item</ListBoxItem>
+            <ListBoxItem value="d" disabled>Disabled item</ListBoxItem>
+          </ListBox>
+        </ListBoxShotItem>
+        <ListBoxShotItem label="multiple (a + c selected)">
+          <ListBox multiple value={['a', 'c']} onValueChange={() => {}} style={{ width: 240 }}>
+            <ListBoxItem value="a">First item (selected)</ListBoxItem>
+            <ListBoxItem value="b">Second item</ListBoxItem>
+            <ListBoxItem value="c">Third item (selected)</ListBoxItem>
+            <ListBoxItem value="d">Fourth item</ListBoxItem>
+          </ListBox>
+        </ListBoxShotItem>
+      </Row>
+    </div>
+  ),
+}

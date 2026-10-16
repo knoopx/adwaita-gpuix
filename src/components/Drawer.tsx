@@ -2,6 +2,7 @@ import { createContext, useContext, type ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
 import { useAdwaita } from '../theme/adwaita'
 import { T, Row, FloatingStage, OverlayShell, OverlayPanel, CloseButton, OverlayFooter } from './common'
+import { Button } from './Button'
 
 export type DrawerSide = 'bottom' | 'left' | 'right' | 'top'
 
@@ -222,27 +223,85 @@ export function DrawerClose({ children, style }: DrawerCloseProps) {
 
 /* ── Showcase ─────────────────────────────────────────────────────────── */
 
-/** Full Drawer montage for static renders / playground (closed + open
- *  right-side panel contained in a bounded stage). */
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** The shared open-drawer body: header (title + close), content, footer. */
+function DrawerBody({ title }: { title: string }) {
+  return (
+    <>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>{title}</DrawerTitle>
+          <DrawerClose />
+        </DrawerHeader>
+        <T>Drawer content goes here.</T>
+        <DrawerFooter>
+          <Button label="Close" onClick={noop} />
+        </DrawerFooter>
+      </DrawerContent>
+    </>
+  )
+}
+
+/** Full Drawer shot for static renders / playground: closed (renders
+ *  nothing) + all four `side` variants contained in bounded stages. */
 export function DrawerShowcase(): ReactNode {
   return (
-    <Row label="Drawer" col>
-      <Row label="Closed">
-        <Drawer open={false} onOpenChange={noop} side="right" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Closed (open=false renders nothing)">
+        <Drawer open={false} onOpenChange={noop} side="right">
+          <DrawerTrigger>
+            <Button label="Open drawer" onClick={noop} />
+          </DrawerTrigger>
+        </Drawer>
       </Row>
-      <Row label="Open">
-        <FloatingStage>
-          <Drawer open={true} onOpenChange={noop} side="right" contained>
-            <DrawerContent>
-              <DrawerHeader>
-                <DrawerTitle>Drawer title</DrawerTitle>
-                <DrawerClose />
-              </DrawerHeader>
-              <T>Drawer content goes here.</T>
-            </DrawerContent>
-          </Drawer>
-        </FloatingStage>
+      <Row label="Open · sides (side prop, contained in a stage)" col>
+        <ShotItem label="side=left">
+          <FloatingStage width={360} height={150}>
+            <Drawer open={true} onOpenChange={noop} side="left" contained>
+              <DrawerBody title="Left drawer" />
+            </Drawer>
+          </FloatingStage>
+        </ShotItem>
+        <ShotItem label="side=right">
+          <FloatingStage width={360} height={150}>
+            <Drawer open={true} onOpenChange={noop} side="right" contained>
+              <DrawerBody title="Right drawer" />
+            </Drawer>
+          </FloatingStage>
+        </ShotItem>
+        <ShotItem label="side=top">
+          <FloatingStage width={360} height={150}>
+            <Drawer open={true} onOpenChange={noop} side="top" contained>
+              <DrawerBody title="Top drawer" />
+            </Drawer>
+          </FloatingStage>
+        </ShotItem>
+        <ShotItem label="side=bottom (drag handle)">
+          <FloatingStage width={360} height={150}>
+            <Drawer open={true} onOpenChange={noop} side="bottom" contained>
+              <DrawerBody title="Bottom drawer" />
+            </Drawer>
+          </FloatingStage>
+        </ShotItem>
       </Row>
-    </Row>
+    </div>
   )
+}
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+
+export const DrawerShot: ComponentShot = {
+  name: 'Drawer',
+  el: <DrawerShowcase />,
 }

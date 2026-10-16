@@ -171,3 +171,48 @@ export function Button({
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const ButtonShot: ComponentShot = {
+  name: 'Button',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Variants" col>
+        <ShotItem label="default"><Button label="Default" onClick={() => {}} /></ShotItem>
+        <ShotItem label="suggested"><Button variant="suggested" label="Suggested" onClick={() => {}} /></ShotItem>
+        <ShotItem label="destructive"><Button variant="destructive" label="Destructive" onClick={() => {}} /></ShotItem>
+        <ShotItem label="pill"><Button variant="pill" label="Pill" onClick={() => {}} /></ShotItem>
+        <ShotItem label="text"><Button variant="text" label="Text" onClick={() => {}} /></ShotItem>
+        <ShotItem label="icon"><Button variant="icon" icon="settings" onClick={() => {}} /></ShotItem>
+        <ShotItem label="secondary"><Button variant="secondary" label="Secondary" onClick={() => {}} /></ShotItem>
+      </Row>
+      <Row label="Sizes">
+        <ShotItem label="sm (28)"><Button size="sm" label="Save" onClick={() => {}} /></ShotItem>
+        <ShotItem label="default (34)"><Button label="Save" onClick={() => {}} /></ShotItem>
+        <ShotItem label="lg (40)"><Button size="lg" label="Save" onClick={() => {}} /></ShotItem>
+        <ShotItem label="icon (square)"><Button size="icon" icon="settings" onClick={() => {}} /></ShotItem>
+      </Row>
+      <Row label="States">
+        <ShotItem label="disabled"><Button label="Disabled" disabled onClick={() => {}} /></ShotItem>
+        <ShotItem label="icon + label"><Button icon="settings" label="Save" onClick={() => {}} /></ShotItem>
+        <ShotItem label="children slot">
+          <Button label="Add"><T size="caption" weight={700}>+1</T></Button>
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

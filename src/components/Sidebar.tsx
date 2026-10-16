@@ -348,3 +348,83 @@ export function SidebarMenuItem({ icon, label, selected, onClick, style }: Sideb
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row, FloatingStage } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** The shared sidebar body: header + two labelled groups + a footer user row. */
+function ShotSideContent({ collapsed }: { collapsed: boolean }) {
+  return (
+    <>
+      <SidebarHeader>
+        <T size="title3" weight={600}>Adwaita</T>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel icon={collapsed ? 'list' : undefined}>General</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenuItem icon="home" label="Home" selected />
+            <SidebarMenuItem icon="settings" label="Settings" />
+            <SidebarMenuItem icon="user" label="Profile" />
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel icon={collapsed ? 'settings' : undefined}>Preferences</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenuItem icon="sunMoon" label="Appearance" />
+            <SidebarMenuItem icon="list" label="Shortcuts" />
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenuItem icon="user" label="Ada Lovelace" />
+      </SidebarFooter>
+    </>
+  )
+}
+
+export const SidebarShot: ComponentShot = {
+  name: 'Sidebar',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Expanded + collapsed (open prop)">
+        <ShotItem label="expanded (default, 220px)">
+          <Sidebar>
+            <ShotSideContent collapsed={false} />
+          </Sidebar>
+        </ShotItem>
+        <ShotItem label="collapsed (open=false, 56px rail)">
+          <Sidebar open={false}>
+            <ShotSideContent collapsed />
+          </Sidebar>
+        </ShotItem>
+      </Row>
+      <Row label="Mobile sheet · open (contained)" col>
+        <FloatingStage width={340} height={240}>
+          <Sidebar mobile contained open>
+            <ShotSideContent collapsed={false} />
+          </Sidebar>
+        </FloatingStage>
+      </Row>
+      <Row label="Mobile sheet · closed" col>
+        <FloatingStage width={340} height={120}>
+          <Sidebar mobile contained open={false}>
+            <ShotSideContent collapsed={false} />
+          </Sidebar>
+        </FloatingStage>
+      </Row>
+    </div>
+  ),
+}

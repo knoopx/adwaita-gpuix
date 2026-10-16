@@ -183,3 +183,50 @@ export function Slider({
     </div>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import type { ReactNode } from 'react'
+import { Row, T } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const SliderShot: ComponentShot = {
+  name: 'Slider',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Single value" col>
+        <ShotItem label="horizontal, value 40">
+          <Slider value={40} onValueChange={() => {}} width={300} />
+        </ShotItem>
+        <ShotItem label="steps (min 0, max 10, step 5)">
+          <Slider value={5} min={0} max={10} step={5} onValueChange={() => {}} width={300} />
+        </ShotItem>
+      </Row>
+      <Row label="Range (multiple thumbs)" col>
+        <ShotItem label="[20, 70]">
+          <Slider value={[20, 70]} onValueChange={() => {}} width={300} />
+        </ShotItem>
+      </Row>
+      <Row label="Orientation & states" col>
+        <ShotItem label="vertical">
+          <div style={{ display: 'flex', alignItems: 'center', height: 140 }}>
+            <Slider orientation="vertical" value={60} onValueChange={() => {}} height={120} />
+          </div>
+        </ShotItem>
+        <ShotItem label="disabled">
+          <Slider value={40} disabled onValueChange={() => {}} width={300} />
+        </ShotItem>
+      </Row>
+    </div>
+  ),
+}

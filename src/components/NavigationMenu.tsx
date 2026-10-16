@@ -179,3 +179,64 @@ export function NavigationMenuLink({ label, onClick, active, style }: Navigation
     />
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { T, Row, FloatingStage } from './common'
+
+/** A captioned shot item: a small dim caption above the item. */
+function NavMenuShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+export const NavigationMenuShot: ComponentShot = {
+  name: 'NavigationMenu',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Bar (open state is internal — popdowns closed)">
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem item="products">
+              <NavigationMenuTrigger item="products">
+                <T>Products</T>
+              </NavigationMenuTrigger>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink label="Docs" active />
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink label="About" />
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+      </Row>
+      <Row label="Popdown (ungated content, item prop omitted) + indicator" col>
+        <div style={{ display: 'flex', flexDirection: 'row', gap: 16, alignItems: 'flex-start' }}>
+          <NavMenuShotItem label="NavigationMenuContent (links: active + inactive)">
+            <FloatingStage width={240} height={150}>
+              <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
+                <NavigationMenuContent>
+                  <NavigationMenuLink label="Laptops" />
+                  <NavigationMenuLink label="Phones" active />
+                  <NavigationMenuLink label="Tablets" />
+                </NavigationMenuContent>
+              </div>
+            </FloatingStage>
+          </NavMenuShotItem>
+          <NavMenuShotItem label="NavigationMenuIndicator (open underline)">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <T size="body">Products</T>
+              <NavigationMenuIndicator />
+            </div>
+          </NavMenuShotItem>
+        </div>
+      </Row>
+    </div>
+  ),
+}

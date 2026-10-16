@@ -119,3 +119,88 @@ export function PopoverDescription({ children, style }: PopoverDescriptionProps)
     </T>
   )
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { Row, FloatingStage } from './common'
+import { Button } from './Button'
+
+/** A captioned shot item: a small dim caption above the item. */
+function PopoverShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** A compact open-popover anchor: trigger button + anchored content on a side. */
+function SidePopover({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'; text: string }) {
+  return (
+    <Popover open={true} onOpenChange={() => {}}>
+      <PopoverAnchor>
+        <PopoverTrigger>
+          <Button label={side} onClick={() => {}} />
+        </PopoverTrigger>
+        <PopoverContent side={side}>
+          <T size="caption">{text}</T>
+        </PopoverContent>
+      </PopoverAnchor>
+    </Popover>
+  )
+}
+
+export const PopoverShot: ComponentShot = {
+  name: 'Popover',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Closed trigger">
+        <Popover open={false} onOpenChange={() => {}}>
+          <PopoverTrigger>
+            <Button label="Open popover" onClick={() => {}} />
+          </PopoverTrigger>
+        </Popover>
+      </Row>
+      <Row label="Open · sides (side prop, anchored in a stage)" col>
+        <FloatingStage width={480} height={120}>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: 16, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+            <PopoverShotItem label="side=top">
+              <SidePopover side="top" text="Above the trigger" />
+            </PopoverShotItem>
+            <PopoverShotItem label="side=right">
+              <SidePopover side="right" text="Right of the trigger" />
+            </PopoverShotItem>
+            <PopoverShotItem label="side=bottom">
+              <SidePopover side="bottom" text="Below the trigger" />
+            </PopoverShotItem>
+            <PopoverShotItem label="side=left">
+              <SidePopover side="left" text="Left of the trigger" />
+            </PopoverShotItem>
+          </div>
+        </FloatingStage>
+      </Row>
+      <Row label="Open · rich content (header + title + description)" col>
+        <FloatingStage width={480} height={170}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <Popover open={true} onOpenChange={() => {}}>
+              <PopoverAnchor>
+                <PopoverTrigger>
+                  <Button label="Open popover" onClick={() => {}} />
+                </PopoverTrigger>
+                <PopoverContent>
+                  <PopoverHeader>
+                    <PopoverTitle>Popover title</PopoverTitle>
+                    <PopoverDescription>A dim description line under the title.</PopoverDescription>
+                  </PopoverHeader>
+                  <Button label="Confirm" onClick={() => {}} />
+                </PopoverContent>
+              </PopoverAnchor>
+            </Popover>
+          </div>
+        </FloatingStage>
+      </Row>
+    </div>
+  ),
+}

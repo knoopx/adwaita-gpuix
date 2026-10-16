@@ -229,3 +229,85 @@ export function DropdownMenuSubTrigger({ label, icon, style }: DropdownMenuSubTr
 export function DropdownMenuSubContent({ children, style }: DropdownMenuSubContentProps) {
   return <MenuSubContent style={style}>{children}</MenuSubContent>
 }
+
+// ── Showcase shot ─────────────────────────────────────────────────────────
+import type { ComponentShot } from '../../scripts/shot'
+import { T, Row, FloatingStage } from './common'
+import { Button } from './Button'
+
+/** A captioned shot item: a small dim caption above the item. */
+function DDMShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
+      {children}
+    </div>
+  )
+}
+
+/** The full open menu: every row kind (label, icon, shortcut, inset,
+ *  disabled, destructive, checkbox, radio group, sub-trigger). */
+function DDMFullMenu() {
+  return (
+    <DropdownMenu open={true} onOpenChange={() => {}}>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>File</DropdownMenuLabel>
+        <DropdownMenuItem label="New file" icon="plus" shortcut="Ctrl+N" />
+        <DropdownMenuItem label="Open" icon="folder" shortcut="Ctrl+O" />
+        <DropdownMenuItem label="Indented row" icon="list" inset />
+        <DropdownMenuItem label="Disabled item" icon="user" disabled />
+        <DropdownMenuItem label="Delete" icon="trash" variant="destructive" />
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuCheckboxItem label="Show hidden files" checked={true} onCheckedChange={() => {}} />
+          <DropdownMenuCheckboxItem label="Wrap lines" checked={false} onCheckedChange={() => {}} />
+        </DropdownMenuGroup>
+        <DropdownMenuRadioGroup defaultValue="dark">
+          <DropdownMenuRadioItem label="Light theme" value="light" />
+          <DropdownMenuRadioItem label="Dark theme" value="dark" />
+        </DropdownMenuRadioGroup>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger label="Submenu" icon="chevronRight" />
+          <DropdownMenuSubContent>
+            <DropdownMenuItem label="Sub item" />
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+export const DropdownMenuShot: ComponentShot = {
+  name: 'DropdownMenu',
+  el: (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+      <Row label="Closed trigger">
+        <DropdownMenu open={false} onOpenChange={() => {}}>
+          <DropdownMenuTrigger>
+            <Button label="Open menu" onClick={() => {}} />
+          </DropdownMenuTrigger>
+        </DropdownMenu>
+      </Row>
+      <Row label="Open · all row kinds" col>
+        <FloatingStage width={480} height={340}>
+          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 8 }}>
+            <DDMFullMenu />
+          </div>
+        </FloatingStage>
+      </Row>
+      <Row label="Open · side=left" col>
+        <FloatingStage width={480} height={140}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <DropdownMenu open={true} onOpenChange={() => {}}>
+              <DropdownMenuContent side="left">
+                <DropdownMenuLabel>Side</DropdownMenuLabel>
+                <DropdownMenuItem label="Left-anchored item" icon="plus" />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </FloatingStage>
+      </Row>
+    </div>
+  ),
+}
