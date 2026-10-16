@@ -4,7 +4,13 @@
  * Headless per-component PNGs for the Adwaita/GPUix library, rendered with
  * takumi-js (JSX/CSS → PNG, no browser, native on Linux).
  *
- * Pipeline: serialize each montage with `renderToStaticMarkup` (standard React
+ * Each component file owns its own showcase shot (the
+ * `// ── Showcase shot ──` section at the end of `src/components/<File>.tsx`
+ * exporting `<Name>Shot: ComponentShot`); this script imports those shots
+ * directly. `AVATAR_IMG` comes from `./shot` (scripts/shot.ts), which also
+ * carries the `ComponentShot` shape and the shared `LEVELS`.
+ *
+ * Pipeline: serialize each shot with `renderToStaticMarkup` (standard React
  * server render), sanitize the GPUix-only style artifacts out of the HTML, then
  * rasterize the HTML with takumi. GPUix state maps (`hover`/`active`/
  * `boxShadow`) serialize to `[object Object]` and takumi's CSS parser rejects a
@@ -19,22 +25,90 @@ import { writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { AdwaitaProvider, buildTheme } from '../src/index'
-import { AVATAR_IMG } from './montage-shared'
-import { CORE_SHOTS } from './montages/core'
-import { FEEDBACK_SHOTS } from './montages/feedback'
-import { INPUTS_SHOTS } from './montages/inputs'
-import { OVERLAY_SHOTS } from './montages/overlays'
-import { OVERLAY_EXTRA_SHOTS } from './montages/overlays-extra'
+import { AVATAR_IMG } from './shot'
+
+// ── core ─────────────────────────────────────────────────────────────────
+import { ButtonShot } from '../src/components/Button'
+import { HeaderBarShot } from '../src/components/HeaderBar'
+import { BannerShot } from '../src/components/Banner'
+import { ToastShot } from '../src/components/Toast'
+import { SpinnerShot } from '../src/components/Spinner'
+import { StatusPageShot } from '../src/components/StatusPage'
+import { SwitchShot } from '../src/components/Switch'
+import { EntryShot } from '../src/components/Entry'
+import { InputShot } from '../src/components/Input'
+import { CardShot } from '../src/components/Card'
+import { BoxedListShot } from '../src/components/BoxedList'
+import { AlertDialogShot } from '../src/components/AlertDialog'
+import { TabsShot } from '../src/components/Tabs'
+import { ToggleGroupShot } from '../src/components/ToggleGroup'
+import { AvatarShot } from '../src/components/Avatar'
+import { ProgressBarShot } from '../src/components/ProgressBar'
+
+// ── feedback ─────────────────────────────────────────────────────────────
+import { ViewSwitcherShot } from '../src/components/ViewSwitcher'
+import { PreferencesPageShot } from '../src/components/PreferencesPage'
+import { BadgeShot } from '../src/components/Badge'
+import { LabelShot } from '../src/components/Label'
+import { SeparatorShot } from '../src/components/Separator'
+import { SkeletonShot } from '../src/components/Skeleton'
+import { KbdShot } from '../src/components/Kbd'
+import { AlertShot } from '../src/components/Alert'
+import { AspectRatioShot } from '../src/components/AspectRatio'
+import { EmptyShot } from '../src/components/Empty'
+import { TypographyShot } from '../src/components/Typography'
+import { InputGroupShot } from '../src/components/InputGroup'
+import { InputOTPShot } from '../src/components/InputOTP'
+import { TextareaShot } from '../src/components/Textarea'
+import { CheckboxShot } from '../src/components/Checkbox'
+import { RadioGroupShot } from '../src/components/RadioGroup'
+
+// ── inputs ───────────────────────────────────────────────────────────────
+import { SliderShot } from '../src/components/Slider'
+import { ToggleShot } from '../src/components/Toggle'
+import { NativeSelectShot } from '../src/components/NativeSelect'
+import { FieldShot } from '../src/components/Field'
+import { SelectShot } from '../src/components/Select'
+import { AccordionShot } from '../src/components/Accordion'
+import { CollapsibleShot } from '../src/components/Collapsible'
+import { TableShot } from '../src/components/Table'
+import { BreadcrumbShot } from '../src/components/Breadcrumb'
+import { PaginationShot } from '../src/components/Pagination'
+import { CarouselShot } from '../src/components/Carousel'
+import { ResizableShot } from '../src/components/Resizable'
+import { DialogShot } from '../src/components/Dialog'
+import { DrawerShot } from '../src/components/Drawer'
+
+// ── overlays ─────────────────────────────────────────────────────────────
+import { SheetShot } from '../src/components/Sheet'
+import { PopoverShot } from '../src/components/Popover'
+import { TooltipShot } from '../src/components/Tooltip'
+import { HoverCardShot } from '../src/components/HoverCard'
+import { DropdownMenuShot } from '../src/components/DropdownMenu'
+import { ContextMenuShot } from '../src/components/ContextMenu'
+import { MenubarShot } from '../src/components/Menubar'
+import { NavigationMenuShot } from '../src/components/NavigationMenu'
+import { CommandShot } from '../src/components/Command'
+
+// ── overlays-extra ───────────────────────────────────────────────────────
+import { CalendarShot, DatePickerShot } from '../src/components/Calendar'
+import { ChartShot } from '../src/components/Chart'
+import { ComboboxShot } from '../src/components/Combobox'
+import { NumberFieldShot } from '../src/components/NumberField'
+import { SidebarShot } from '../src/components/Sidebar'
+import { ListBoxShot } from '../src/components/ListBox'
+import { DescriptionShot } from '../src/components/Description'
+import { ToasterShot } from '../src/components/Toaster'
 
 // ── Paths / theme ─────────────────────────────────────────────────────────
 const componentsDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'components')
-// Use window_bg (the darkest Adwaita surface) as the montage backdrop so
+// Use window_bg (the darkest Adwaita surface) as the shot backdrop so
 // view_bg / button_bg element surfaces (inputs, cards, rows, triggers) stay
 // visible — matching real libadwaita surface layering (window < view < card).
 const bg = buildTheme('dark', 'blue').colors.window_bg
 const only = process.env.ONLY
 
-// Valid 1×1 red PNG (the AVATAR_IMG data-uri in the Avatar montage is
+// Valid 1×1 red PNG (the AVATAR_IMG data-uri in the Avatar shot is
 // truncated → bad CRC, which takumi's PNG decoder rejects).
 const VALID_1X1_B64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAADUExURTWE5H1SYY8AAAAHdElNRQfqCg8NJhnGtSIEAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDI2LTEwLTE1VDEzOjM4OjI1KzAwOjAwXBiS9gAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyNi0xMC0xNVQxMzozODoyNSswMDowMC1FKkoAAAAodEVYdGRhdGU6dGltZXN0YW1wIDIwMjYtMTAtMTVUMTM6Mzg6MjUrMDA6MDB6UAuVAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='
@@ -53,13 +127,77 @@ function sanitizeHtml(html: string): string {
   return s
 }
 
-// ── The 64 component montages ─────────────────────────────────────────────
+// ── The 64 component shots (per-component file order) ────────────────────
 const COMPONENTS = [
-  ...CORE_SHOTS,
-  ...FEEDBACK_SHOTS,
-  ...INPUTS_SHOTS,
-  ...OVERLAY_SHOTS,
-  ...OVERLAY_EXTRA_SHOTS,
+  // core
+  ButtonShot,
+  HeaderBarShot,
+  BannerShot,
+  ToastShot,
+  SpinnerShot,
+  StatusPageShot,
+  SwitchShot,
+  EntryShot,
+  InputShot,
+  CardShot,
+  BoxedListShot,
+  AlertDialogShot,
+  TabsShot,
+  ToggleGroupShot,
+  AvatarShot,
+  ProgressBarShot,
+  // feedback
+  ViewSwitcherShot,
+  PreferencesPageShot,
+  BadgeShot,
+  LabelShot,
+  SeparatorShot,
+  SkeletonShot,
+  KbdShot,
+  AlertShot,
+  AspectRatioShot,
+  EmptyShot,
+  TypographyShot,
+  InputGroupShot,
+  InputOTPShot,
+  TextareaShot,
+  CheckboxShot,
+  RadioGroupShot,
+  // inputs
+  SliderShot,
+  ToggleShot,
+  NativeSelectShot,
+  FieldShot,
+  SelectShot,
+  AccordionShot,
+  CollapsibleShot,
+  TableShot,
+  BreadcrumbShot,
+  PaginationShot,
+  CarouselShot,
+  ResizableShot,
+  DialogShot,
+  DrawerShot,
+  // overlays
+  SheetShot,
+  PopoverShot,
+  TooltipShot,
+  HoverCardShot,
+  DropdownMenuShot,
+  ContextMenuShot,
+  MenubarShot,
+  NavigationMenuShot,
+  CommandShot,
+  // overlays-extra
+  CalendarShot,
+  DatePickerShot,
+  ChartShot,
+  ComboboxShot,
+  NumberFieldShot,
+  SidebarShot,
+  ListBoxShot,
+  DescriptionShot,
+  ToasterShot,
 ]
 
 // ── Main ──────────────────────────────────────────────────────────────────
