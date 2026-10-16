@@ -151,8 +151,6 @@ export function Slider({
       backgroundColor: colors.accent,
       borderWidth: 2,
       borderColor: '#ffffff',
-      boxShadow: { offsetX: 0, offsetY: 1, blurRadius: 2, spreadRadius: 0, color: 'rgba(0,0,0,0.2)' },
-
 
       pointerEvents: 'none',
     }

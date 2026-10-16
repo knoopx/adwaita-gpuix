@@ -35,7 +35,6 @@ export function Switch({ checked, onChange, disabled, style }: SwitchProps) {
           height: 20,
           borderRadius: 10,
           backgroundColor: checked ? colors.accent_fg : '#ffffff',
-          boxShadow: { offsetX: 0, offsetY: 1, blurRadius: 2, spreadRadius: 0, color: 'rgba(0,0,0,0.25)' },
         }}
       />
     </div>

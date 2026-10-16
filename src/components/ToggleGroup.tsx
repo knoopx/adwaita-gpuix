@@ -77,9 +77,6 @@ export function ToggleGroup(props: ToggleGroupProps) {
               borderWidth: outline && !isActive ? 1 : 0,
               borderColor: colors.border,
               backgroundColor: isActive ? activeBg : 'transparent',
-              boxShadow: isActive
-                ? { offsetX: 0, offsetY: 1, blurRadius: 3, spreadRadius: 0, color: 'rgba(0,0,0,0.2)' }
-                : undefined,
               cursor: 'pointer',
               hover: isActive ? undefined : { backgroundColor: hexToRgba(colors.fg, 0.06) },
             }}

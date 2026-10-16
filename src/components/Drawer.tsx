@@ -108,7 +108,6 @@ function renderDrawerShell(
       <OverlayPanel
         position={pos}
         panelStyle={{
-          boxShadow: { offsetX: 0, offsetY: 0, blurRadius: 24, spreadRadius: 0, color: 'rgba(0,0,0,0.18)' },
           ...panelStyle,
         }}
       >

@@ -151,14 +151,6 @@ export function ShotItem({ label, children }: { label: string; children: ReactNo
   )
 }
 
-export const cardShadow = {
-  offsetX: 0,
-  offsetY: 4,
-  blurRadius: 12,
-  spreadRadius: 0,
-  color: 'rgba(0,0,0,0.15)',
-} as const
-
 export function FloatingPanel({
   children,
   side = 'bottom',
@@ -193,7 +185,6 @@ export function FloatingPanel({
           borderWidth: 1,
           borderColor: colors.border,
           backgroundColor: colors.view_bg,
-          boxShadow: cardShadow,
           ...style,
         }}
       >
@@ -750,7 +741,6 @@ export function dialogCardStyle(
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.view_bg,
-    boxShadow: { offsetX: 0, offsetY: 8, blurRadius: 24, spreadRadius: 0, color: 'rgba(0,0,0,0.18)' },
   }
 }
 
@@ -775,7 +765,6 @@ export function listPanelStyle(t: AdwaitaTheme, style?: Partial<StyleDesc>): Par
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.view_bg,
-    boxShadow: cardShadow,
     maxHeight: 200,
     ...style,
   }
@@ -836,38 +825,81 @@ export interface AdwaitaInputBaseProps {
   invalid?: boolean
   autoFocus?: boolean
   onSubmit?: () => void
+  /** Mask the displayed value with bullet characters (password entries). */
+  mask?: boolean
   style?: Partial<StyleDesc>
   testId?: string
 }
 
-export function AdwaitaInputBase({ value, onChange, placeholder, disabled, invalid, autoFocus, onSubmit, style, testId }: AdwaitaInputBaseProps) {
+export function AdwaitaInputBase({ value, onChange, placeholder, disabled, invalid, autoFocus, onSubmit, mask, style, testId }: AdwaitaInputBaseProps) {
   const t = useAdwaita()
-  const { colors, typography, radii } = t
+  const { colors, radii } = t
+  const [internal, setInternal] = useState<string>(value ?? '')
+  const [focused, setFocused] = useState(false)
+  const current = value ?? internal
+
+  const displayed = mask ? '•'.repeat(current.length) : current
+  const showPlaceholder = current.length === 0 && placeholder !== undefined
+  const borderColor = disabled ? colors.border : focused ? colors.accent : invalid ? colors.destructive : colors.border
+
   return (
-    <input
-      testId={testId}
-      value={value}
-      placeholder={placeholder}
-      autoFocus={autoFocus && !disabled ? true : undefined}
-      readOnly={disabled}
-      onChange={disabled ? undefined : (event) => onChange?.(event.value ?? '')}
-      onSubmit={disabled ? undefined : onSubmit}
-      theme={{ caret: colors.accent }}
+    <div
       style={{
+        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         minHeight: 34,
         borderRadius: radii.button,
         borderWidth: 1,
-        borderColor: invalid ? colors.destructive : colors.border,
+        borderColor,
         backgroundColor: colors.view_bg,
-        fontSize: typography.body,
-        fontFamily: typography.fontFamily,
-        color: colors.fg,
         opacity: disabled ? 0.5 : 1,
-        cursor: disabled ? 'default' : 'text',
+        cursor: disabled ? 'not-allowed' : 'text',
         ...style,
       }}
-    />
+    >
+      {/* Native editor: invisible but hit-testable, covers the whole shell. */}
+      <input
+        {...(testId ? { testId } : {})}
+        value={current}
+        placeholder={placeholder}
+        autoFocus={autoFocus && !disabled ? true : undefined}
+        readOnly={disabled}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        onChange={disabled ? undefined : (event) => {
+          const next = event.value ?? ''
+          if (value === undefined) setInternal(next)
+          onChange?.(next)
+        }}
+        onSubmit={disabled ? undefined : onSubmit}
+        theme={{ caret: colors.accent }}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          opacity: 0,
+          borderWidth: 0,
+          backgroundColor: 'transparent',
+        }}
+      />
+      {/* Visual layer: the value (masked) or the dim placeholder. */}
+      {displayed.length > 0 || showPlaceholder ? (
+        <T
+          size="body"
+          color={showPlaceholder ? colors.dim_fg : colors.fg}
+          style={{
+            flexShrink: 1,
+            pointerEvents: 'none',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {displayed || placeholder}
+        </T>
+      ) : null}
+    </div>
   )
 }

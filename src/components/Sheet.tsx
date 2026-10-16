@@ -100,7 +100,6 @@ function renderSheetShell(
       width: 320,
       borderRightWidth: 1,
       borderColor: colors.border,
-      boxShadow: { offsetX: 4, offsetY: 0, blurRadius: 16, spreadRadius: 0, color: 'rgba(0,0,0,0.12)' },
     }
   } else if (side === 'right') {
     panelStyle = {
@@ -110,7 +109,6 @@ function renderSheetShell(
       width: 320,
       borderLeftWidth: 1,
       borderColor: colors.border,
-      boxShadow: { offsetX: -4, offsetY: 0, blurRadius: 16, spreadRadius: 0, color: 'rgba(0,0,0,0.12)' },
     }
   } else if (side === 'bottom') {
     panelStyle = {
@@ -119,7 +117,6 @@ function renderSheetShell(
       width: '100%',
       borderTopWidth: 1,
       borderColor: colors.border,
-      boxShadow: { offsetX: 0, offsetY: -4, blurRadius: 16, spreadRadius: 0, color: 'rgba(0,0,0,0.12)' },
     }
   } else {
     panelStyle = {
@@ -128,7 +125,6 @@ function renderSheetShell(
       width: '100%',
       borderBottomWidth: 1,
       borderColor: colors.border,
-      boxShadow: { offsetX: 0, offsetY: 4, blurRadius: 16, spreadRadius: 0, color: 'rgba(0,0,0,0.12)' },
     }
   }
 

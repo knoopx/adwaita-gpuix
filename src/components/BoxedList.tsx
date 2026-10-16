@@ -93,13 +93,21 @@ function RowShell({
           minWidth: 0,
         }}
       >
-        <T size="body" color={colors.fg} style={{ lineHeight: 15 }}>
-          {title}
-        </T>
-        {subtitle ? (
-          <T size="caption" color={colors.dim_fg} style={{ lineHeight: 15 }}>
-            {subtitle}
+        {/* Fixed-height line boxes: <text> has no reliable intrinsic height in
+            the takumi rasterizer (a unitless lineHeight serializes as a CSS
+            multiplier and balloons the row), so each line gets an explicit
+            box. Valid GPUix layout in the native app as well. */}
+        <div style={{ height: 18 }}>
+          <T size="body" color={colors.fg}>
+            {title}
           </T>
+        </div>
+        {subtitle ? (
+          <div style={{ height: 16 }}>
+            <T size="caption" color={colors.dim_fg}>
+              {subtitle}
+            </T>
+          </div>
         ) : null}
       </div>
       {suffix}

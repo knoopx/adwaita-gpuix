@@ -18,9 +18,6 @@ export function Input({ value, onChange, placeholder, type = 'text', disabled, i
   const t = useAdwaita()
   const { radii } = t
 
-
-
-  void type
   return (
     <AdwaitaInputBase
       value={value}
@@ -28,13 +25,14 @@ export function Input({ value, onChange, placeholder, type = 'text', disabled, i
       placeholder={placeholder}
       disabled={disabled}
       invalid={invalid}
+      mask={type === 'password'}
       style={{ padding: 8, borderRadius: radii.row, ...style }}
     />
   )
 }
 
 import type { ComponentShot } from '../../scripts/shot'
-import { Row, T, Shot, ShotItem } from './common'
+import { Row, Shot, ShotItem } from './common'
 
 export const InputShot: ComponentShot = {
   name: 'Input',
@@ -46,9 +44,10 @@ export const InputShot: ComponentShot = {
         <ShotItem label="invalid"><Input value="invalid value" invalid /></ShotItem>
         <ShotItem label="disabled"><Input value="Read only" disabled /></ShotItem>
       </Row>
-      <Row label="Types (GPUix has no input type — all render plain text)" col>
+      <Row label="Types (password masks; the rest render plain text)" col>
         <ShotItem label="text"><Input type="text" placeholder="Plain text" /></ShotItem>
-        <ShotItem label="password"><Input type="password" placeholder="••••••••" /></ShotItem>
+        <ShotItem label="password"><Input type="password" value="hunter2" /></ShotItem>
+        <ShotItem label="password (empty)"><Input type="password" placeholder="Password" /></ShotItem>
         <ShotItem label="email"><Input type="email" placeholder="you@example.com" /></ShotItem>
         <ShotItem label="number"><Input type="number" placeholder="42" /></ShotItem>
         <ShotItem label="search"><Input type="search" placeholder="Search…" /></ShotItem>

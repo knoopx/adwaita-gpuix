@@ -169,7 +169,7 @@ function BarChart({ data, color, height, style }: ChartRendererProps) {
     <ChartFrame labels={data} style={style}>
       <BarRow height={height} gap={4}>
         {data.map((d, i) => {
-          const barHeight = Math.max(4, Math.round((d.value / maxValue) * plotHeight))
+          const barHeight = d.value === 0 ? 0 : Math.max(4, Math.round((d.value / maxValue) * plotHeight))
           return (
             <div
               key={i}
@@ -188,7 +188,7 @@ function BarChart({ data, color, height, style }: ChartRendererProps) {
               <div
                 style={{
                   width: '100%',
-                  minHeight: 4,
+                  minHeight: d.value === 0 ? 0 : 4,
                   height: barHeight,
                   borderRadius: 4,
                   backgroundColor: color,
@@ -242,7 +242,7 @@ function MultiBarChart({
               }}
             >
               {d.values.map((v, j) => {
-                const barHeight = Math.max(4, Math.round((v.value / maxValue) * plotHeight))
+                const barHeight = v.value === 0 ? 0 : Math.max(4, Math.round((v.value / maxValue) * plotHeight))
                 return (
                   <div
                     key={j}
@@ -259,7 +259,7 @@ function MultiBarChart({
                     <div
                       style={{
                         width: 8,
-                        minHeight: 4,
+                        minHeight: v.value === 0 ? 0 : 4,
                         height: barHeight,
                         borderRadius: 2,
                         backgroundColor: seriesColor(palette, j),
