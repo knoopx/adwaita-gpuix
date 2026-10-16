@@ -61,13 +61,13 @@ export function PreferencesPage({ children, style }: PreferencesPageProps) {
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
+import { Row, Shot } from './common'
 import { ActionRow, ButtonRow, ComboRow, EntryRow, ExpanderRow, SpinRow, SwitchRow } from './BoxedList'
 
 export const PreferencesPageShot: ComponentShot = {
   name: 'PreferencesPage',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="All row kinds (two groups)" col>
         <PreferencesPage>
           <PreferencesGroup title="General">
@@ -87,6 +87,6 @@ export const PreferencesPageShot: ComponentShot = {
           </PreferencesGroup>
         </PreferencesPage>
       </Row>
-    </div>
+    </Shot>
   ),
 }

@@ -209,24 +209,13 @@ export function FieldSeparator({ children, style }: FieldSeparatorProps) {
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
+import { Row, Shot, ShotItem } from './common'
 import { Input } from './Input'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
 
 export const FieldShot: ComponentShot = {
   name: 'Field',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Vertical (default)" col>
         <ShotItem label="label + control + description + error">
           <Field>
@@ -276,6 +265,6 @@ export const FieldShot: ComponentShot = {
         <ShotItem label="labelled"><FieldSeparator>or</FieldSeparator></ShotItem>
         <ShotItem label="unlabelled"><FieldSeparator /></ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

@@ -167,19 +167,8 @@ export function TooltipContent({ children, side, sideOffset = 4, style }: Toolti
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
+import { Row, Shot, ShotItem } from './common'
 import { Button } from './Button'
-
-/** A captioned shot item: a small dim caption above the item. */
-function TooltipShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
 
 /** An open tooltip on a given side (the `side` prop on the root). */
 function SideTooltip({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'; text: string }) {
@@ -198,7 +187,7 @@ function SideTooltip({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'
 export const TooltipShot: ComponentShot = {
   name: 'Tooltip',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Closed (open=false)">
         <TooltipProvider delayDuration={300}>
           <Tooltip open={false}>
@@ -211,18 +200,18 @@ export const TooltipShot: ComponentShot = {
       </Row>
       <Row label="Open · sides (side prop)" col>
         <div style={{ display: 'flex', flexDirection: 'row', gap: 24, alignItems: 'center' }}>
-          <TooltipShotItem label="side=top">
+          <ShotItem label="side=top">
             <SideTooltip side="top" text="Tooltip above" />
-          </TooltipShotItem>
-          <TooltipShotItem label="side=right">
+          </ShotItem>
+          <ShotItem label="side=right">
             <SideTooltip side="right" text="Tooltip right" />
-          </TooltipShotItem>
-          <TooltipShotItem label="side=bottom">
+          </ShotItem>
+          <ShotItem label="side=bottom">
             <SideTooltip side="bottom" text="Tooltip below" />
-          </TooltipShotItem>
-          <TooltipShotItem label="side=left">
+          </ShotItem>
+          <ShotItem label="side=left">
             <SideTooltip side="left" text="Tooltip left" />
-          </TooltipShotItem>
+          </ShotItem>
         </div>
       </Row>
       <Row label="Content-side override (TooltipContent side)" col>
@@ -243,6 +232,6 @@ export const TooltipShot: ComponentShot = {
           <TooltipContent>Uncontrolled open state</TooltipContent>
         </Tooltip>
       </Row>
-    </div>
+    </Shot>
   ),
 }

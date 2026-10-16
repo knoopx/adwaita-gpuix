@@ -199,23 +199,12 @@ export function CarouselItem({ children, width = 200, style }: CarouselItemProps
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row, T } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, T, Shot, ShotItem } from './common'
 
 export const CarouselShot: ComponentShot = {
   name: 'Carousel',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Default window (visible=3, 5 items)" col>
         <ShotItem label="start — prev disabled, next enabled">
           <Carousel visible={3}>
@@ -242,6 +231,6 @@ export const CarouselShot: ComponentShot = {
           </Carousel>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

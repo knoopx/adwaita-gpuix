@@ -37,24 +37,12 @@ export function Skeleton({ width = 120, height = 16, variant = 'default', style 
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
-import { Row, T } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const SkeletonShot: ComponentShot = {
   name: 'Skeleton',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Default (rounded blocks)" col>
         <ShotItem label="text line (120×16)">
           <Skeleton width={120} height={16} />
@@ -68,6 +56,6 @@ export const SkeletonShot: ComponentShot = {
         <ShotItem label="32px"><Skeleton variant="circle" width={32} /></ShotItem>
         <ShotItem label="24px"><Skeleton variant="circle" width={24} /></ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

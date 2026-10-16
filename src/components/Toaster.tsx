@@ -112,20 +112,8 @@ export function Toaster({ toasts = [], position = 'bottom-left', onDismiss, styl
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
 import { useAdwaita } from '../theme/adwaita'
-import { FloatingStage, T, Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { FloatingStage, T, Row, Shot, ShotItem } from './common'
 
 /** A bounded app-window stage holding a positioned Toaster stack. */
 function ToastStage({
@@ -170,7 +158,7 @@ function ToastStage({
 export const ToasterShot: ComponentShot = {
   name: 'Toaster',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Toast types (leading icon)" col>
         <ShotItem label="default / success / warning / error / loading">
           <ToastStage
@@ -218,6 +206,6 @@ export const ToasterShot: ComponentShot = {
           </ShotItem>
         </div>
       </Row>
-    </div>
+    </Shot>
   ),
 }

@@ -255,17 +255,6 @@ export function SheetClose({ children, style }: SheetCloseProps) {
 
 const noop = () => {}
 
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
-
 /** The shared open-sheet body: header (title + close), content, footer. */
 function SheetBody({ title }: { title: string }) {
   return (
@@ -287,7 +276,7 @@ function SheetBody({ title }: { title: string }) {
  *  custom-close variant, each contained in a bounded stage. */
 export function SheetShowcase(): ReactNode {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Closed (open=false renders nothing)">
         <Sheet open={false} onOpenChange={noop} side="left">
           <SheetTrigger>
@@ -340,12 +329,13 @@ export function SheetShowcase(): ReactNode {
           </FloatingStage>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   )
 }
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
+import { Shot, ShotItem } from './common'
 
 export const SheetShot: ComponentShot = {
   name: 'Sheet',

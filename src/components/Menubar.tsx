@@ -233,7 +233,7 @@ export function MenubarShortcut({ children, style }: MenubarShortcutProps) {
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
+import { Row, Shot } from './common'
 
 /** A bordered card frame for the standalone content block. */
 function MenubarContentFrame({ children }: { children: ReactNode }) {
@@ -258,7 +258,7 @@ function MenubarContentFrame({ children }: { children: ReactNode }) {
 export const MenubarShot: ComponentShot = {
   name: 'Menubar',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Bar (popdowns closed — open state is internal)">
         <Menubar>
           <MenubarMenu label="File">
@@ -301,6 +301,6 @@ export const MenubarShot: ComponentShot = {
           </MenubarContent>
         </MenubarContentFrame>
       </Row>
-    </div>
+    </Shot>
   ),
 }

@@ -110,23 +110,12 @@ export function InlineCode({ children, style }: InlineCodeProps) {
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const TypographyShot: ComponentShot = {
   name: 'Typography',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Headings (levels 1–6)" col>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           <Heading level={1}>Heading 1</Heading>
@@ -158,6 +147,6 @@ export const TypographyShot: ComponentShot = {
           </Paragraph>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

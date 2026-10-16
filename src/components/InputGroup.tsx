@@ -169,19 +169,8 @@ export function InputGroupTextarea({ value, onChange, placeholder, rows, style }
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
+import { Row, Shot, ShotItem } from './common'
 import { Icon } from './icons'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
 
 /** A dim 14px icon for the button-addon examples (theme colour needs a hook). */
 function AddonIcon({ name }: { name: 'search' | 'plus' }) {
@@ -192,7 +181,7 @@ function AddonIcon({ name }: { name: 'search' | 'plus' }) {
 export const InputGroupShot: ComponentShot = {
   name: 'InputGroup',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Alignments" col>
         <ShotItem label="row (default) — prefix + suffix addons">
           <InputGroup>
@@ -238,6 +227,6 @@ export const InputGroupShot: ComponentShot = {
           </InputGroup>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

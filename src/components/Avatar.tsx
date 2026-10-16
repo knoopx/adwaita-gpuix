@@ -194,23 +194,12 @@ export function AvatarGroupCount({ count, size = 32, style }: AvatarGroupCountPr
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import { AVATAR_IMG, type ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const AvatarShot: ComponentShot = {
   name: 'Avatar',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Sizes">
         <ShotItem label="24"><Avatar name="Ada Lovelace" size={24} /></ShotItem>
         <ShotItem label="32"><Avatar name="Grace Hopper" size={32} /></ShotItem>
@@ -244,6 +233,6 @@ export const AvatarShot: ComponentShot = {
           </AvatarGroup>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

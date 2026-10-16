@@ -139,7 +139,7 @@ export function EmptyAction({ children, style }: EmptyActionProps) {
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { buildTheme } from '../theme/adwaita'
-import { Row } from './common'
+import { Row, Shot } from './common'
 import { Button } from './Button'
 import { Icon } from './icons'
 
@@ -151,7 +151,7 @@ function SparklesIcon() {
 export const EmptyShot: ComponentShot = {
   name: 'Empty',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Full (media + title + description + content + action)" col>
         <Empty>
           <EmptyMedia>
@@ -187,6 +187,6 @@ export const EmptyShot: ComponentShot = {
           <EmptyTitle>Empty</EmptyTitle>
         </Empty>
       </Row>
-    </div>
+    </Shot>
   ),
 }

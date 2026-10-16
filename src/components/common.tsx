@@ -67,6 +67,65 @@ export function Row({ label, children, col = false }: { label: string; children:
   )
 }
 
+/* ── Shared text building blocks ───────────────────────────────────────── */
+
+export interface TextPartProps {
+  size?: TextSize
+  weight?: string | number
+  /** Render in the dim foreground (description text) instead of the primary foreground. */
+  dim?: boolean
+  style?: Partial<StyleDesc>
+  children: ReactNode
+}
+
+/**
+ * A themed title / description text part: primary or dim foreground.
+ * Shared by the libadwaita title + description pairs (AlertTitle /
+ * AlertDescription, PopoverTitle / PopoverDescription).
+ */
+export function TextPart({ size = 'body', weight, dim, style, children }: TextPartProps) {
+  const t = useAdwaita()
+  return (
+    <T size={size} weight={weight} color={dim ? t.colors.dim_fg : t.colors.fg} style={style}>
+      {children}
+    </T>
+  )
+}
+
+/**
+ * A labelled control row: the control + a sibling body-text label in a
+ * flex row (GPUix has no `htmlFor` — the label is a sibling `T`).
+ * `disabled` dims the whole row. Shared by Checkbox and RadioGroup.
+ */
+export function LabeledControl({
+  control,
+  label,
+  disabled,
+  style,
+}: {
+  control: ReactNode
+  label: string
+  disabled?: boolean
+  style?: Partial<StyleDesc>
+}) {
+  const t = useAdwaita()
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        opacity: disabled ? 0.5 : 1,
+        ...style,
+      }}
+    >
+      {control}
+      <T size="body" color={t.colors.fg}>{label}</T>
+    </div>
+  )
+}
+
 /**
  * A bounded `position: relative` stage that contains an open floating panel
  * (Dialog/Drawer/Sheet rendered with `contained`), so the panel + scrim sit
@@ -96,6 +155,27 @@ export function FloatingStage({
         overflow: 'hidden',
       }}
     >
+      {children}
+    </div>
+  )
+}
+
+/* ── Shared showcase-shot scaffolding ──────────────────────────────────── */
+
+/**
+ * The showcase-shot stage: a fixed-width (528px) column with 12px gap that
+ * holds a shot's `Row` sections. The root wrapper of every `<Name>Shot`.
+ */
+export function Shot({ children }: { children: ReactNode }) {
+  return <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>{children}</div>
+}
+
+/** A captioned shot item: a small dim caption above the item. */
+export function ShotItem({ label, children }: { label: string; children: ReactNode }) {
+  const t = useAdwaita()
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <T size="caption" color={t.colors.dim_fg}>{label}</T>
       {children}
     </div>
   )

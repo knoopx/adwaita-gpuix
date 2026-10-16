@@ -207,24 +207,13 @@ export function DialogClose({ children, style }: DialogCloseProps) {
 
 /* ── Showcase ─────────────────────────────────────────────────────────── */
 
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
-
 /** Full Dialog shot for static renders / playground: closed trigger +
  *  open panel variants (auto close button / custom DialogClose), each
  *  contained in a bounded stage. */
 export function DialogShowcase(): ReactNode {
   const t = useAdwaita()
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Closed trigger">
         <Dialog open={false} onOpenChange={noop}>
           <DialogTrigger>
@@ -270,12 +259,13 @@ export function DialogShowcase(): ReactNode {
           </FloatingStage>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   )
 }
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
+import { Shot, ShotItem } from './common'
 
 export const DialogShot: ComponentShot = {
   name: 'Dialog',

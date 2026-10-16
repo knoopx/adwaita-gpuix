@@ -229,19 +229,8 @@ export function ContextMenuSubContent({ children, style }: ContextMenuSubContent
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { T, Row, FloatingStage } from './common'
+import { T, Row, FloatingStage, Shot, ShotItem } from './common'
 import { buildTheme } from '../theme/adwaita'
-
-/** A captioned shot item: a small dim caption above the item. */
-function CtxMenuShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
 
 /** The full open context menu: every row kind the API exposes
  *  (label, items, disabled, checkbox checked/unchecked, radio group, sub-trigger). */
@@ -277,7 +266,7 @@ function CtxMenuFull() {
 export const ContextMenuShot: ComponentShot = {
   name: 'ContextMenu',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Trigger area (closed — right-click to open)">
         <ContextMenu open={false} onOpenChange={() => {}}>
           <ContextMenuTrigger>
@@ -303,6 +292,6 @@ export const ContextMenuShot: ComponentShot = {
           </div>
         </FloatingStage>
       </Row>
-    </div>
+    </Shot>
   ),
 }

@@ -182,23 +182,12 @@ export function Banner({
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const BannerShot: ComponentShot = {
   name: 'Banner',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Tones" col>
         <ShotItem label="info"><Banner title="New version available" body="A stable release is ready to install." tone="info" onClose={() => {}} /></ShotItem>
         <ShotItem label="warning"><Banner title="Storage almost full" body="You have used 95% of your quota." tone="warning" onClose={() => {}} /></ShotItem>
@@ -217,6 +206,6 @@ export const BannerShot: ComponentShot = {
           <Banner title="Update ready" body="A new version is waiting." tone="info" actionLabel="Update" onAction={() => {}} onClose={() => {}} narrow />
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

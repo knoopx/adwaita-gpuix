@@ -79,24 +79,12 @@ export function Toast({ message, actionLabel, onAction, type = 'default', onDism
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const ToastShot: ComponentShot = {
   name: 'Toast',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Types" col>
         <ShotItem label="default (no icon)"><Toast message="File saved" /></ShotItem>
         <ShotItem label="success"><Toast message="File saved" type="success" /></ShotItem>
@@ -112,6 +100,6 @@ export const ToastShot: ComponentShot = {
           <Toast message="File saved" type="success" actionLabel="Undo" onAction={() => {}} onDismiss={() => {}} />
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

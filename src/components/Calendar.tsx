@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import type { StyleDesc } from '@gpuix/react'
 import { useAdwaita } from '../theme/adwaita'
 import { T, inputShellStyle, listPanelStyle } from './common'
@@ -470,67 +470,56 @@ export function DatePicker({ value, onChange, open, onOpenChange, style }: DateP
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function CalendarShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const CalendarShot: ComponentShot = {
   name: 'Calendar',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Selection modes (mode prop)" col>
         <div style={{ display: 'flex', flexDirection: 'row', gap: 16, alignItems: 'flex-start' }}>
-          <CalendarShotItem label="mode=single (selected date)">
+          <ShotItem label="mode=single (selected date)">
             <Calendar month={new Date(2025, 5, 1)} selected={new Date(2025, 5, 15)} onSelect={() => {}} />
-          </CalendarShotItem>
-          <CalendarShotItem label="mode=multiple (value: Date[])">
+          </ShotItem>
+          <ShotItem label="mode=multiple (value: Date[])">
             <Calendar
               mode="multiple"
               month={new Date(2025, 5, 1)}
               value={[new Date(2025, 5, 3), new Date(2025, 5, 15), new Date(2025, 5, 27)]}
               onValueChange={() => {}}
             />
-          </CalendarShotItem>
+          </ShotItem>
         </div>
-        <CalendarShotItem label="mode=range (selected: [start, end])">
+        <ShotItem label="mode=range (selected: [start, end])">
           <Calendar
             mode="range"
             month={new Date(2025, 5, 1)}
             selected={[new Date(2025, 5, 10), new Date(2025, 5, 20)]}
             onValueChange={() => {}}
           />
-        </CalendarShotItem>
+        </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }
 
 export const DatePickerShot: ComponentShot = {
   name: 'DatePicker',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Trigger states">
-        <CalendarShotItem label="closed · empty (no value)">
+        <ShotItem label="closed · empty (no value)">
           <DatePicker open={false} onChange={() => {}} />
-        </CalendarShotItem>
-        <CalendarShotItem label="closed · with value">
+        </ShotItem>
+        <ShotItem label="closed · with value">
           <DatePicker value={new Date(2025, 5, 15)} open={false} onChange={() => {}} />
-        </CalendarShotItem>
+        </ShotItem>
       </Row>
       <Row label="Open · anchored calendar" col>
         <div style={{ width: 280 }}>
           <DatePicker value={new Date(2025, 5, 15)} open={true} onChange={() => {}} />
         </div>
       </Row>
-    </div>
+    </Shot>
   ),
 }

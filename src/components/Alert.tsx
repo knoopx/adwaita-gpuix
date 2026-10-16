@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
 import { useAdwaita, type AdwaitaColors } from '../theme/adwaita'
-import { T } from './common'
+import { TextPart } from './common'
 import { Icon, type IconName } from './icons'
 
 export type AlertVariant = 'default' | 'success' | 'warning' | 'destructive'
@@ -72,11 +72,10 @@ export interface AlertTitleProps {
 
 /** Bold title4 text for alert headers. */
 export function AlertTitle({ children, style }: AlertTitleProps) {
-  const t = useAdwaita()
   return (
-    <T size="title4" weight={700} color={t.colors.fg} style={style}>
+    <TextPart size="title4" weight={700} style={style}>
       {children}
-    </T>
+    </TextPart>
   )
 }
 
@@ -87,33 +86,21 @@ export interface AlertDescriptionProps {
 
 /** Dim caption text for alert descriptions. */
 export function AlertDescription({ children, style }: AlertDescriptionProps) {
-  const t = useAdwaita()
   return (
-    <T size="body" color={t.colors.dim_fg} style={style}>
+    <TextPart dim style={style}>
       {children}
-    </T>
+    </TextPart>
   )
 }
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const AlertShot: ComponentShot = {
   name: 'Alert',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Variants (icon + title + description)" col>
         <ShotItem label="default (accent tint, info icon)">
           <Alert>
@@ -140,6 +127,6 @@ export const AlertShot: ComponentShot = {
           </Alert>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

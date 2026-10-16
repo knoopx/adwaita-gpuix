@@ -60,7 +60,7 @@ export function AspectRatio({ ratio, width, height, children, style }: AspectRat
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { buildTheme } from '../theme/adwaita'
-import { T, Row } from './common'
+import { T, Row, Shot, ShotItem } from './common'
 
 /** A tinted fill box with a centred ratio label. */
 function FillBox({ label, height }: { label: string; height?: number }) {
@@ -81,20 +81,10 @@ function FillBox({ label, height }: { label: string; height?: number }) {
   )
 }
 
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={buildTheme('dark', 'blue').colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
-
 export const AspectRatioShot: ComponentShot = {
   name: 'AspectRatio',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="By width (16:9, width=400)" col>
         <AspectRatio ratio={16 / 9} width={400}>
           <FillBox label="16 : 9" />
@@ -119,6 +109,6 @@ export const AspectRatioShot: ComponentShot = {
           </div>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

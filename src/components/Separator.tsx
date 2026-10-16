@@ -38,24 +38,12 @@ export function Separator({ orientation = 'horizontal', style }: SeparatorProps)
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
-import { Row, T } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, T, Shot, ShotItem } from './common'
 
 export const SeparatorShot: ComponentShot = {
   name: 'Separator',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Orientations">
         <ShotItem label="horizontal">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
@@ -72,6 +60,6 @@ export const SeparatorShot: ComponentShot = {
           </div>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

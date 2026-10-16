@@ -51,24 +51,12 @@ export function Spinner({ size = 32, label = true, style }: SpinnerProps) {
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const SpinnerShot: ComponentShot = {
   name: 'Spinner',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Sizes">
         <ShotItem label="16"><Spinner size={16} /></ShotItem>
         <ShotItem label="32"><Spinner size={32} /></ShotItem>
@@ -78,6 +66,6 @@ export const SpinnerShot: ComponentShot = {
         <ShotItem label="a11y label (visually hidden)"><Spinner size={32} label /></ShotItem>
         <ShotItem label="no label"><Spinner size={32} label={false} /></ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

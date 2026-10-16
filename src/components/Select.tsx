@@ -207,18 +207,7 @@ export function SelectSeparator({ style }: SelectSeparatorProps) {
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import { LEVELS, type ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 /**
  * A left-aligned fixed-width stage that contains one open Select. In static
@@ -248,10 +237,27 @@ function ShotSelectValuePlaceholder() {
   return <SelectValue placeholder={<T size="body" color={t.colors.dim_fg}>Select…</T>} />
 }
 
+/** An open select with a two-item content list anchored to one side. */
+function SideSelect({ side }: { side: 'top' | 'right' | 'left' }) {
+  return (
+    <SelectStage>
+      <Select open value="low" items={LEVELS} onValueChange={() => {}}>
+        <SelectTrigger>
+          <ShotSelectValue text="Low" />
+        </SelectTrigger>
+        <SelectContent side={side}>
+          <SelectItem value="low">Low</SelectItem>
+          <SelectItem value="medium">Medium</SelectItem>
+        </SelectContent>
+      </Select>
+    </SelectStage>
+  )
+}
+
 export const SelectShot: ComponentShot = {
   name: 'Select',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Trigger (sizes + states)">
         <ShotItem label="default (34px)">
           <Select value="medium" items={LEVELS} onValueChange={() => {}}>
@@ -321,46 +327,10 @@ export const SelectShot: ComponentShot = {
         </ShotItem>
       </Row>
       <Row label="Content sides (side prop)" col>
-        <ShotItem label="side=top">
-          <SelectStage>
-            <Select open value="low" items={LEVELS} onValueChange={() => {}}>
-              <SelectTrigger>
-                <ShotSelectValue text="Low" />
-              </SelectTrigger>
-              <SelectContent side="top">
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-              </SelectContent>
-            </Select>
-          </SelectStage>
-        </ShotItem>
-        <ShotItem label="side=right">
-          <SelectStage>
-            <Select open value="low" items={LEVELS} onValueChange={() => {}}>
-              <SelectTrigger>
-                <ShotSelectValue text="Low" />
-              </SelectTrigger>
-              <SelectContent side="right">
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-              </SelectContent>
-            </Select>
-          </SelectStage>
-        </ShotItem>
-        <ShotItem label="side=left">
-          <SelectStage>
-            <Select open value="low" items={LEVELS} onValueChange={() => {}}>
-              <SelectTrigger>
-                <ShotSelectValue text="Low" />
-              </SelectTrigger>
-              <SelectContent side="left">
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-              </SelectContent>
-            </Select>
-          </SelectStage>
-        </ShotItem>
+        <ShotItem label="side=top"><SideSelect side="top" /></ShotItem>
+        <ShotItem label="side=right"><SideSelect side="right" /></ShotItem>
+        <ShotItem label="side=left"><SideSelect side="left" /></ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

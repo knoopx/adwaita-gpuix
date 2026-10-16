@@ -225,25 +225,14 @@ export function CommandDialog({ open, onOpenChange, contained, children, style }
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row, FloatingStage } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function CommandShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, FloatingStage, Shot, ShotItem } from './common'
 
 export const CommandShot: ComponentShot = {
   name: 'Command',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Open palette · item states" col>
-        <CommandShotItem label="groups + items (shortcut / selected / search terms) + separator">
+        <ShotItem label="groups + items (shortcut / selected / search terms) + separator">
           <Command>
             <CommandInput placeholder="Type a command…" />
             <CommandList>
@@ -259,15 +248,15 @@ export const CommandShot: ComponentShot = {
               </CommandGroup>
             </CommandList>
           </Command>
-        </CommandShotItem>
-        <CommandShotItem label="empty state">
+        </ShotItem>
+        <ShotItem label="empty state">
           <Command>
             <CommandInput placeholder="Type a command…" />
             <CommandList>
               <CommandEmpty />
             </CommandList>
           </Command>
-        </CommandShotItem>
+        </ShotItem>
       </Row>
       <Row label="Command dialog (contained, in a stage)" col>
         <FloatingStage width={480} height={220}>
@@ -284,6 +273,6 @@ export const CommandShot: ComponentShot = {
           </div>
         </FloatingStage>
       </Row>
-    </div>
+    </Shot>
   ),
 }

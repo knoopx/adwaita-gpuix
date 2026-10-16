@@ -232,19 +232,8 @@ export function DropdownMenuSubContent({ children, style }: DropdownMenuSubConte
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { T, Row, FloatingStage } from './common'
+import { T, Row, FloatingStage, Shot, ShotItem } from './common'
 import { Button } from './Button'
-
-/** A captioned shot item: a small dim caption above the item. */
-function DDMShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
 
 /** The full open menu: every row kind (label, icon, shortcut, inset,
  *  disabled, destructive, checkbox, radio group, sub-trigger). */
@@ -281,7 +270,7 @@ function DDMFullMenu() {
 export const DropdownMenuShot: ComponentShot = {
   name: 'DropdownMenu',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Closed trigger">
         <DropdownMenu open={false} onOpenChange={() => {}}>
           <DropdownMenuTrigger>
@@ -308,6 +297,6 @@ export const DropdownMenuShot: ComponentShot = {
           </div>
         </FloatingStage>
       </Row>
-    </div>
+    </Shot>
   ),
 }

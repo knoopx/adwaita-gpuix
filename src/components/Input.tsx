@@ -45,24 +45,12 @@ export function Input({ value, onChange, placeholder, type = 'text', disabled, i
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
-import { Row, T } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, T, Shot, ShotItem } from './common'
 
 export const InputShot: ComponentShot = {
   name: 'Input',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="States" col>
         <ShotItem label="placeholder"><Input placeholder="Type here…" /></ShotItem>
         <ShotItem label="with value"><Input value="Hello world" /></ShotItem>
@@ -77,6 +65,6 @@ export const InputShot: ComponentShot = {
         <ShotItem label="search"><Input type="search" placeholder="Search…" /></ShotItem>
         <ShotItem label="url"><Input type="url" placeholder="https://…" /></ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

@@ -267,18 +267,7 @@ export function AccordionContent({ children, open, style }: AccordionContentProp
 // Disabled — using the example's item content (the screenshot set).
 
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 /** Reference example width: `max-w-lg` (32rem = 512px). */
 const LAYOUT: Partial<StyleDesc> = { maxWidth: 512 }
@@ -370,8 +359,28 @@ export const AccordionShot: ComponentShot = {
   ),
 }
 
-function Shot({ children }: { children: ReactNode }) {
-  return <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>{children}</div>
+/**
+ * The shared trigger + content pair of the bordered sub-shots: a padded
+ * trigger (body, weight 500) and a padded content (body; dim foreground
+ * when `dimContent`). Extracted so BorderShot / DisabledShot share one
+ * markup; each caller keeps its own item data and item-level props.
+ */
+function ShotItemBody({ item, dimContent }: { item: { trigger: string; content: string }; dimContent?: boolean }) {
+  const t = useAdwaita()
+  return (
+    <>
+      <AccordionTrigger style={{ paddingLeft: 10, paddingRight: 10 }}>
+        <T size="body" weight={500}>
+          {item.trigger}
+        </T>
+      </AccordionTrigger>
+      <AccordionContent style={{ paddingLeft: 10, paddingRight: 10 }}>
+        <T size="body" color={dimContent ? t.colors.dim_fg : undefined}>
+          {item.content}
+        </T>
+      </AccordionContent>
+    </>
+  )
 }
 
 /**
@@ -413,16 +422,7 @@ function BorderShot() {
             borderRadius: t.radii.row,
           }}
         >
-          <AccordionTrigger style={{ paddingLeft: 10, paddingRight: 10 }}>
-            <T size="body" weight={500}>
-              {item.trigger}
-            </T>
-          </AccordionTrigger>
-          <AccordionContent style={{ paddingLeft: 10, paddingRight: 10 }}>
-            <T size="body" color={t.colors.dim_fg}>
-              {item.content}
-            </T>
-          </AccordionContent>
+          <ShotItemBody item={item} dimContent />
         </AccordionItem>
       ))}
     </Accordion>
@@ -554,14 +554,7 @@ function DisabledShot() {
             padding: 4,
           }}
         >
-          <AccordionTrigger style={{ paddingLeft: 10, paddingRight: 10 }}>
-            <T size="body" weight={500}>
-              {item.trigger}
-            </T>
-          </AccordionTrigger>
-          <AccordionContent style={{ paddingLeft: 10, paddingRight: 10 }}>
-            <T size="body">{item.content}</T>
-          </AccordionContent>
+          <ShotItemBody item={item} />
         </AccordionItem>
       ))}
     </Accordion>

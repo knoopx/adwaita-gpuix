@@ -200,24 +200,12 @@ export function Slider({
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
-import { Row, T } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const SliderShot: ComponentShot = {
   name: 'Slider',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Single value" col>
         <ShotItem label="horizontal, value 40">
           <Slider value={40} onValueChange={() => {}} width={300} />
@@ -241,6 +229,6 @@ export const SliderShot: ComponentShot = {
           <Slider value={40} disabled onValueChange={() => {}} width={300} />
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

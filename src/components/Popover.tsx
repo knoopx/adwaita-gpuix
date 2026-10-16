@@ -1,7 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { FloatingPanel, T } from './common'
+import { FloatingPanel, T, TextPart } from './common'
 
 /* ── Types ────────────────────────────────────────────────────────────── */
 
@@ -103,38 +102,25 @@ export function PopoverHeader({ children, style }: PopoverHeaderProps) {
 }
 
 export function PopoverTitle({ children, style }: PopoverTitleProps) {
-  const t = useAdwaita()
   return (
-    <T size="body" weight={600} color={t.colors.fg} style={style}>
+    <TextPart weight={600} style={style}>
       {children}
-    </T>
+    </TextPart>
   )
 }
 
 export function PopoverDescription({ children, style }: PopoverDescriptionProps) {
-  const t = useAdwaita()
   return (
-    <T size="body" color={t.colors.dim_fg} style={style}>
+    <TextPart dim style={style}>
       {children}
-    </T>
+    </TextPart>
   )
 }
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row, FloatingStage } from './common'
+import { Row, FloatingStage, Shot, ShotItem } from './common'
 import { Button } from './Button'
-
-/** A captioned shot item: a small dim caption above the item. */
-function PopoverShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
 
 /** A compact open-popover anchor: trigger button + anchored content on a side. */
 function SidePopover({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'; text: string }) {
@@ -155,7 +141,7 @@ function SidePopover({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'
 export const PopoverShot: ComponentShot = {
   name: 'Popover',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Closed trigger">
         <Popover open={false} onOpenChange={() => {}}>
           <PopoverTrigger>
@@ -166,18 +152,18 @@ export const PopoverShot: ComponentShot = {
       <Row label="Open · sides (side prop, anchored in a stage)" col>
         <FloatingStage width={480} height={120}>
           <div style={{ display: 'flex', flexDirection: 'row', gap: 16, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            <PopoverShotItem label="side=top">
+            <ShotItem label="side=top">
               <SidePopover side="top" text="Above the trigger" />
-            </PopoverShotItem>
-            <PopoverShotItem label="side=right">
+            </ShotItem>
+            <ShotItem label="side=right">
               <SidePopover side="right" text="Right of the trigger" />
-            </PopoverShotItem>
-            <PopoverShotItem label="side=bottom">
+            </ShotItem>
+            <ShotItem label="side=bottom">
               <SidePopover side="bottom" text="Below the trigger" />
-            </PopoverShotItem>
-            <PopoverShotItem label="side=left">
+            </ShotItem>
+            <ShotItem label="side=left">
               <SidePopover side="left" text="Left of the trigger" />
-            </PopoverShotItem>
+            </ShotItem>
           </div>
         </FloatingStage>
       </Row>
@@ -201,6 +187,6 @@ export const PopoverShot: ComponentShot = {
           </div>
         </FloatingStage>
       </Row>
-    </div>
+    </Shot>
   ),
 }

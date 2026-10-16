@@ -111,18 +111,7 @@ export function CollapsibleContent({ children, open, style }: CollapsibleContent
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { useAdwaita } from '../theme/adwaita'
-import { Row, T } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, T, Shot, ShotItem } from './common'
 
 /** A bordered frame around a collapsible instance (so open/closed are distinguishable). */
 function CollapsibleFrame({ children }: { children: ReactNode }) {
@@ -137,7 +126,7 @@ function CollapsibleFrame({ children }: { children: ReactNode }) {
 export const CollapsibleShot: ComponentShot = {
   name: 'Collapsible',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="States">
         <ShotItem label="open (content visible)">
           <CollapsibleFrame>
@@ -164,6 +153,6 @@ export const CollapsibleShot: ComponentShot = {
           </CollapsibleFrame>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

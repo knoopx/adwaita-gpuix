@@ -116,23 +116,12 @@ export function NativeSelect({ value, options, groups, onChange, style }: Native
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import { LEVELS, type ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const NativeSelectShot: ComponentShot = {
   name: 'NativeSelect',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="States" col>
         <ShotItem label="selected (Medium)">
           <NativeSelect value="medium" options={LEVELS} onChange={() => {}} />
@@ -154,6 +143,6 @@ export const NativeSelectShot: ComponentShot = {
           />
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

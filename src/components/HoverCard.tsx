@@ -71,20 +71,9 @@ export function HoverCardContent({ children, side = 'bottom', sideOffset = 8, st
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { T, Row, FloatingStage } from './common'
+import { T, Row, FloatingStage, Shot, ShotItem } from './common'
 import { Button } from './Button'
 import { Icon } from './icons'
-
-/** A captioned shot item: a small dim caption above the item. */
-function HoverCardShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
 
 /** A compact open hover card: trigger button + anchored content on a side. */
 function SideHoverCard({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'; text: string }) {
@@ -117,7 +106,7 @@ function HoverCardRichBody() {
 export const HoverCardShot: ComponentShot = {
   name: 'HoverCard',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Closed trigger">
         <HoverCard open={false} onOpenChange={() => {}}>
           <HoverCardTrigger>
@@ -128,18 +117,18 @@ export const HoverCardShot: ComponentShot = {
       <Row label="Open · sides (side prop, anchored in a stage)" col>
         <FloatingStage width={480} height={120}>
           <div style={{ display: 'flex', flexDirection: 'row', gap: 16, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            <HoverCardShotItem label="side=top">
+            <ShotItem label="side=top">
               <SideHoverCard side="top" text="Above the trigger" />
-            </HoverCardShotItem>
-            <HoverCardShotItem label="side=right">
+            </ShotItem>
+            <ShotItem label="side=right">
               <SideHoverCard side="right" text="Right of the trigger" />
-            </HoverCardShotItem>
-            <HoverCardShotItem label="side=bottom">
+            </ShotItem>
+            <ShotItem label="side=bottom">
               <SideHoverCard side="bottom" text="Below the trigger" />
-            </HoverCardShotItem>
-            <HoverCardShotItem label="side=left">
+            </ShotItem>
+            <ShotItem label="side=left">
               <SideHoverCard side="left" text="Left of the trigger" />
-            </HoverCardShotItem>
+            </ShotItem>
           </div>
         </FloatingStage>
       </Row>
@@ -157,6 +146,6 @@ export const HoverCardShot: ComponentShot = {
           </div>
         </FloatingStage>
       </Row>
-    </div>
+    </Shot>
   ),
 }

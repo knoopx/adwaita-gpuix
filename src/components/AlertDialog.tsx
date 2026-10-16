@@ -302,24 +302,13 @@ export const MessageDialog = AlertDialog
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
+import { Row, Shot, ShotItem } from './common'
 import { Icon } from './icons'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
 
 export const AlertDialogShot: ComponentShot = {
   name: 'AlertDialog',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Flat (actions[])" col>
         <ShotItem label="destructive + default actions">
           <AlertDialog
@@ -381,6 +370,6 @@ export const AlertDialogShot: ComponentShot = {
           />
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

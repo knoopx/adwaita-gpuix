@@ -1,6 +1,6 @@
 import type { StyleDesc } from '@gpuix/react'
 import { useAdwaita, hexToRgba, type AdwaitaTheme } from '../theme/adwaita'
-import { T } from './common'
+import { LabeledControl } from './common'
 import { Icon } from './icons'
 
 export type CheckboxState = boolean | 'indeterminate'
@@ -86,36 +86,17 @@ export function Checkbox({ checked = false, onCheckedChange, disabled, label, st
   if (label === undefined) return box
 
   // Label association: a sibling `T` in a flex row (GPUix has no htmlFor).
-  return (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, opacity: disabled ? 0.5 : 1 }}>
-      {box}
-      <T size="body" color={colors.fg}>
-        {label}
-      </T>
-    </div>
-  )
+  return <LabeledControl control={box} label={label} disabled={disabled} />
 }
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const CheckboxShot: ComponentShot = {
   name: 'Checkbox',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Checked states">
         <ShotItem label="unchecked"><Checkbox checked={false} onCheckedChange={() => {}} /></ShotItem>
         <ShotItem label="checked"><Checkbox checked onCheckedChange={() => {}} /></ShotItem>
@@ -132,6 +113,6 @@ export const CheckboxShot: ComponentShot = {
         <ShotItem label="indeterminate"><Checkbox checked="indeterminate" onCheckedChange={() => {}} label="Indeterminate" /></ShotItem>
         <ShotItem label="disabled"><Checkbox checked onCheckedChange={() => {}} disabled label="Disabled" /></ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

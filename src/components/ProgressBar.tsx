@@ -57,24 +57,12 @@ export function ProgressBar({ value, percent, height = 6, style }: ProgressBarPr
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
-import { Row, T } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, T, Shot, ShotItem } from './common'
 
 export const ProgressBarShot: ComponentShot = {
   name: 'ProgressBar',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Values (0–100 scale)" col>
         <ShotItem label="0%"><ProgressBar value={0} /></ShotItem>
         <ShotItem label="25%"><ProgressBar value={25} /></ShotItem>
@@ -91,6 +79,6 @@ export const ProgressBarShot: ComponentShot = {
         <ShotItem label="12"><ProgressBar value={40} height={12} /></ShotItem>
         <ShotItem label="20"><ProgressBar value={40} height={20} /></ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

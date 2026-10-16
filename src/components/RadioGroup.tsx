@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
 import { useAdwaita, hexToRgba } from '../theme/adwaita'
-import { T } from './common'
+import { LabeledControl } from './common'
 
 interface RadioGroupContextValue { value: string; onValueChange: (value: string) => void }
 const RadioGroupCtx = createContext<RadioGroupContextValue | null>(null)
@@ -97,35 +97,18 @@ export function RadioGroupItem({ value, disabled, label, style }: RadioGroupItem
 
   if (label === undefined) return circle
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, opacity: disabled ? 0.5 : 1 }}>
-      {circle}
-      <T size="body" color={colors.fg}>
-        {label}
-      </T>
-    </div>
-  )
+  // Label association: a sibling `T` in a flex row (GPUix has no htmlFor).
+  return <LabeledControl control={circle} label={label} disabled={disabled} />
 }
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const RadioGroupShot: ComponentShot = {
   name: 'RadioGroup',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label={'Selection (controlled, value="b")'}>
         <ShotItem label="group">
           <RadioGroup value="b" onValueChange={() => {}}>
@@ -151,6 +134,6 @@ export const RadioGroupShot: ComponentShot = {
           </RadioGroup>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

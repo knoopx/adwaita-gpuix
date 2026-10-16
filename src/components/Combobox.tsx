@@ -380,104 +380,100 @@ export function ComboboxChips({ values, onRemove, inputValue, onInputChange, pla
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row, FloatingStage } from './common'
+import { Row, FloatingStage, Shot, ShotItem } from './common'
 
-/** A captioned shot item: a small dim caption above the item. */
-function ComboboxShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
+const COMBO_ITEMS = ['low', 'medium', 'high']
+
+/** A closed combobox trigger in one of the shot's states (default / empty / disabled / clear). */
+function TriggerStateShot({ value, disabled, showClear }: { value?: string; disabled?: boolean; showClear?: boolean }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
+    <Combobox
+      value={value}
+      disabled={disabled}
+      items={COMBO_ITEMS}
+      onValueChange={() => {}}
+      inputValue=""
+      onInputValueChange={() => {}}
+      style={{ width: 120, display: 'flex', flexDirection: 'column', gap: 8 }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        <ComboboxInput
+          placeholder={showClear ? undefined : 'Search…'}
+          showClear={showClear}
+          value={showClear ? value : undefined}
+          onClear={showClear ? () => {} : undefined}
+          disabled={disabled}
+        />
+        <ComboboxTrigger disabled={disabled} />
+      </div>
+    </Combobox>
   )
 }
 
-const COMBO_ITEMS = ['low', 'medium', 'high']
+/** An open combobox in a centered floating stage (item-states / empty shots). */
+function OpenComboboxStage({ height, value, inputValue, children }: { height: number; value: string; inputValue: string; children: ReactNode }) {
+  return (
+    <FloatingStage width={480} height={height}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', height: '100%' }}>
+        <Combobox
+          open
+          value={value}
+          items={COMBO_ITEMS}
+          onValueChange={() => {}}
+          inputValue={inputValue}
+          onInputValueChange={() => {}}
+          style={{ width: 320, display: 'flex', flexDirection: 'column', gap: 8 }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+            <ComboboxInput placeholder="Search…" />
+            <ComboboxTrigger />
+          </div>
+          {children}
+        </Combobox>
+      </div>
+    </FloatingStage>
+  )
+}
 
 export const ComboboxShot: ComponentShot = {
   name: 'Combobox',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Trigger states">
-        <ComboboxShotItem label="default value">
-          <Combobox value="medium" items={COMBO_ITEMS} onValueChange={() => {}} inputValue="" onInputValueChange={() => {}} style={{ width: 120, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-              <ComboboxInput placeholder="Search…" />
-              <ComboboxTrigger />
-            </div>
-          </Combobox>
-        </ComboboxShotItem>
-        <ComboboxShotItem label="empty (no value)">
-          <Combobox items={COMBO_ITEMS} onValueChange={() => {}} inputValue="" onInputValueChange={() => {}} style={{ width: 120, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-              <ComboboxInput placeholder="Search…" />
-              <ComboboxTrigger />
-            </div>
-          </Combobox>
-        </ComboboxShotItem>
-        <ComboboxShotItem label="disabled">
-          <Combobox disabled value="medium" items={COMBO_ITEMS} onValueChange={() => {}} inputValue="" onInputValueChange={() => {}} style={{ width: 120, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-              <ComboboxInput placeholder="Search…" disabled />
-              <ComboboxTrigger disabled />
-            </div>
-          </Combobox>
-        </ComboboxShotItem>
-        <ComboboxShotItem label="clear (showClear + value)">
-          <Combobox value="medium" items={COMBO_ITEMS} onValueChange={() => {}} inputValue="" onInputValueChange={() => {}} style={{ width: 120, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-              <ComboboxInput showClear value="medium" onClear={() => {}} />
-              <ComboboxTrigger />
-            </div>
-          </Combobox>
-        </ComboboxShotItem>
+        <ShotItem label="default value"><TriggerStateShot value="medium" /></ShotItem>
+        <ShotItem label="empty (no value)"><TriggerStateShot /></ShotItem>
+        <ShotItem label="disabled"><TriggerStateShot value="medium" disabled /></ShotItem>
+        <ShotItem label="clear (showClear + value)"><TriggerStateShot value="medium" showClear /></ShotItem>
       </Row>
       <Row label="Open · item states" col>
-        <FloatingStage width={480} height={200}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', height: '100%' }}>
-            <Combobox open value="medium" items={COMBO_ITEMS} onValueChange={() => {}} inputValue="" onInputValueChange={() => {}} style={{ width: 320, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                <ComboboxInput placeholder="Search…" />
-                <ComboboxTrigger />
-              </div>
-              <ComboboxContent>
-                <ComboboxGroup>
-                  <ComboboxLabel>Levels</ComboboxLabel>
-                  <ComboboxList>
-                    <ComboboxItem value="low">Low</ComboboxItem>
-                    <ComboboxItem value="medium" selected>Medium</ComboboxItem>
-                    <ComboboxItem value="high">High</ComboboxItem>
-                  </ComboboxList>
-                </ComboboxGroup>
-                <ComboboxSeparator />
-                <ComboboxGroup>
-                  <ComboboxLabel>Extra</ComboboxLabel>
-                  <ComboboxList>
-                    <ComboboxItem value="off" disabled>Off (disabled)</ComboboxItem>
-                  </ComboboxList>
-                </ComboboxGroup>
-              </ComboboxContent>
-            </Combobox>
-          </div>
-        </FloatingStage>
+        <OpenComboboxStage height={200} value="medium" inputValue="">
+          <ComboboxContent>
+            <ComboboxGroup>
+              <ComboboxLabel>Levels</ComboboxLabel>
+              <ComboboxList>
+                <ComboboxItem value="low">Low</ComboboxItem>
+                <ComboboxItem value="medium" selected>Medium</ComboboxItem>
+                <ComboboxItem value="high">High</ComboboxItem>
+              </ComboboxList>
+            </ComboboxGroup>
+            <ComboboxSeparator />
+            <ComboboxGroup>
+              <ComboboxLabel>Extra</ComboboxLabel>
+              <ComboboxList>
+                <ComboboxItem value="off" disabled>Off (disabled)</ComboboxItem>
+              </ComboboxList>
+            </ComboboxGroup>
+          </ComboboxContent>
+        </OpenComboboxStage>
       </Row>
       <Row label="Open · empty (no match)" col>
-        <FloatingStage width={480} height={140}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', height: '100%' }}>
-            <Combobox open value="" items={COMBO_ITEMS} onValueChange={() => {}} inputValue="zzz" onInputValueChange={() => {}} style={{ width: 320, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                <ComboboxInput placeholder="Search…" />
-                <ComboboxTrigger />
-              </div>
-              <ComboboxContent>
-                <ComboboxList>
-                  <ComboboxEmpty>No results for “zzz”</ComboboxEmpty>
-                </ComboboxList>
-              </ComboboxContent>
-            </Combobox>
-          </div>
-        </FloatingStage>
+        <OpenComboboxStage height={140} value="" inputValue="zzz">
+          <ComboboxContent>
+            <ComboboxList>
+              <ComboboxEmpty>No results for “zzz”</ComboboxEmpty>
+            </ComboboxList>
+          </ComboboxContent>
+        </OpenComboboxStage>
       </Row>
       <Row label="Multi-select chips" col>
         <Combobox multiple onValueChange={() => {}} style={{ width: 480, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -490,6 +486,6 @@ export const ComboboxShot: ComponentShot = {
           />
         </Combobox>
       </Row>
-    </div>
+    </Shot>
   ),
 }

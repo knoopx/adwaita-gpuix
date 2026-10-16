@@ -107,8 +107,7 @@ export function ToggleGroup(props: ToggleGroupProps) {
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
-import { Row } from './common'
+import { Row, Shot, ShotItem } from './common'
 
 const SHOT_OPTS = [
   { id: 'day', label: 'Day' },
@@ -122,21 +121,10 @@ const SHOT_ICON_OPTS: { id: string; icon: IconName }[] = [
   { id: 'panel', icon: 'panel' },
 ]
 
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
-
 export const ToggleGroupShot: ComponentShot = {
   name: 'ToggleGroup',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Variants" col>
         <ShotItem label="default"><ToggleGroup options={SHOT_OPTS} value="week" onChange={() => {}} /></ShotItem>
         <ShotItem label="outline"><ToggleGroup options={SHOT_OPTS} variant="outline" value="day" onChange={() => {}} /></ShotItem>
@@ -151,6 +139,6 @@ export const ToggleGroupShot: ComponentShot = {
         <ShotItem label="multiple (multi-select)"><ToggleGroup multiple options={SHOT_OPTS} value={['day', 'month']} onChange={() => {}} /></ShotItem>
         <ShotItem label="none selected"><ToggleGroup options={SHOT_OPTS} value="" onChange={() => {}} /></ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

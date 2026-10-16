@@ -142,23 +142,12 @@ export function InputOTPSeparator({ style }: InputOTPSeparatorProps) {
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, Shot, ShotItem } from './common'
 
 export const InputOTPShot: ComponentShot = {
   name: 'InputOTP',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="States" col>
         <ShotItem label="empty (length 4)">
           <InputOTP length={4} value="" onChange={() => {}} />
@@ -192,6 +181,6 @@ export const InputOTPShot: ComponentShot = {
           </InputOTPGroup>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

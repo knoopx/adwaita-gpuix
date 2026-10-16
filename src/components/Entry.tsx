@@ -13,6 +13,7 @@ export interface EntryProps {
   onSubmit?: () => void
   autoFocus?: boolean
   style?: Partial<StyleDesc>
+  testId?: string
 }
 
 /**
@@ -28,13 +29,14 @@ export interface EntryProps {
  * - `disabled` dims the entry (opacity 0.5) and skips `onChange`/`onSubmit`.
  * - `invalid` switches the border to the destructive colour.
  */
-export function Entry({ value, placeholder, type = 'text', disabled, invalid, onChange, onSubmit, autoFocus, style }: EntryProps) {
+export function Entry({ value, placeholder, type = 'text', disabled, invalid, onChange, onSubmit, autoFocus, style, testId }: EntryProps) {
   // `type` is intentionally not forwarded: the GPUix `input` host element has
   // no `type` attribute (see the doc comment above). The parameter is kept in
   // the destructure so callers get a typed, documented surface.
   void type
   return (
     <AdwaitaInputBase
+      testId={testId}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
@@ -49,25 +51,13 @@ export function Entry({ value, placeholder, type = 'text', disabled, invalid, on
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import type { ReactNode } from 'react'
 import { useAdwaita } from '../theme/adwaita'
-import { Row, T } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, T, Shot, ShotItem } from './common'
 
 export const EntryShot: ComponentShot = {
   name: 'Entry',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="States" col>
         <ShotItem label="placeholder"><Entry placeholder="Type here…" /></ShotItem>
         <ShotItem label="with value"><Entry value="Hello world" /></ShotItem>
@@ -82,6 +72,6 @@ export const EntryShot: ComponentShot = {
         <ShotItem label="search"><Entry type="search" placeholder="Search…" /></ShotItem>
         <ShotItem label="url"><Entry type="url" placeholder="https://…" /></ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

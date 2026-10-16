@@ -223,17 +223,6 @@ export function DrawerClose({ children, style }: DrawerCloseProps) {
 
 /* ── Showcase ─────────────────────────────────────────────────────────── */
 
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
-
 /** The shared open-drawer body: header (title + close), content, footer. */
 function DrawerBody({ title }: { title: string }) {
   return (
@@ -256,7 +245,7 @@ function DrawerBody({ title }: { title: string }) {
  *  nothing) + all four `side` variants contained in bounded stages. */
 export function DrawerShowcase(): ReactNode {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Closed (open=false renders nothing)">
         <Drawer open={false} onOpenChange={noop} side="right">
           <DrawerTrigger>
@@ -294,12 +283,13 @@ export function DrawerShowcase(): ReactNode {
           </FloatingStage>
         </ShotItem>
       </Row>
-    </div>
+    </Shot>
   )
 }
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
+import { Shot, ShotItem } from './common'
 
 export const DrawerShot: ComponentShot = {
   name: 'Drawer',

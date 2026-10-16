@@ -156,36 +156,24 @@ export function NumberField({
 }
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
-import type { ReactNode } from 'react'
 import type { ComponentShot } from '../../scripts/shot'
-import { Row, T } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function NumberFieldShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, T, Shot, ShotItem } from './common'
 
 export const NumberFieldShot: ComponentShot = {
   name: 'NumberField',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="States">
-        <NumberFieldShotItem label="default (42)">
+        <ShotItem label="default (42)">
           <NumberField defaultValue={42} style={{ width: 160 }} />
-        </NumberFieldShotItem>
-        <NumberFieldShotItem label="clamped (min 0, max 200, step 10, value 100)">
+        </ShotItem>
+        <ShotItem label="clamped (min 0, max 200, step 10, value 100)">
           <NumberField value={100} min={0} max={200} step={10} onChange={() => {}} style={{ width: 160 }} />
-        </NumberFieldShotItem>
-        <NumberFieldShotItem label="disabled (5)">
+        </ShotItem>
+        <ShotItem label="disabled (5)">
           <NumberField defaultValue={5} disabled style={{ width: 160 }} />
-        </NumberFieldShotItem>
+        </ShotItem>
       </Row>
-    </div>
+    </Shot>
   ),
 }

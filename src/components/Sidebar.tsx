@@ -351,18 +351,7 @@ export function SidebarMenuItem({ icon, label, selected, onClick, style }: Sideb
 
 // ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
-import { Row, FloatingStage } from './common'
-
-/** A captioned shot item: a small dim caption above the item. */
-function ShotItem({ label, children }: { label: string; children: ReactNode }) {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>{label}</T>
-      {children}
-    </div>
-  )
-}
+import { Row, FloatingStage, Shot, ShotItem } from './common'
 
 /** The shared sidebar body: header + two labelled groups + a footer user row. */
 function ShotSideContent({ collapsed }: { collapsed: boolean }) {
@@ -398,7 +387,7 @@ function ShotSideContent({ collapsed }: { collapsed: boolean }) {
 export const SidebarShot: ComponentShot = {
   name: 'Sidebar',
   el: (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>
+    <Shot>
       <Row label="Expanded + collapsed (open prop)">
         <ShotItem label="expanded (default, 220px)">
           <Sidebar>
@@ -425,6 +414,6 @@ export const SidebarShot: ComponentShot = {
           </Sidebar>
         </FloatingStage>
       </Row>
-    </div>
+    </Shot>
   ),
 }
