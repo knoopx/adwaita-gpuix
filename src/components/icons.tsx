@@ -1,9 +1,12 @@
-import type { StyleDesc } from '@gpuix/react'
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
 import {
   ArrowLeft,
   ArrowRight,
+  ArrowUp,
   Bell,
   Bookmark,
+  Calendar,
   Check,
   Circle,
   CircleAlert,
@@ -11,50 +14,86 @@ import {
   CircleDashed,
   CircleDot,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   ChevronUp,
   ChevronsUpDown,
   Clock,
+  Code,
+  Container,
+  Copy,
   Eye,
+  File,
+  FileArchive,
+  FileBraces,
+  FileCode,
+  FileCog,
+  FileImage,
+  FileLock,
+  FileTerminal,
   FileText,
   Folder,
+  Hammer,
   Footprints,
   GitBranch,
   GitPullRequest,
+  Globe,
+  GripVertical,
+  Heading1,
+  Heading2,
+  Heading3,
   Home,
   Inbox,
   Info,
+  Image,
   Layers,
   LayoutGrid,
+  Link,
   List,
+  Package,
+  Pencil,
   ListOrdered,
+  Mail,
   Menu,
+  MapPin,
   MessageSquare,
   Minus,
   Moon,
   PanelLeft,
   Pause,
+  Phone,
   Play,
   Plus,
+  Quote,
   RefreshCw,
+  RotateCcw,
+  RotateCw,
+  ScrollText,
   Search,
   Settings,
+  Snowflake,
   Sparkles,
   Trash2,
   Sun,
   SunMoon,
+  Table,
+  TerminalSquare,
   Timer,
   TriangleAlert,
+  Type,
   User,
   UserRound,
   X,
-} from 'lucide-static'
+} from "lucide-static";
 
 export const ICONS = {
   close: X,
   plus: Plus,
   minus: Minus,
+  calendar: Calendar,
+  mapPin: MapPin,
   chevronDown: ChevronDown,
+  chevronLeft: ChevronLeft,
   chevronRight: ChevronRight,
   chevronUp: ChevronUp,
   chevronsUpDown: ChevronsUpDown,
@@ -63,6 +102,7 @@ export const ICONS = {
   alert: CircleAlert,
   success: CircleCheck,
   check: Check,
+  copy: Copy,
   circle: Circle,
   circleDashed: CircleDashed,
   circleDot: CircleDot,
@@ -81,17 +121,35 @@ export const ICONS = {
   sun: Sun,
   moon: Moon,
   sunMoon: SunMoon,
+  file: File,
+  fileArchive: FileArchive,
+  fileBraces: FileBraces,
+  fileCode: FileCode,
+  fileCog: FileCog,
+  fileImage: FileImage,
+  fileLock: FileLock,
+  fileTerminal: FileTerminal,
   fileText: FileText,
   folder: Folder,
+  snowflake: Snowflake,
+  package: Package,
+  container: Container,
+  hammer: Hammer,
+  scrollText: ScrollText,
+  pencil: Pencil,
   inbox: Inbox,
   eye: Eye,
   layers: Layers,
   gitBranch: GitBranch,
   gitPullRequest: GitPullRequest,
+  globe: Globe,
   pause: Pause,
+  phone: Phone,
   play: Play,
   arrowLeft: ArrowLeft,
   arrowRight: ArrowRight,
+  arrowUp: ArrowUp,
+  mail: Mail,
   menu: Menu,
   messageSquare: MessageSquare,
   bookmark: Bookmark,
@@ -99,19 +157,54 @@ export const ICONS = {
   footprints: Footprints,
   refresh: RefreshCw,
   trash: Trash2,
-} as const
+  type: Type,
+  heading1: Heading1,
+  heading2: Heading2,
+  heading3: Heading3,
+  quote: Quote,
+  code: Code,
+  image: Image,
+  table: Table,
+  terminal: TerminalSquare,
+  link: Link,
+  gripVertical: GripVertical,
+  rotateCcw: RotateCcw,
+  rotateCw: RotateCw,
+} as const;
 
-export type IconName = keyof typeof ICONS
+export type IconName = keyof typeof ICONS;
 
 export interface IconProps {
-  name: IconName
-  size?: number
-  color: string
-  style?: Partial<StyleDesc>
+  name: IconName;
+  size?: number;
+  color?: string;
+  style?: Partial<StyleDesc>;
+}
+
+export function renderIconSvg(
+  svg: string,
+  color: string,
+  size: number,
+  style?: Partial<StyleDesc>,
+) {
+  const src = `data:image/svg+xml,${encodeURIComponent(
+    svg.replace(/currentColor/g, color),
+  )}`;
+  return (
+    <img
+      src={src}
+      style={{
+        width: size,
+        height: size,
+        flexShrink: 0,
+        pointerEvents: "none",
+        ...style,
+      }}
+    />
+  );
 }
 
 export function Icon({ name, size = 16, color, style }: IconProps) {
-  const svg = ICONS[name].replace(/currentColor/g, color)
-  const src = `data:image/svg+xml,${encodeURIComponent(svg)}`
-  return <img src={src} style={{ width: size, height: size, flexShrink: 0, ...style }} />
+  const t = useAdwaita();
+  return renderIconSvg(ICONS[name], color ?? t.colors.fg, size, style);
 }
