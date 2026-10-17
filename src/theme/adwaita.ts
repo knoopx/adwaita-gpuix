@@ -1,4 +1,10 @@
-import { createContext, createElement, useContext, useMemo, type ReactNode } from 'react'
+import {
+  createContext,
+  createElement,
+  useContext,
+  useMemo,
+  type ReactNode,
+} from "react";
 
 import {
   type ColorScheme,
@@ -8,6 +14,10 @@ import {
   NIGHTSKY,
   isDarkScheme,
   ACCENTS,
+  ACCENT_SETS,
+  TINT_ALPHA,
+  SELECTION,
+  APPEARANCE,
   RADIUS,
   SPACE,
   TYPE,
@@ -17,13 +27,17 @@ import {
   hexToRgba,
   shade,
   accentForeground,
-} from './tokens'
+} from "./tokens";
 
 export {
   SCHEMES,
   NIGHTSKY,
   isDarkScheme,
   ACCENTS,
+  ACCENT_SETS,
+  TINT_ALPHA,
+  SELECTION,
+  APPEARANCE,
   RADIUS,
   SPACE,
   TYPE,
@@ -33,34 +47,36 @@ export {
   hexToRgba,
   shade,
   accentForeground,
-}
-export type { ColorScheme, AccentKey, SemanticTokens }
+};
+export type { ColorScheme, AccentKey, SemanticTokens };
 
 export interface AdwaitaColors {
-  window_bg: string
-  view_bg: string
-  headerbar_bg: string
-  sidebar_bg: string
-  fg: string
-  dim_fg: string
-  accent: string
-  destructive: string
-  success: string
-  warning: string
-  border: string
-  button_bg: string
-  button_hover: string
-  button_active: string
-  accent_fg: string
-  destructive_fg: string
-  accentTint: string
-  destructiveTint: string
-  successTint: string
-  warningTint: string
+  window_bg: string;
+  view_bg: string;
+  headerbar_bg: string;
+  sidebar_bg: string;
+  fg: string;
+  dim_fg: string;
+  accent: string;
+  destructive: string;
+  success: string;
+  warning: string;
+  border: string;
+  button_bg: string;
+  button_hover: string;
+  button_active: string;
+  osd_bg: string;
+  accent_fg: string;
+  destructive_fg: string;
+  accentTint: string;
+  selectionMuted: string;
+  destructiveTint: string;
+  successTint: string;
+  warningTint: string;
 }
 
 function toFlatColors(t: SemanticTokens): AdwaitaColors {
-  const c = t.color
+  const c = t.color;
   return {
     window_bg: c.surface.window,
     view_bg: c.surface.view,
@@ -76,53 +92,59 @@ function toFlatColors(t: SemanticTokens): AdwaitaColors {
     button_bg: c.surface.button,
     button_hover: c.surface.buttonHover,
     button_active: c.surface.buttonActive,
+    osd_bg: c.surface.osd,
     accent_fg: c.text.onAccent,
     destructive_fg: c.functional.destructiveFg,
     accentTint: c.accent.tint,
+    selectionMuted: c.selection.muted,
     destructiveTint: c.functional.destructiveTint,
     successTint: c.functional.successTint,
     warningTint: c.functional.warningTint,
-  }
+  };
 }
 
 export interface AdwaitaTheme {
-  scheme: ColorScheme
+  scheme: ColorScheme;
 
-  accent: AccentKey | null
+  accent: AccentKey | null;
 
-  colors: AdwaitaColors
+  colors: AdwaitaColors;
 
   radii: {
-    window: number
-    card: number
-    row: number
-    button: number
-    pill: number
-  }
+    window: number;
+    card: number;
+    row: number;
+    button: number;
+    pill: number;
+  };
 
   typography: {
-    title1: number
-    title2: number
-    title3: number
-    title4: number
-    body: number
-    caption: number
-    fontFamily: string
-    fontFamilyMono: string
-  }
+    title1: number;
+    title2: number;
+    title3: number;
+    title4: number;
+    body: number;
+    caption: number;
+    micro: number;
+    fontFamily: string;
+    fontFamilyMono: string;
+  };
 
   spacing: {
-    gap: number
-    padding: number
-    paddingTight: number
-    rowHeight: number
-  }
+    gap: number;
+    padding: number;
+    paddingTight: number;
+    rowHeight: number;
+  };
 
-  tokens: SemanticTokens
+  tokens: SemanticTokens;
 }
 
-export function buildTheme(scheme: ColorScheme, accent?: AccentKey | null): AdwaitaTheme {
-  const tokens = resolveTokens(scheme, accent ?? null)
+export function buildTheme(
+  scheme: ColorScheme,
+  accent?: AccentKey | null,
+): AdwaitaTheme {
+  const tokens = resolveTokens(scheme, accent ?? null);
   return {
     scheme,
     accent: accent ?? null,
@@ -136,29 +158,44 @@ export function buildTheme(scheme: ColorScheme, accent?: AccentKey | null): Adwa
       rowHeight: 40,
     },
     tokens,
-  }
+  };
 }
 
-export const AdwaitaContext = createContext<AdwaitaTheme | null>(null)
+
+export function selectionBg(t: AdwaitaTheme, focused = true): string {
+  return focused ? t.colors.accentTint : t.colors.selectionMuted;
+}
+
+
+export function rowHoverBg(t: AdwaitaTheme): string {
+  return hexToRgba(t.colors.fg, 0.04);
+}
+
+export const AdwaitaContext = createContext<AdwaitaTheme | null>(null);
 
 export interface AdwaitaProviderProps {
-  scheme?: ColorScheme
+  scheme?: ColorScheme;
 
-  accent?: AccentKey | null
-  children?: ReactNode
+  accent?: AccentKey | null;
+  children?: ReactNode;
 }
 
-export function AdwaitaProvider({ scheme = 'light', accent = null, children }: AdwaitaProviderProps) {
-  const theme = useMemo(() => buildTheme(scheme, accent), [scheme, accent])
-  return createElement(AdwaitaContext.Provider, { value: theme }, children)
+export function AdwaitaProvider({
+  scheme = "light",
+  accent = null,
+  children,
+}: AdwaitaProviderProps) {
+  const theme = useMemo(() => buildTheme(scheme, accent), [scheme, accent]);
+  return createElement(AdwaitaContext.Provider, { value: theme }, children);
 }
 
 export function buildNightskyTheme(accent?: AccentKey): AdwaitaTheme {
-  return buildTheme('nightsky', accent)
+  return buildTheme("nightsky", accent);
 }
 
 export function useAdwaita(): AdwaitaTheme {
-  const ctx = useContext(AdwaitaContext)
-  if (!ctx) throw new Error('useAdwaita() must be used within an <AdwaitaProvider>')
-  return ctx
+  const ctx = useContext(AdwaitaContext);
+  if (!ctx)
+    throw new Error("useAdwaita() must be used within an <AdwaitaProvider>");
+  return ctx;
 }

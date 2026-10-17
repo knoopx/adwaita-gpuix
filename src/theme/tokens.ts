@@ -1,153 +1,163 @@
-export type ColorScheme = 'light' | 'dark' | 'nightsky'
+export type ColorScheme = "light" | "dark" | "nightsky";
 
-export const SCHEMES: ColorScheme[] = ['light', 'dark', 'nightsky']
+export const SCHEMES: ColorScheme[] = ["light", "dark", "nightsky"];
 
 export function isDarkScheme(scheme: ColorScheme): boolean {
-  return scheme === 'dark' || scheme === 'nightsky'
+  return scheme === "dark" || scheme === "nightsky";
 }
 
 export type AccentKey =
-  | 'blue'
-  | 'teal'
-  | 'green'
-  | 'yellow'
-  | 'orange'
-  | 'red'
-  | 'pink'
-  | 'purple'
-  | 'slate'
+  | "blue"
+  | "teal"
+  | "green"
+  | "yellow"
+  | "orange"
+  | "red"
+  | "pink"
+  | "purple"
+  | "slate";
 
 export const ACCENTS: Record<AccentKey, string> = {
-  blue: '#3584e4',
-  teal: '#00a19a',
-  green: '#26a269',
-  yellow: '#e5a50a',
-  orange: '#e7772b',
-  red: '#c01c28',
-  pink: '#a51e67',
-  purple: '#9141ac',
-  slate: '#5e5c64',
-}
+  blue: "#3584e4",
+  teal: "#00a19a",
+  green: "#26a269",
+  yellow: "#e5a50a",
+  orange: "#e7772b",
+  red: "#c01c28",
+  pink: "#a51e67",
+  purple: "#9141ac",
+  slate: "#5e5c64",
+};
 
 export const NIGHTSKY = {
+  defaultAccent: "#fad000",
 
-  defaultAccent: '#fad000',
-
-  accentFg: '#191033',
+  accentFg: "#191033",
 
   accents: {
-    blue: '#3584e4',
-    teal: '#2190a4',
-    green: '#3a944a',
-    yellow: '#c88800',
-    orange: '#ed5b00',
-    red: '#e62d42',
-    pink: '#d56199',
-    purple: '#9141ac',
-    slate: '#6f8396',
+    blue: "#3584e4",
+    teal: "#2190a4",
+    green: "#3a944a",
+    yellow: "#c88800",
+    orange: "#ed5b00",
+    red: "#e62d42",
+    pink: "#d56199",
+    purple: "#9141ac",
+    slate: "#6f8396",
   },
 
   neutrals: {
+    window: "#191033",
 
-    window: '#191033',
+    view: "#191033",
 
-    view: '#191033',
+    headerbar: "#211641",
 
-    headerbar: '#211641',
+    sidebar: "#211641",
 
-    sidebar: '#211641',
+    card: "#211641",
 
-    card: '#211641',
+    button: "rgba(248,248,248,0.1)",
 
+    buttonHover: "rgba(248,248,248,0.15)",
 
-    button: 'rgba(248,248,248,0.1)',
+    buttonActive: "rgba(248,248,248,0.3)",
 
-    buttonHover: 'rgba(248,248,248,0.15)',
-
-    buttonActive: 'rgba(248,248,248,0.3)',
+    osd: "#211641",
   },
 
   text: {
+    primary: "#f8f8f8",
 
-    primary: '#f8f8f8',
-
-
-    dim: 'rgba(248,248,248,0.55)',
+    dim: "rgba(248,248,248,0.55)",
   },
 
-  border: 'rgba(248,248,248,0.15)',
+  border: "rgba(248,248,248,0.15)",
 
   functional: {
+    destructive: "#ff628c",
 
-    destructive: '#ff628c',
+    destructiveFg: "#191033",
 
-    destructiveFg: '#191033',
+    success: "#a5ff90",
 
-    success: '#a5ff90',
-
-    warning: '#faefa5',
+    warning: "#faefa5",
   },
 
   extras: {
-    scrollbarOutline: '#32245d',
-    orange: '#ffb454',
-    magenta: '#fb94ff',
+    scrollbarOutline: "#32245d",
+    orange: "#ffb454",
+    magenta: "#fb94ff",
   },
-} as const
+} as const;
 
-const NEUTRALS: Record<ColorScheme, {
-  window: string
-  view: string
-  headerbar: string
-  sidebar: string
-  card: string
-  button: string
-  buttonHover: string
-  buttonActive: string
-}> = {
+const NEUTRALS: Record<
+  ColorScheme,
+  {
+    window: string;
+    view: string;
+    headerbar: string;
+    sidebar: string;
+    card: string;
+    button: string;
+    buttonHover: string;
+    buttonActive: string;
+    osd: string;
+  }
+> = {
   light: {
-    window: '#fafafa',
-    view: '#ffffff',
-    headerbar: '#ffffff',
-    sidebar: '#f0f0f0',
+    window: "#fafafa",
+    view: "#ffffff",
+    headerbar: "#ffffff",
+    sidebar: "#f0f0f0",
 
-    card: '#ffffff',
-    button: '#f6f6f6',
-    buttonHover: '#ececec',
-    buttonActive: '#e0e0e0',
+    card: "#ffffff",
+    button: "#f6f6f6",
+    buttonHover: "#ececec",
+    buttonActive: "#e0e0e0",
+    osd: "#333333",
   },
   dark: {
-    window: '#242424',
-    view: '#303030',
-    headerbar: '#2a2a2a',
-    sidebar: '#2e2e2e',
+    window: "#242424",
+    view: "#303030",
+    headerbar: "#2a2a2a",
+    sidebar: "#2e2e2e",
 
-    card: 'rgba(255,255,255,0.08)',
-    button: '#3a3a3a',
-    buttonHover: '#454545',
-    buttonActive: '#515151',
+    card: "rgba(255,255,255,0.08)",
+    button: "#3a3a3a",
+    buttonHover: "#454545",
+    buttonActive: "#515151",
+    osd: "#565656",
   },
   nightsky: NIGHTSKY.neutrals,
-}
+};
 
 const TEXT: Record<ColorScheme, { primary: string; dim: string }> = {
-  light: { primary: '#2e2e2e', dim: 'rgba(0,0,0,0.55)' },
-  dark: { primary: '#ffffff', dim: 'rgba(255,255,255,0.55)' },
+  light: { primary: "#2e2e2e", dim: "rgba(0,0,0,0.55)" },
+  dark: { primary: "#ffffff", dim: "rgba(255,255,255,0.55)" },
   nightsky: {
     primary: NIGHTSKY.text.primary,
     dim: NIGHTSKY.text.dim,
   },
-}
+};
 
 const BORDER: Record<ColorScheme, string> = {
-  light: 'rgba(0,0,0,0.15)',
-  dark: 'rgba(255,255,255,0.15)',
+  light: "rgba(0,0,0,0.15)",
+  dark: "rgba(255,255,255,0.15)",
   nightsky: NIGHTSKY.border,
-}
+};
 
-const FUNCTIONAL: Record<ColorScheme, { destructive: string; success: string; warning: string; destructiveFg?: string }> = {
-  light: { destructive: '#c01c28', success: '#26a269', warning: '#e5a50a' },
-  dark: { destructive: '#ed333b', success: '#26a269', warning: '#e5a50a' },
+const FUNCTIONAL: Record<
+  ColorScheme,
+  {
+    destructive: string;
+    success: string;
+    warning: string;
+    destructiveFg?: string;
+  }
+> = {
+  light: { destructive: "#c01c28", success: "#26a269", warning: "#e5a50a" },
+  dark: { destructive: "#ed333b", success: "#26a269", warning: "#e5a50a" },
   nightsky: {
     destructive: NIGHTSKY.functional.destructive,
     success: NIGHTSKY.functional.success,
@@ -155,7 +165,53 @@ const FUNCTIONAL: Record<ColorScheme, { destructive: string; success: string; wa
 
     destructiveFg: NIGHTSKY.accentFg,
   },
-}
+};
+
+export const ACCENT_SETS: Record<
+  ColorScheme,
+  {
+    accents: Record<AccentKey, string>;
+    defaultAccent: string;
+    accentFg: string | null;
+  }
+> = {
+  light: {
+    accents: ACCENTS,
+    defaultAccent: ACCENTS.blue,
+    accentFg: null,
+  },
+  dark: {
+    accents: ACCENTS,
+    defaultAccent: ACCENTS.blue,
+    accentFg: null,
+  },
+  nightsky: {
+    accents: NIGHTSKY.accents,
+    defaultAccent: NIGHTSKY.defaultAccent,
+    accentFg: NIGHTSKY.accentFg,
+  },
+};
+
+export const TINT_ALPHA: Record<
+  ColorScheme,
+  { accent: number; destructive: number; success: number; warning: number }
+> = {
+  light: { accent: 0.12, destructive: 0.12, success: 0.14, warning: 0.16 },
+  dark: { accent: 0.22, destructive: 0.28, success: 0.24, warning: 0.24 },
+  nightsky: { accent: 0.22, destructive: 0.28, success: 0.24, warning: 0.24 },
+};
+
+export const SELECTION: Record<ColorScheme, { muted: string }> = {
+  light: { muted: hexToRgba(TEXT.light.primary, 0.07) },
+  dark: { muted: hexToRgba(TEXT.dark.primary, 0.12) },
+  nightsky: { muted: NIGHTSKY.neutrals.card },
+};
+
+export const APPEARANCE: Record<ColorScheme, "dark" | "light"> = {
+  light: "light",
+  dark: "dark",
+  nightsky: "dark",
+};
 
 export const RADIUS = {
   xs: 4,
@@ -163,7 +219,7 @@ export const RADIUS = {
   md: 10,
   lg: 12,
   full: 999,
-} as const
+} as const;
 
 export const SPACE = {
   xs: 4,
@@ -171,7 +227,7 @@ export const SPACE = {
   md: 12,
   lg: 16,
   xl: 24,
-} as const
+} as const;
 
 export const TYPE = {
   title1: 20,
@@ -180,124 +236,132 @@ export const TYPE = {
   title4: 14,
   body: 14,
   caption: 12,
+  
+  micro: 11,
 
-  fontFamily: 'Inter',
+  fontFamily: "Inter",
 
-  fontFamilyMono: 'JetBrainsMono Nerd Font Mono',
+  fontFamilyMono: "JetBrainsMono Nerd Font Mono",
   weight: { regular: 400, medium: 500, semibold: 600, bold: 700 },
-} as const
+} as const;
 
 export function hexToRgba(hex: string, alpha: number): string {
-  const h = hex.replace('#', '')
-  const r = parseInt(h.slice(0, 2), 16)
-  const g = parseInt(h.slice(2, 4), 16)
-  const b = parseInt(h.slice(4, 6), 16)
-  return `rgba(${r},${g},${b},${alpha})`
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
 }
 
 export function shade(hex: string, pct: number): string {
-  const h = hex.replace('#', '')
-  let r = parseInt(h.slice(0, 2), 16)
-  let g = parseInt(h.slice(2, 4), 16)
-  let b = parseInt(h.slice(4, 6), 16)
-  const target = pct < 0 ? 0 : 255
-  const p = Math.abs(pct)
-  r = Math.round((target - r) * p) + r
-  g = Math.round((target - g) * p) + g
-  b = Math.round((target - b) * p) + b
-  return `rgb(${r},${g},${b})`
+  const h = hex.replace("#", "");
+  let r = parseInt(h.slice(0, 2), 16);
+  let g = parseInt(h.slice(2, 4), 16);
+  let b = parseInt(h.slice(4, 6), 16);
+  const target = pct < 0 ? 0 : 255;
+  const p = Math.abs(pct);
+  r = Math.round((target - r) * p) + r;
+  g = Math.round((target - g) * p) + g;
+  b = Math.round((target - b) * p) + b;
+  return `rgb(${r},${g},${b})`;
 }
 
 function luminance(hex: string): number {
-  const h = hex.replace('#', '')
-  const r = parseInt(h.slice(0, 2), 16) / 255
-  const g = parseInt(h.slice(2, 4), 16) / 255
-  const b = parseInt(h.slice(4, 6), 16) / 255
-  const lin = (c: number) => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4))
-  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16) / 255;
+  const g = parseInt(h.slice(2, 4), 16) / 255;
+  const b = parseInt(h.slice(4, 6), 16) / 255;
+  const lin = (c: number) =>
+    c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 }
 
 export function accentForeground(accent: string): string {
-  return luminance(accent) > 0.5 ? '#2e2e2e' : '#ffffff'
+  return luminance(accent) > 0.5 ? "#2e2e2e" : "#ffffff";
 }
 
 export interface SemanticColors {
-
   surface: {
-    window: string
-    view: string
-    headerbar: string
-    sidebar: string
-    card: string
-    button: string
-    buttonHover: string
-    buttonActive: string
-  }
+    window: string;
+    view: string;
+    headerbar: string;
+    sidebar: string;
+    card: string;
+    button: string;
+    buttonHover: string;
+    buttonActive: string;
+    osd: string;
+  };
 
   text: {
-    primary: string
-    dim: string
-    onAccent: string
-  }
+    primary: string;
+    dim: string;
+    onAccent: string;
+  };
 
   accent: {
-    base: string
-    tint: string
-    fg: string
-  }
+    base: string;
+    tint: string;
+    fg: string;
+  };
 
   functional: {
-    destructive: string
-    destructiveTint: string
-    destructiveFg: string
-    success: string
-    successTint: string
-    warning: string
-    warningTint: string
-  }
+    destructive: string;
+    destructiveTint: string;
+    destructiveFg: string;
+    success: string;
+    successTint: string;
+    warning: string;
+    warningTint: string;
+  };
+
+  selection: {
+    muted: string;
+  };
 
   border: {
-    default: string
-  }
+    default: string;
+  };
 }
 
 export interface SemanticTokens {
-  color: SemanticColors
+  color: SemanticColors;
   radius: {
-    window: number
-    card: number
-    row: number
-    button: number
-    pill: number
-  }
+    window: number;
+    card: number;
+    row: number;
+    button: number;
+    pill: number;
+  };
   space: {
-    gap: number
-    padding: number
-    paddingTight: number
-  }
+    gap: number;
+    padding: number;
+    paddingTight: number;
+  };
   typography: {
-    title1: number
-    title2: number
-    title3: number
-    title4: number
-    body: number
-    caption: number
-    fontFamily: string
-    fontFamilyMono: string
-  }
+    title1: number;
+    title2: number;
+    title3: number;
+    title4: number;
+    body: number;
+    caption: number;
+    micro: number;
+    fontFamily: string;
+    fontFamilyMono: string;
+  };
 }
 
-export function resolveTokens(scheme: ColorScheme, accent?: AccentKey | null): SemanticTokens {
-  const n = NEUTRALS[scheme]
-  const accentBase =
-    scheme === 'nightsky'
-      ? (accent ? NIGHTSKY.accents[accent] : NIGHTSKY.defaultAccent)
-      : ACCENTS[accent ?? 'blue']
-  const dark = isDarkScheme(scheme)
-  const f = FUNCTIONAL[scheme]
+export function resolveTokens(
+  scheme: ColorScheme,
+  accent?: AccentKey | null,
+): SemanticTokens {
+  const n = NEUTRALS[scheme];
+  const set = ACCENT_SETS[scheme];
+  const alpha = TINT_ALPHA[scheme];
+  const f = FUNCTIONAL[scheme];
 
-
-  const onAccent = scheme === 'nightsky' ? NIGHTSKY.accentFg : accentForeground(accentBase)
+  const accentBase = accent ? set.accents[accent] : set.defaultAccent;
+  const onAccent = set.accentFg ?? accentForeground(accentBase);
 
   return {
     color: {
@@ -310,6 +374,7 @@ export function resolveTokens(scheme: ColorScheme, accent?: AccentKey | null): S
         button: n.button,
         buttonHover: n.buttonHover,
         buttonActive: n.buttonActive,
+        osd: n.osd,
       },
       text: {
         primary: TEXT[scheme].primary,
@@ -318,18 +383,21 @@ export function resolveTokens(scheme: ColorScheme, accent?: AccentKey | null): S
       },
       accent: {
         base: accentBase,
-        tint: hexToRgba(accentBase, dark ? 0.22 : 0.12),
+        tint: hexToRgba(accentBase, alpha.accent),
         fg: onAccent,
       },
       functional: {
         destructive: f.destructive,
-        destructiveTint: hexToRgba(f.destructive, dark ? 0.28 : 0.12),
+        destructiveTint: hexToRgba(f.destructive, alpha.destructive),
 
-        destructiveFg: f.destructiveFg ?? '#ffffff',
+        destructiveFg: f.destructiveFg ?? "#ffffff",
         success: f.success,
-        successTint: hexToRgba(f.success, dark ? 0.24 : 0.14),
+        successTint: hexToRgba(f.success, alpha.success),
         warning: f.warning,
-        warningTint: hexToRgba(f.warning, dark ? 0.24 : 0.16),
+        warningTint: hexToRgba(f.warning, alpha.warning),
+      },
+      selection: {
+        muted: SELECTION[scheme].muted,
       },
       border: {
         default: BORDER[scheme],
@@ -354,34 +422,37 @@ export function resolveTokens(scheme: ColorScheme, accent?: AccentKey | null): S
       title4: TYPE.title4,
       body: TYPE.body,
       caption: TYPE.caption,
+      micro: TYPE.micro,
       fontFamily: TYPE.fontFamily,
       fontFamilyMono: TYPE.fontFamilyMono,
     },
-  }
+  };
 }
 
 function v(value: string | number): { value: string | number } {
-  return { value }
+  return { value };
 }
 
-export function tokensToDtcg(scheme: ColorScheme, accent?: AccentKey | null): Record<string, unknown> {
-  const t = resolveTokens(scheme, accent)
-  const c = t.color
+export function tokensToDtcg(
+  scheme: ColorScheme,
+  accent?: AccentKey | null,
+): Record<string, unknown> {
+  const t = resolveTokens(scheme, accent);
+  const c = t.color;
 
-
-  const accentPrimitives =
-    scheme === 'nightsky'
-      ? Object.fromEntries([
-          ...Object.entries(NIGHTSKY.accents).map(([k, val]) => [k, v(val)]),
-          ['default', v(NIGHTSKY.defaultAccent)],
-        ])
-      : Object.fromEntries(Object.entries(ACCENTS).map(([k, val]) => [k, v(val)]))
+  const set = ACCENT_SETS[scheme];
+  const accentPrimitives = Object.fromEntries([
+    ...Object.entries(set.accents).map(([k, val]) => [k, v(val)]),
+    ["default", v(set.defaultAccent)],
+  ]);
   return {
     color: {
       primitive: {
         accent: accentPrimitives,
         neutral: {
-          [scheme]: Object.fromEntries(Object.entries(NEUTRALS[scheme]).map(([k, val]) => [k, v(val)])),
+          [scheme]: Object.fromEntries(
+            Object.entries(NEUTRALS[scheme]).map(([k, val]) => [k, v(val)]),
+          ),
         },
       },
 
@@ -392,13 +463,14 @@ export function tokensToDtcg(scheme: ColorScheme, accent?: AccentKey | null): Re
         sidebar: v(c.surface.sidebar),
         card: v(c.surface.card),
         button: v(c.surface.button),
-        'button-hover': v(c.surface.buttonHover),
-        'button-active': v(c.surface.buttonActive),
+        "button-hover": v(c.surface.buttonHover),
+        "button-active": v(c.surface.buttonActive),
+        osd: v(c.surface.osd),
       },
       text: {
         primary: v(c.text.primary),
         dim: v(c.text.dim),
-        'on-accent': v(c.text.onAccent),
+        "on-accent": v(c.text.onAccent),
       },
       accent: {
         base: v(c.accent.base),
@@ -418,6 +490,9 @@ export function tokensToDtcg(scheme: ColorScheme, accent?: AccentKey | null): Re
         base: v(c.functional.warning),
         tint: v(c.functional.warningTint),
       },
+      selection: {
+        muted: v(c.selection.muted),
+      },
       border: {
         default: v(c.border.default),
       },
@@ -432,7 +507,7 @@ export function tokensToDtcg(scheme: ColorScheme, accent?: AccentKey | null): Re
     space: {
       gap: v(t.space.gap),
       padding: v(t.space.padding),
-      'padding-tight': v(t.space.paddingTight),
+      "padding-tight": v(t.space.paddingTight),
     },
     typography: {
       title1: v(t.typography.title1),
@@ -441,21 +516,22 @@ export function tokensToDtcg(scheme: ColorScheme, accent?: AccentKey | null): Re
       title4: v(t.typography.title4),
       body: v(t.typography.body),
       caption: v(t.typography.caption),
-      'font-family': v(t.typography.fontFamily),
-      'font-family-mono': v(t.typography.fontFamilyMono),
+      micro: v(t.typography.micro),
+      "font-family": v(t.typography.fontFamily),
+      "font-family-mono": v(t.typography.fontFamilyMono),
     },
-  }
+  };
 }
 
 export function tokensToDtcgAll(): Record<string, unknown> {
-  const accents = Object.keys(ACCENTS) as AccentKey[]
-  const out: Record<string, unknown> = {}
+  const accents = Object.keys(ACCENTS) as AccentKey[];
+  const out: Record<string, unknown> = {};
   for (const s of SCHEMES) {
     for (const a of accents) {
-      out[`${s}-${a}`] = tokensToDtcg(s, a)
+      out[`${s}-${a}`] = tokensToDtcg(s, a);
     }
   }
 
-  out['nightsky-default'] = tokensToDtcg('nightsky', null)
-  return out
+  out["nightsky-default"] = tokensToDtcg("nightsky", null);
+  return out;
 }
