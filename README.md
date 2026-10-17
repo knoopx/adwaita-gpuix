@@ -24,8 +24,8 @@ JSX runtime. Your `tsconfig.json` **must** include:
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@gpuix/react"
-  }
+    "jsxImportSource": "@gpuix/react",
+  },
 }
 ```
 
@@ -44,7 +44,7 @@ Conventions that differ from the web:
   an object; **`padding` / `margin` / `border` / `radius` are numbers** (px).
 - **`<virtual-list>`** is the only supported scroller. Wrap each row in a
   `<div>`: `<virtual-list estimatedItemHeight={140} style={{ flexGrow: 1,
-  minHeight: 0 }}>…rows…</virtual-list>`.
+minHeight: 0 }}>…rows…</virtual-list>`.
 - `render` and `motion` are imported from `@gpuix/react`.
 
 ## Components
@@ -66,15 +66,32 @@ Conventions that differ from the web:
 ## Usage
 
 ```tsx
-import { render } from '@gpuix/react'
-import { AdwaitaProvider, HeaderBar, Button, Card, T } from 'adwaita-gpuix'
+import { render } from "@gpuix/react";
+import { AdwaitaProvider, HeaderBar, Button, Card, T } from "adwaita-gpuix";
 
 function App() {
   return (
     <AdwaitaProvider scheme="light" accent="blue">
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-        <HeaderBar title="Adwaita GPUix" left={<Button variant="icon" icon="panel" />} />
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 16 }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <HeaderBar
+          title="Adwaita GPUix"
+          left={<Button variant="icon" icon="panel" />}
+        />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 8,
+            padding: 16,
+          }}
+        >
           <Card title="Hello">
             <T>GPU-rendered Adwaita components.</T>
           </Card>
@@ -82,10 +99,10 @@ function App() {
         </div>
       </div>
     </AdwaitaProvider>
-  )
+  );
 }
 
-render(<App />, { title: 'Adwaita GPUix', width: 900, height: 720 })
+render(<App />, { title: "Adwaita GPUix", width: 900, height: 720 });
 ```
 
 ## Running
