@@ -6,13 +6,14 @@ import { Icon, type IconName } from "./icons";
 import { Switch } from "./Switch";
 import { Entry } from "./Entry";
 
-export function BoxedList({
-  children,
-  style,
-}: {
-  children: ReactNode;
+export interface BoxedListProps {
+  children?: ReactNode;
+  
+  emptyLabel?: string;
   style?: Partial<StyleDesc>;
-}) {
+}
+
+export function BoxedList({ children, emptyLabel, style }: BoxedListProps) {
   const t = useAdwaita();
   const items = Children.toArray(children);
   return (
@@ -20,7 +21,7 @@ export function BoxedList({
       style={{
         display: "flex",
         flexDirection: "column",
-        borderRadius: 12,
+        borderRadius: t.radii.card,
         borderWidth: 1,
         borderColor: t.colors.border,
         backgroundColor: t.colors.view_bg,
@@ -28,6 +29,21 @@ export function BoxedList({
         ...style,
       }}
     >
+      {items.length === 0 && emptyLabel !== undefined ? (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: t.spacing.rowHeight,
+            padding: t.spacing.paddingTight,
+          }}
+        >
+          <T size="caption" color={t.colors.dim_fg}>
+            {emptyLabel}
+          </T>
+        </div>
+      ) : null}
       {items.map((child, i) => (
         <div
           key={i}
@@ -49,6 +65,8 @@ interface RowShellProps {
   prefix?: ReactNode;
   suffix?: ReactNode;
   onClick?: () => void;
+  selected?: boolean;
+  disabled?: boolean;
   height?: number;
 }
 
@@ -58,23 +76,29 @@ function RowShell({
   prefix,
   suffix,
   onClick,
+  selected,
+  disabled,
   height,
 }: RowShellProps) {
   const t = useAdwaita();
-  const { colors } = t;
+  const { colors, spacing } = t;
+  const interactive = onClick !== undefined && !disabled;
   return (
     <div
-      onClick={onClick}
+      onClick={interactive ? onClick : undefined}
       style={{
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        gap: 12,
-        minHeight: height ?? 44,
-        paddingLeft: 12,
-        paddingRight: 12,
-        cursor: onClick ? "pointer" : "default",
-        hover: onClick
+        gap: spacing.paddingTight,
+        minHeight: height ?? spacing.rowHeight,
+        paddingLeft: spacing.paddingTight,
+        paddingRight: spacing.paddingTight,
+        cursor: interactive ? "pointer" : "default",
+        backgroundColor: selected ? colors.accentTint : "transparent",
+        opacity: disabled ? 0.5 : 1,
+        pointerEvents: disabled ? "none" : "auto",
+        hover: interactive && !selected
           ? {
               backgroundColor: hexToRgba(
                 colors.fg,
@@ -93,21 +117,13 @@ function RowShell({
           minWidth: 0,
         }}
       >
-        {/* Fixed-height line boxes: <text> has no reliable intrinsic height in
-            the takumi rasterizer (a unitless lineHeight serializes as a CSS
-            multiplier and balloons the row), so each line gets an explicit
-            box. Valid GPUix layout in the native app as well. */}
-        <div style={{ height: 18 }}>
-          <T size="body" color={colors.fg}>
-            {title}
-          </T>
-        </div>
+        <T size="body" color={colors.fg}>
+          {title}
+        </T>
         {subtitle ? (
-          <div style={{ height: 16 }}>
-            <T size="caption" color={colors.dim_fg}>
-              {subtitle}
-            </T>
-          </div>
+          <T size="caption" color={colors.dim_fg}>
+            {subtitle}
+          </T>
         ) : null}
       </div>
       {suffix}
@@ -121,6 +137,8 @@ export interface ActionRowProps {
   prefix?: IconName;
   suffix?: IconName;
   onClick?: () => void;
+  selected?: boolean;
+  disabled?: boolean;
 }
 
 export function ActionRow({
@@ -129,6 +147,8 @@ export function ActionRow({
   prefix,
   suffix,
   onClick,
+  selected,
+  disabled,
 }: ActionRowProps) {
   const t = useAdwaita();
   const { colors } = t;
@@ -136,7 +156,9 @@ export function ActionRow({
     <RowShell
       title={title}
       subtitle={subtitle}
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
+      selected={selected}
+      disabled={disabled}
       prefix={
         prefix ? (
           <Icon name={prefix} size={18} color={colors.dim_fg} />
@@ -190,6 +212,7 @@ export interface SwitchRowProps {
   subtitle?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  disabled?: boolean;
 }
 
 export function SwitchRow({
@@ -197,12 +220,20 @@ export function SwitchRow({
   subtitle,
   checked,
   onChange,
+  disabled,
 }: SwitchRowProps) {
   return (
     <RowShell
       title={title}
       subtitle={subtitle}
-      suffix={<Switch checked={checked} onChange={onChange} />}
+      disabled={disabled}
+      suffix={
+        <Switch
+          checked={checked}
+          onChange={onChange}
+          disabled={disabled}
+        />
+      }
     />
   );
 }
@@ -225,7 +256,7 @@ export function SpinRow({
   onChange,
 }: SpinRowProps) {
   const t = useAdwaita();
-  const { colors } = t;
+  const { colors, radii } = t;
   const stepBtn = (dir: -1 | 1, disabled: boolean) => (
     <div
       onClick={
@@ -236,7 +267,7 @@ export function SpinRow({
       style={{
         width: 28,
         height: 28,
-        borderRadius: 8,
+        borderRadius: radii.button,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -286,7 +317,7 @@ export interface ComboRowProps {
 
 export function ComboRow({ title, value, options, onChange }: ComboRowProps) {
   const t = useAdwaita();
-  const { colors } = t;
+  const { colors, radii } = t;
   const cycle = () => {
     const i = options.indexOf(value);
     const next = options[(i + 1) % options.length];
@@ -306,7 +337,7 @@ export function ComboRow({ title, value, options, onChange }: ComboRowProps) {
             minHeight: 30,
             paddingLeft: 10,
             paddingRight: 8,
-            borderRadius: 8,
+            borderRadius: radii.button,
             backgroundColor: colors.button_bg,
             cursor: "pointer",
             hover: { backgroundColor: colors.button_hover },
@@ -330,7 +361,7 @@ export interface ExpanderRowProps {
 
 export function ExpanderRow({ title, subtitle, children }: ExpanderRowProps) {
   const t = useAdwaita();
-  const { colors } = t;
+  const { colors, spacing } = t;
   const [open, setOpen] = useState(false);
   return (
     <div>
@@ -338,15 +369,21 @@ export function ExpanderRow({ title, subtitle, children }: ExpanderRowProps) {
         title={title}
         subtitle={subtitle}
         onClick={() => setOpen((o) => !o)}
-        suffix={<Icon name="chevronDown" size={18} color={colors.dim_fg} />}
+        suffix={
+          <Icon
+            name={open ? "chevronUp" : "chevronDown"}
+            size={18}
+            color={colors.dim_fg}
+          />
+        }
       />
       {open ? (
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: 8,
-            padding: 12,
+            gap: spacing.gap,
+            padding: spacing.paddingTight,
             paddingTop: 0,
           }}
         >
@@ -361,6 +398,7 @@ export interface ButtonRowProps {
   title: string;
   label: string;
   destructive?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
 }
 
@@ -368,25 +406,29 @@ export function ButtonRow({
   title,
   label,
   destructive,
+  disabled,
   onClick,
 }: ButtonRowProps) {
   const t = useAdwaita();
-  const { colors } = t;
+  const { colors, spacing } = t;
   const fg = destructive ? colors.destructive : colors.accent;
-  const hoverBg = destructive ? colors.destructiveTint : colors.button_hover;
+  const hoverBg = destructive ? colors.destructiveTint : colors.accentTint;
   return (
     <div
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
       style={{
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        minHeight: 44,
-        paddingLeft: 12,
-        paddingRight: 12,
-        cursor: "pointer",
-        hover: { backgroundColor: hoverBg },
+        gap: spacing.paddingTight,
+        minHeight: spacing.rowHeight,
+        paddingLeft: spacing.paddingTight,
+        paddingRight: spacing.paddingTight,
+        cursor: disabled ? "default" : "pointer",
+        opacity: disabled ? 0.5 : 1,
+        pointerEvents: disabled ? "none" : "auto",
+        hover: disabled ? undefined : { backgroundColor: hoverBg },
       }}
     >
       <T size="body" color={colors.fg}>
@@ -398,75 +440,3 @@ export function ButtonRow({
     </div>
   );
 }
-
-import type { ComponentShot } from "../../scripts/shot";
-import { Row, Shot, ShotItem } from "./common";
-
-export const BoxedListShot: ComponentShot = {
-  name: "BoxedList",
-  el: (
-    <Shot>
-      <Row label="ActionRow" col>
-        <ShotItem label="with prefix + suffix icons">
-          <BoxedList>
-            <ActionRow title="Open settings" subtitle="Configure the application" prefix="settings" suffix="chevronDown" onClick={() => {}} />
-          </BoxedList>
-        </ShotItem>
-        <ShotItem label="plain (no icons)">
-          <BoxedList>
-            <ActionRow title="Open settings" subtitle="Configure the application" onClick={() => {}} />
-          </BoxedList>
-        </ShotItem>
-      </Row>
-      <Row label="EntryRow" col>
-        <ShotItem label="with value">
-          <BoxedList><EntryRow title="Display name" value="Ada Lovelace" /></BoxedList>
-        </ShotItem>
-        <ShotItem label="placeholder (empty)">
-          <BoxedList><EntryRow title="Display name" placeholder="Type here…" /></BoxedList>
-        </ShotItem>
-      </Row>
-      <Row label="SwitchRow" col>
-        <ShotItem label="on">
-          <BoxedList><SwitchRow title="Notifications" subtitle="Show badges" checked={true} onChange={() => {}} /></BoxedList>
-        </ShotItem>
-        <ShotItem label="off">
-          <BoxedList><SwitchRow title="Notifications" checked={false} onChange={() => {}} /></BoxedList>
-        </ShotItem>
-      </Row>
-      <Row label="SpinRow" col>
-        <ShotItem label="mid range">
-          <BoxedList><SpinRow title="Volume" value={40} onChange={() => {}} /></BoxedList>
-        </ShotItem>
-        <ShotItem label="at min (− disabled)">
-          <BoxedList><SpinRow title="Volume" value={0} onChange={() => {}} /></BoxedList>
-        </ShotItem>
-        <ShotItem label="at max (+ disabled)">
-          <BoxedList><SpinRow title="Volume" value={99} onChange={() => {}} /></BoxedList>
-        </ShotItem>
-      </Row>
-      <Row label="ComboRow" col>
-        <ShotItem label="cycling pill">
-          <BoxedList><ComboRow title="Language" value="English" options={['English', 'Español', 'Français']} onChange={() => {}} /></BoxedList>
-        </ShotItem>
-      </Row>
-      <Row label="ExpanderRow" col>
-        <ShotItem label="collapsed (expanded is internal state)">
-          <BoxedList>
-            <ExpanderRow title="Advanced" subtitle="More options">
-              <T>Advanced details revealed here.</T>
-            </ExpanderRow>
-          </BoxedList>
-        </ShotItem>
-      </Row>
-      <Row label="ButtonRow" col>
-        <ShotItem label="accent">
-          <BoxedList><ButtonRow title="Share project" label="Share" onClick={() => {}} /></BoxedList>
-        </ShotItem>
-        <ShotItem label="destructive">
-          <BoxedList><ButtonRow title="Delete project" label="Delete" destructive onClick={() => {}} /></BoxedList>
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
-};

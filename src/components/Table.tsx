@@ -1,266 +1,263 @@
-import type { ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita, hexToRgba } from '../theme/adwaita'
-import { T } from './common'
+import { Children, type ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita, hexToRgba } from "../theme/adwaita";
+import { T, type TextSize } from "./common";
 
-export interface TableProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+export type TableCellAlign = "left" | "center" | "right";
+
+function alignStyle(align: TableCellAlign | undefined): Partial<StyleDesc> {
+  if (align === "center") return { justifyContent: "center" };
+  if (align === "right") return { justifyContent: "flex-end" };
+  return {};
 }
 
-export function Table({ children, style }: TableProps) {
-  const t = useAdwaita()
-  const { colors, radii } = t
+const ELLIPSIS: Partial<StyleDesc> = {
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
+};
+
+function TableTextCell({
+  size,
+  weight,
+  color,
+  align,
+  children,
+  style,
+}: {
+  size: TextSize;
+  weight?: string | number;
+  color: string;
+  align?: TableCellAlign;
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
+}) {
+  const t = useAdwaita();
+  const pad = t.spacing.gap;
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        alignItems: "center",
+        flexGrow: 1,
+        minWidth: 0,
+        padding: pad,
+        ...alignStyle(align),
+        ...style,
+      }}
+    >
+      <T size={size} weight={weight} color={color} align={align} style={ELLIPSIS}>
+        {children}
+      </T>
+    </div>
+  );
+}
+
+export interface TableProps {
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
+}
+
+export function Table({ children, style }: TableProps) {
+  const t = useAdwaita();
+  const { colors, radii } = t;
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
         borderRadius: radii.card,
         borderWidth: 1,
         borderColor: colors.border,
         backgroundColor: colors.view_bg,
-        overflow: 'hidden',
+        overflow: "hidden",
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 export interface TableHeaderProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function TableHeader({ children, style }: TableHeaderProps) {
+  const t = useAdwaita();
+  const { colors } = t;
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: colors.headerbar_bg,
         borderBottomWidth: 1,
+        borderColor: colors.border,
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 export interface TableBodyProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  zebra?: boolean;
+  style?: Partial<StyleDesc>;
 }
 
-export function TableBody({ children, style }: TableBodyProps) {
+export function TableBody({ children, zebra, style }: TableBodyProps) {
+  const t = useAdwaita();
+  const zebraBg = hexToRgba(t.colors.fg, 0.04);
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', ...style }}>{children}</div>
-  )
+    <div style={{ display: "flex", flexDirection: "column", ...style }}>
+      {zebra
+        ? Children.map(children, (child, i) => (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                ...(i % 2 === 1 ? { backgroundColor: zebraBg } : {}),
+              }}
+            >
+              {child}
+            </div>
+          ))
+        : children}
+    </div>
+  );
 }
 
 export interface TableFooterProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function TableFooter({ children, style }: TableFooterProps) {
-  const t = useAdwaita()
-  const { colors } = t
+  const t = useAdwaita();
+  const { colors } = t;
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        borderTopWidth: 1,
-        borderColor: colors.border,
+        display: "flex",
+        flexDirection: "column",
         backgroundColor: hexToRgba(colors.fg, 0.04),
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 export interface TableFootCellProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  align?: TableCellAlign;
+  style?: Partial<StyleDesc>;
 }
 
-export function TableFootCell({ children, style }: TableFootCellProps) {
-  const t = useAdwaita()
+export function TableFootCell({
+  children,
+  align,
+  style,
+}: TableFootCellProps) {
+  const t = useAdwaita();
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: 8,
-        flexGrow: 1,
-        ...style,
-      }}
+    <TableTextCell
+      size="body"
+      weight={500}
+      color={t.colors.fg}
+      align={align}
+      style={style}
     >
-      <T size="body" weight={500} color={t.colors.fg}>
-        {children}
-      </T>
-    </div>
-  )
+      {children}
+    </TableTextCell>
+  );
 }
 
 export interface TableRowProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  selected?: boolean;
+  style?: Partial<StyleDesc>;
 }
 
-export function TableRow({ children, style }: TableRowProps) {
-  const t = useAdwaita()
-  const { colors } = t
+export function TableRow({ children, selected, style }: TableRowProps) {
+  const t = useAdwaita();
+  const { colors } = t;
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'row',
+        display: "flex",
+        flexDirection: "row",
         borderBottomWidth: 1,
         borderColor: colors.border,
+        ...(selected ? { backgroundColor: colors.accentTint } : {}),
         hover: { backgroundColor: colors.accentTint },
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 export interface TableHeadProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  align?: TableCellAlign;
+  style?: Partial<StyleDesc>;
 }
 
-export function TableHead({ children, style }: TableHeadProps) {
-  const t = useAdwaita()
+export function TableHead({ children, align, style }: TableHeadProps) {
+  const t = useAdwaita();
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: 8,
-        flexGrow: 1,
-        ...style,
-      }}
+    <TableTextCell
+      size="caption"
+      weight={700}
+      color={t.colors.dim_fg}
+      align={align}
+      style={style}
     >
-      <T size="caption" weight={700} color={t.colors.dim_fg}>
-        {children}
-      </T>
-    </div>
-  )
+      {children}
+    </TableTextCell>
+  );
 }
 
 export interface TableCellProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  align?: TableCellAlign;
+  style?: Partial<StyleDesc>;
 }
 
-export function TableCell({ children, style }: TableCellProps) {
-  const t = useAdwaita()
+export function TableCell({ children, align, style }: TableCellProps) {
+  const t = useAdwaita();
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: 8,
-        flexGrow: 1,
-        ...style,
-      }}
+    <TableTextCell
+      size="body"
+      color={t.colors.fg}
+      align={align}
+      style={style}
     >
-      <T size="body" color={t.colors.fg}>
-        {children}
-      </T>
-    </div>
-  )
+      {children}
+    </TableTextCell>
+  );
 }
 
 export interface TableCaptionProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function TableCaption({ children, style }: TableCaptionProps) {
-  const t = useAdwaita()
+  const t = useAdwaita();
+  const pad = t.spacing.gap;
   return (
-    <div style={{ padding: 8, ...style }}>
+    <div style={{ padding: pad, ...style }}>
       <T size="caption" color={t.colors.dim_fg}>
         {children}
       </T>
     </div>
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
-
-export const TableShot: ComponentShot = {
-  name: 'Table',
-  el: (
-    <Shot>
-      <Row label="Header + body + footer" col>
-        <ShotItem label="full table">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>Ada</TableCell>
-                <TableCell>ada@example.com</TableCell>
-                <TableCell>Admin</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Grace</TableCell>
-                <TableCell>grace@example.com</TableCell>
-                <TableCell>Editor</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Alan</TableCell>
-                <TableCell>alan@example.com</TableCell>
-                <TableCell>Viewer</TableCell>
-              </TableRow>
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableFootCell>Total</TableFootCell>
-                <TableFootCell>—</TableFootCell>
-                <TableFootCell>3 users</TableFootCell>
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </ShotItem>
-      </Row>
-      <Row label="Caption">
-        <ShotItem label="caption below the table">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Key</TableHead>
-                  <TableHead>Value</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>Theme</TableCell>
-                  <TableCell>Dark</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-            <TableCaption>Settings summary — 1 row.</TableCaption>
-          </div>
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
+  );
 }

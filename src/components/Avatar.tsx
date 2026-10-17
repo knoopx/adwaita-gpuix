@@ -1,24 +1,42 @@
-import { Children, type ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { T } from './common'
+import { Children, type ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
+import { T } from "./common";
+import { Icon, type IconName } from "./icons";
 
 export interface AvatarProps {
-  name: string
-  size?: number
-  src?: string
-  style?: Partial<StyleDesc>
+  name: string;
+  size?: number;
+  src?: string;
+  
+  icon?: IconName;
+  
+  ring?: boolean;
+  
+  disabled?: boolean;
+  style?: Partial<StyleDesc>;
 }
 
 function initials(name: string): string {
-  const words = name.trim().split(/\s+/).filter(Boolean)
-  const letters = words.slice(0, 2).map((w) => w[0])
-  return letters.join('').toUpperCase() || '?'
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  const letters = words.slice(0, 2).map((w) => w[0]);
+  return letters.join("").toUpperCase();
 }
 
-export function Avatar({ name, size = 32, src, style }: AvatarProps) {
-  const t = useAdwaita()
-  const { colors } = t
+export function Avatar({
+  name,
+  size = 32,
+  src,
+  icon,
+  ring,
+  disabled,
+  style,
+}: AvatarProps) {
+  const t = useAdwaita();
+  const { colors } = t;
+  const hasName = name.trim().length > 0;
+  const ringStyle = ring ? { borderWidth: 1, borderColor: colors.border } : {};
+  const opacity = disabled ? 0.5 : 1;
   if (src) {
     return (
       <img
@@ -29,120 +47,157 @@ export function Avatar({ name, size = 32, src, style }: AvatarProps) {
           height: size,
           borderRadius: size / 2,
           flexShrink: 0,
+          ...ringStyle,
+          opacity,
           ...style,
         }}
       />
-    )
+    );
   }
+  const content = icon ? (
+    <Icon
+      name={icon}
+      size={Math.max(12, Math.round(size * 0.5))}
+      color={hasName ? colors.accent : colors.dim_fg}
+    />
+  ) : hasName ? (
+    <T
+      weight={700}
+      color={colors.accent}
+      style={{ fontSize: Math.max(10, Math.round(size * 0.4)) }}
+    >
+      {initials(name)}
+    </T>
+  ) : (
+    <Icon
+      name="user"
+      size={Math.max(12, Math.round(size * 0.5))}
+      color={colors.dim_fg}
+    />
+  );
   return (
     <div
       style={{
         width: size,
         height: size,
         borderRadius: size / 2,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: colors.accentTint,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: hasName ? colors.accentTint : colors.button_bg,
         flexShrink: 0,
+        ...ringStyle,
+        opacity,
         ...style,
       }}
     >
-      <T
-        weight={700}
-        color={colors.accent}
-        style={{ fontSize: Math.max(10, Math.round(size * 0.4)) }}
-      >
-        {initials(name)}
-      </T>
+      {content}
     </div>
-  )
+  );
 }
 
 export interface AvatarBadgeProps {
+  children?: ReactNode;
 
-  children?: ReactNode
+  size?: number;
 
-  size?: number
-
-  color?: string
-  style?: Partial<StyleDesc>
+  color?: string;
+  
+  ringColor?: string;
+  style?: Partial<StyleDesc>;
 }
 
-export function AvatarBadge({ children, size = 12, color, style }: AvatarBadgeProps) {
-  const t = useAdwaita()
-  const { colors } = t
+export function AvatarBadge({
+  children,
+  size = 12,
+  color,
+  ringColor,
+  style,
+}: AvatarBadgeProps) {
+  const t = useAdwaita();
+  const { colors } = t;
   return (
     <div
       style={{
-        position: 'absolute',
+        position: "absolute",
         bottom: 0,
         right: 0,
         width: size,
         height: size,
         borderRadius: size / 2,
         borderWidth: 2,
-        borderColor: colors.view_bg,
+        borderColor: ringColor ?? colors.view_bg,
         backgroundColor: color ?? colors.accent,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 export interface AvatarGroupProps {
-  children: ReactNode
+  children: ReactNode;
 
-  size?: number
+  size?: number;
 
-  overlap?: number
-  style?: Partial<StyleDesc>
+  overlap?: number;
+  style?: Partial<StyleDesc>;
 }
 
-export function AvatarGroup({ children, size = 32, overlap = 8, style }: AvatarGroupProps) {
-  const kids = Children.toArray(children)
+export function AvatarGroup({
+  children,
+  size = 32,
+  overlap = 8,
+  style,
+}: AvatarGroupProps) {
+  const kids = Children.toArray(children);
+  
+  
+  const ordered = [...kids].reverse();
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
         minHeight: size,
         ...style,
       }}
     >
-      {kids.map((child, i) => (
+      {ordered.map((child, i) => (
         <div
           key={i}
           style={{
-            position: 'relative',
+            position: "relative",
             flexShrink: 0,
-            marginRight: i === kids.length - 1 ? 0 : -overlap,
+            marginRight: i === ordered.length - 1 ? 0 : -overlap,
           }}
         >
           {child}
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 export interface AvatarGroupCountProps {
+  count: number;
 
-  count: number
-
-  size?: number
-  style?: Partial<StyleDesc>
+  size?: number;
+  style?: Partial<StyleDesc>;
 }
 
-export function AvatarGroupCount({ count, size = 32, style }: AvatarGroupCountProps) {
-  const t = useAdwaita()
-  const { colors } = t
+export function AvatarGroupCount({
+  count,
+  size = 32,
+  style,
+}: AvatarGroupCountProps) {
+  const t = useAdwaita();
+  const { colors } = t;
   return (
     <div
       style={{
@@ -152,60 +207,20 @@ export function AvatarGroupCount({ count, size = 32, style }: AvatarGroupCountPr
         backgroundColor: colors.button_bg,
         borderWidth: 1,
         borderColor: colors.border,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         flexShrink: 0,
         ...style,
       }}
     >
-      <T size="caption" color={colors.dim_fg} style={{ fontSize: Math.max(10, Math.round(size * 0.35)) }}>
+      <T
+        size="caption"
+        color={colors.dim_fg}
+        style={{ fontSize: Math.max(10, Math.round(size * 0.35)) }}
+      >
         {`+${count}`}
       </T>
     </div>
-  )
-}
-
-import { AVATAR_IMG, type ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
-
-export const AvatarShot: ComponentShot = {
-  name: 'Avatar',
-  el: (
-    <Shot>
-      <Row label="Sizes">
-        <ShotItem label="24"><Avatar name="Ada Lovelace" size={24} /></ShotItem>
-        <ShotItem label="32"><Avatar name="Grace Hopper" size={32} /></ShotItem>
-        <ShotItem label="48"><Avatar name="Alan Turing" size={48} /></ShotItem>
-        <ShotItem label="64"><Avatar name="Katherine J." size={64} /></ShotItem>
-      </Row>
-      <Row label="Photo + badge" col>
-        <ShotItem label="src (photo)">
-          <Avatar name="Photo User" size={48} src={AVATAR_IMG} />
-        </ShotItem>
-        <ShotItem label="with badge (default)">
-          <div style={{ position: 'relative', width: 48, height: 48 }}>
-            <Avatar name="Ada Lovelace" size={48} />
-            <AvatarBadge />
-          </div>
-        </ShotItem>
-        <ShotItem label="with badge (custom colour)">
-          <div style={{ position: 'relative', width: 48, height: 48 }}>
-            <Avatar name="Grace Hopper" size={48} />
-            <AvatarBadge color="#2ec27e" size={14} />
-          </div>
-        </ShotItem>
-      </Row>
-      <Row label="Group" col>
-        <ShotItem label="overlap stack + count">
-          <AvatarGroup size={32} overlap={8}>
-            <Avatar name="Ada Lovelace" size={32} />
-            <Avatar name="Alan Turing" size={32} />
-            <Avatar name="Grace Hopper" size={32} />
-            <AvatarGroupCount count={4} size={32} />
-          </AvatarGroup>
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
+  );
 }

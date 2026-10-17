@@ -1,107 +1,113 @@
-import type { ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita, hexToRgba } from '../theme/adwaita'
-import { T } from './common'
+import type { ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita, hexToRgba, isDarkScheme } from "../theme/adwaita";
+import { T } from "./common";
+import { Icon, type IconName } from "./icons";
 
-export type ToggleVariant = 'default' | 'outline'
-export type ToggleSize = 'sm' | 'default' | 'lg'
+export type ToggleVariant = "default" | "outline";
+export type ToggleSize = "sm" | "default" | "lg";
 
 export interface ToggleProps {
-  pressed: boolean
-  onPressed: () => void
-  variant?: ToggleVariant
-
-  size?: ToggleSize
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  pressed: boolean;
+  onPressed: () => void;
+  variant?: ToggleVariant;
+  size?: ToggleSize;
+  icon?: IconName;
+  disabled?: boolean;
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
-const TOGGLE_MIN_HEIGHT: Record<ToggleSize, number> = { sm: 28, default: 32, lg: 40 }
+const TOGGLE_MIN_HEIGHT: Record<ToggleSize, number> = {
+  sm: 28,
+  default: 34,
+  lg: 40,
+};
 
-export function Toggle({ pressed, onPressed, variant = 'default', size = 'default', children, style }: ToggleProps) {
-  const t = useAdwaita()
-  const { colors, radii } = t
+const TOGGLE_ICON_SIZE: Record<ToggleSize, number> = {
+  sm: 14,
+  default: 16,
+  lg: 18,
+};
 
-  const isOutline = variant === 'outline'
+export function Toggle({
+  pressed,
+  onPressed,
+  variant = "default",
+  size = "default",
+  icon,
+  disabled,
+  children,
+  style,
+}: ToggleProps) {
+  const t = useAdwaita();
+  const { colors, radii, spacing } = t;
+  const dark = isDarkScheme(t.scheme);
 
+  const isOutline = variant === "outline";
 
-
-  const bg = pressed ? colors.accentTint : isOutline ? 'transparent' : colors.button_bg
-  const fg = pressed ? colors.accent : colors.fg
-  const border = colors.border
+  const bg = pressed
+    ? colors.accentTint
+    : isOutline
+      ? "transparent"
+      : colors.button_bg;
+  const fg = pressed ? colors.accent : colors.fg;
+  const iconColor = pressed ? colors.accent : colors.dim_fg;
+  const borderColor = pressed ? colors.accent : colors.border;
 
   return (
     <div
-      onClick={onPressed}
-      tabIndex={0}
+      onClick={disabled ? undefined : onPressed}
+      tabIndex={disabled ? -1 : 0}
       onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') onPressed()
+        if (disabled) return;
+        if (event.key === "Enter" || event.key === " ") onPressed();
       }}
       style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
         gap: 6,
         minHeight: TOGGLE_MIN_HEIGHT[size],
-        paddingLeft: 12,
-        paddingRight: 12,
+        paddingLeft: spacing.paddingTight,
+        paddingRight: spacing.paddingTight,
         borderRadius: radii.button,
         borderWidth: 1,
-        borderColor: border,
+        borderColor,
         backgroundColor: bg,
-        cursor: 'pointer',
-        hover: { backgroundColor: pressed ? colors.accentTint : hexToRgba(colors.fg, 0.06) },
+        opacity: disabled ? 0.5 : 1,
+        cursor: disabled ? "not-allowed" : "pointer",
+        ...(disabled
+          ? {}
+          : {
+              hover: {
+                backgroundColor: pressed
+                  ? colors.accentTint
+                  : colors.button_hover,
+              },
+              active: {
+                backgroundColor: pressed
+                  ? hexToRgba(colors.accent, dark ? 0.35 : 0.25)
+                  : colors.button_active,
+              },
+            }),
         ...style,
       }}
     >
-      <T size="body" weight={600} color={fg}>
-        {children}
-      </T>
+      {icon ? (
+        <Icon
+          name={icon}
+          size={TOGGLE_ICON_SIZE[size]}
+          color={iconColor}
+          style={{ pointerEvents: "none" }}
+        />
+      ) : null}
+      {children ? (
+        <T size="body" weight={600} color={fg}>
+          {children}
+        </T>
+      ) : null}
     </div>
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
-
-export const ToggleShot: ComponentShot = {
-  name: 'Toggle',
-  el: (
-    <Shot>
-      <Row label="States (default variant)">
-        <ShotItem label="unpressed">
-          <Toggle pressed={false} onPressed={() => {}}>Bold</Toggle>
-        </ShotItem>
-        <ShotItem label="pressed">
-          <Toggle pressed onPressed={() => {}}>Bold</Toggle>
-        </ShotItem>
-      </Row>
-      <Row label="Variants" col>
-        <ShotItem label="default (unpressed)">
-          <Toggle pressed={false} variant="default" onPressed={() => {}}>Default</Toggle>
-        </ShotItem>
-        <ShotItem label="default (pressed)">
-          <Toggle pressed variant="default" onPressed={() => {}}>Default</Toggle>
-        </ShotItem>
-        <ShotItem label="outline (unpressed — flat, transparent)">
-          <Toggle pressed={false} variant="outline" onPressed={() => {}}>Outline</Toggle>
-        </ShotItem>
-        <ShotItem label="outline (pressed — accentTint)">
-          <Toggle pressed variant="outline" onPressed={() => {}}>Outline</Toggle>
-        </ShotItem>
-      </Row>
-      <Row label="Sizes">
-        <ShotItem label="sm (28px)">
-          <Toggle pressed={false} size="sm" onPressed={() => {}}>Sm</Toggle>
-        </ShotItem>
-        <ShotItem label="default (32px)">
-          <Toggle pressed={false} size="default" onPressed={() => {}}>Default</Toggle>
-        </ShotItem>
-        <ShotItem label="lg (40px)">
-          <Toggle pressed={false} size="lg" onPressed={() => {}}>Large</Toggle>
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
+  );
 }

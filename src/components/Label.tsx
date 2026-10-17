@@ -1,37 +1,55 @@
-import type { ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { T } from './common'
+import type { ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
+import { T, type TextSize } from "./common";
+
+export type LabelVariant =
+  | "default"
+  | "dim"
+  | "accent"
+  | "destructive"
+  | "success"
+  | "warning";
 
 export interface LabelProps {
-  children: ReactNode
+  children: ReactNode;
 
-  disabled?: boolean
-  style?: Partial<StyleDesc>
+  size?: TextSize;
+
+  variant?: LabelVariant;
+
+  weight?: number | string;
+
+  disabled?: boolean;
+
+  style?: Partial<StyleDesc>;
 }
 
-export function Label({ children, disabled, style }: LabelProps) {
-  const t = useAdwaita()
+export function Label({
+  children,
+  size = "body",
+  variant = "default",
+  weight,
+  disabled,
+  style,
+}: LabelProps) {
+  const t = useAdwaita();
+  const color = {
+    default: t.colors.fg,
+    dim: t.colors.dim_fg,
+    accent: t.colors.accent,
+    destructive: t.colors.destructive,
+    success: t.colors.success,
+    warning: t.colors.warning,
+  }[variant];
   return (
-    <div style={{ opacity: disabled ? 0.5 : 1, ...style }}>
-      <T size="body" color={t.colors.fg}>
-        {children}
-      </T>
-    </div>
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
-
-export const LabelShot: ComponentShot = {
-  name: 'Label',
-  el: (
-    <Shot>
-      <Row label="States">
-        <ShotItem label="default"><Label>Email</Label></ShotItem>
-        <ShotItem label="disabled (dimmed, matches a disabled control)"><Label disabled>Email</Label></ShotItem>
-      </Row>
-    </Shot>
-  ),
+    <T
+      size={size}
+      weight={weight}
+      color={color}
+      style={{ opacity: disabled ? 0.5 : 1, ...style }}
+    >
+      {children}
+    </T>
+  );
 }

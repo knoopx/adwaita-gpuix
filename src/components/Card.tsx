@@ -1,16 +1,16 @@
-import type { ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { T } from './common'
+import type { ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
+import { T } from "./common";
 
 export interface FrameProps {
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function Frame({ children, style }: FrameProps) {
-  const t = useAdwaita()
-  const { colors, radii } = t
+  const t = useAdwaita();
+  const { colors, radii } = t;
   return (
     <div
       style={{
@@ -23,25 +23,25 @@ export function Frame({ children, style }: FrameProps) {
     >
       {children}
     </div>
-  )
+  );
 }
 
 export interface CardProps {
-  title?: string
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  title?: string;
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function Card({ title, children, style }: CardProps) {
-  const t = useAdwaita()
-  const { colors } = t
+  const t = useAdwaita();
+  const { colors, spacing } = t;
   return (
     <Frame
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        padding: 16,
-        gap: 8,
+        display: "flex",
+        flexDirection: "column",
+        padding: spacing.padding,
+        gap: spacing.gap,
         ...style,
       }}
     >
@@ -52,166 +52,114 @@ export function Card({ title, children, style }: CardProps) {
       ) : null}
       {children}
     </Frame>
-  )
+  );
 }
 
 export interface CardHeaderProps {
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function CardHeader({ children, style }: CardHeaderProps) {
-  const t = useAdwaita()
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         gap: 4,
-        padding: t.spacing.paddingTight,
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 export interface CardTitleProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function CardTitle({ children, style }: CardTitleProps) {
-  const t = useAdwaita()
+  const t = useAdwaita();
   return (
     <T size="title4" weight={700} color={t.colors.fg} style={style}>
       {children}
     </T>
-  )
+  );
 }
 
 export interface CardDescriptionProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function CardDescription({ children, style }: CardDescriptionProps) {
-  const t = useAdwaita()
+  const t = useAdwaita();
   return (
     <T size="body" color={t.colors.dim_fg} style={style}>
       {children}
     </T>
-  )
+  );
 }
 
 export interface CardContentProps {
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function CardContent({ children, style }: CardContentProps) {
-  const t = useAdwaita()
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         gap: 8,
-        padding: t.spacing.paddingTight,
         flexGrow: 1,
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 export interface CardFooterProps {
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function CardFooter({ children, style }: CardFooterProps) {
-  const t = useAdwaita()
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
         gap: 8,
-        padding: t.spacing.paddingTight,
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 export interface CardActionProps {
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function CardAction({ children, style }: CardActionProps) {
   return (
     <div
       style={{
-        alignSelf: 'flex-end',
+        alignSelf: "flex-end",
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
-import { Button } from './Button'
-import { Badge } from './Badge'
-
-export const CardShot: ComponentShot = {
-  name: 'Card',
-  el: (
-    <Shot>
-      <Row label="Variants" col>
-        <ShotItem label="Card (title prop)">
-          <Card title="Simple card">
-            <T>Card body content.</T>
-          </Card>
-        </ShotItem>
-        <ShotItem label="Card (compound sub-parts + action)">
-          <Card>
-            <CardHeader>
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <CardTitle>Card title</CardTitle>
-                  <CardDescription>A short description of the card.</CardDescription>
-                </div>
-                <CardAction><Badge>New</Badge></CardAction>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <T>Card body content goes here.</T>
-            </CardContent>
-            <CardFooter>
-              <Button label="Action" onClick={() => {}} />
-              <Button variant="secondary" label="Details" onClick={() => {}} />
-            </CardFooter>
-          </Card>
-        </ShotItem>
-        <ShotItem label="Frame (plain surface)">
-          <Frame>
-            <div style={{ padding: 16 }}>
-              <T>Frame content.</T>
-            </div>
-          </Frame>
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
-}

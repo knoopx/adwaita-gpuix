@@ -1,89 +1,101 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import type { StyleDesc, EventPayload } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { T } from './common'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import type { StyleDesc, EventPayload } from "@gpuix/react";
+import { useAdwaita, hexToRgba } from "../theme/adwaita";
+import { T } from "./common";
+import { Icon, type IconName } from "./icons";
 
 interface ListBoxContextValue {
+  selectedValues: string[];
 
-  selectedValues: string[]
-
-  focused: string | null
-  multiple: boolean
-  onSelect: (value: string) => void
-  onFocusRow: (value: string) => void
-  register: (value: string) => void
-  unregister: (value: string) => void
+  focused: string | null;
+  multiple: boolean;
+  onSelect: (value: string) => void;
+  onFocusRow: (value: string) => void;
+  register: (value: string) => void;
+  unregister: (value: string) => void;
 }
 
-const ListBoxContext = createContext<ListBoxContextValue | null>(null)
+const ListBoxContext = createContext<ListBoxContextValue | null>(null);
 
 export type ListBoxProps =
   | {
-      multiple?: false
-      value?: string
-      defaultValue?: string
-      onValueChange?: (value: string) => void
-      children?: ReactNode
-      style?: Partial<StyleDesc>
+      multiple?: false;
+      value?: string;
+      defaultValue?: string;
+      onValueChange?: (value: string) => void;
+      children?: ReactNode;
+      style?: Partial<StyleDesc>;
     }
   | {
-      multiple: true
-      value?: string[]
-      defaultValue?: string[]
-      onValueChange?: (value: string[]) => void
-      children?: ReactNode
-      style?: Partial<StyleDesc>
-    }
+      multiple: true;
+      value?: string[];
+      defaultValue?: string[];
+      onValueChange?: (value: string[]) => void;
+      children?: ReactNode;
+      style?: Partial<StyleDesc>;
+    };
 
 export function ListBox(props: ListBoxProps) {
-  const t = useAdwaita()
-  const { colors, radii } = t
-  const multiple = props.multiple === true
-
+  const multiple = props.multiple === true;
 
   const [internal, setInternal] = useState<string | string[] | null>(
-    multiple ? (props.defaultValue ?? props.value ?? []) : (props.defaultValue ?? props.value ?? null),
-  )
+    multiple
+      ? (props.defaultValue ?? props.value ?? [])
+      : (props.defaultValue ?? props.value ?? null),
+  );
 
-
-  const [focused, setFocused] = useState<string | null>(null)
-  const orderedRef = useRef<string[]>([])
+  const [focused, setFocused] = useState<string | null>(null);
+  const orderedRef = useRef<string[]>([]);
   const register = (v: string) => {
-    if (!orderedRef.current.includes(v)) orderedRef.current.push(v)
-  }
+    if (!orderedRef.current.includes(v)) orderedRef.current.push(v);
+  };
   const unregister = (v: string) => {
-    orderedRef.current = orderedRef.current.filter((x) => x !== v)
-  }
+    orderedRef.current = orderedRef.current.filter((x) => x !== v);
+  };
 
-  const current = multiple ? ((props.value ?? internal) as string[]) : ((props.value ?? internal) as string | null)
-  const selectedValues: string[] = multiple ? (current as string[]) : current ? [current as string] : []
+  const current = multiple
+    ? ((props.value ?? internal) as string[])
+    : ((props.value ?? internal) as string | null);
+  const selectedValues: string[] = multiple
+    ? (current as string[])
+    : current
+      ? [current as string]
+      : [];
 
   const handleSelect = (v: string) => {
     if (props.multiple === true) {
-      const arr = (props.value ?? internal) as string[]
-      const next = arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]
-      if (props.value === undefined) setInternal(next)
-      props.onValueChange?.(next)
+      const arr = (props.value ?? internal) as string[];
+      const next = arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
+      if (props.value === undefined) setInternal(next);
+      props.onValueChange?.(next);
     } else {
-      if (props.value === undefined) setInternal(v)
-      props.onValueChange?.(v)
+      if (props.value === undefined) setInternal(v);
+      props.onValueChange?.(v);
     }
-  }
+  };
 
   const handleKeyDown = (event: EventPayload) => {
-    const ordered = orderedRef.current
-    if (ordered.length === 0) return
-    const key = event.key
-    if (key === 'ArrowDown' || key === 'ArrowUp') {
-      const curIdx = focused ? ordered.indexOf(focused) : -1
-      let nextIdx: number
-      if (key === 'ArrowDown') nextIdx = curIdx < 0 ? 0 : Math.min(curIdx + 1, ordered.length - 1)
-      else nextIdx = curIdx < 0 ? ordered.length - 1 : Math.max(curIdx - 1, 0)
-      setFocused(ordered[nextIdx])
-    } else if (key === 'Enter') {
-      if (focused) handleSelect(focused)
+    const ordered = orderedRef.current;
+    if (ordered.length === 0) return;
+    const key = event.key;
+    if (key === "ArrowDown" || key === "ArrowUp") {
+      const curIdx = focused ? ordered.indexOf(focused) : -1;
+      let nextIdx: number;
+      if (key === "ArrowDown")
+        nextIdx = curIdx < 0 ? 0 : Math.min(curIdx + 1, ordered.length - 1);
+      else nextIdx = curIdx < 0 ? ordered.length - 1 : Math.max(curIdx - 1, 0);
+      setFocused(ordered[nextIdx]);
+    } else if (key === "Enter") {
+      if (focused) handleSelect(focused);
     }
-  }
+  };
 
   const ctxValue: ListBoxContextValue = {
     selectedValues,
@@ -93,52 +105,70 @@ export function ListBox(props: ListBoxProps) {
     onFocusRow: setFocused,
     register,
     unregister,
-  }
+  };
 
+  
+  
+  
   return (
     <ListBoxContext.Provider value={ctxValue}>
       <div
         tabIndex={0}
         onKeyDown={handleKeyDown}
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-          padding: 4,
-          borderRadius: radii.card,
-          borderWidth: 1,
-          borderColor: colors.border,
-          backgroundColor: colors.view_bg,
+          display: "flex",
+          flexDirection: "column",
           ...props.style,
         }}
       >
         {props.children}
       </div>
     </ListBoxContext.Provider>
-  )
+  );
 }
 
 export interface ListBoxItemProps {
-  value: string
-  disabled?: boolean
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  value: string;
+  disabled?: boolean;
+  icon?: IconName;
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
-export function ListBoxItem({ value, disabled, children, style }: ListBoxItemProps) {
-  const t = useAdwaita()
-  const { colors, radii } = t
-  const ctx = useContext(ListBoxContext)
-  const ctxRef = useRef(ctx)
-  ctxRef.current = ctx
+export function ListBoxItem({
+  value,
+  disabled,
+  icon,
+  children,
+  style,
+}: ListBoxItemProps) {
+  const t = useAdwaita();
+  const { colors, radii, spacing } = t;
+  const ctx = useContext(ListBoxContext);
+  const ctxRef = useRef(ctx);
+  ctxRef.current = ctx;
 
   useEffect(() => {
-    ctxRef.current?.register(value)
-    return () => ctxRef.current?.unregister(value)
-  }, [value])
+    ctxRef.current?.register(value);
+    return () => ctxRef.current?.unregister(value);
+  }, [value]);
 
-  const selected = ctx ? ctx.selectedValues.includes(value) : false
-  const isFocused = ctx?.focused === value
+  const selected = ctx ? ctx.selectedValues.includes(value) : false;
+  const isFocused = ctx?.focused === value;
+
+  
+  
+  const focusRing = isFocused
+    ? {
+        boxShadow: {
+          offsetX: 0,
+          offsetY: 0,
+          blurRadius: 8,
+          spreadRadius: 0,
+          color: hexToRgba(colors.accent, 0.4),
+        },
+      }
+    : {};
 
   return (
     <div
@@ -146,56 +176,49 @@ export function ListBoxItem({ value, disabled, children, style }: ListBoxItemPro
         disabled || !ctx
           ? undefined
           : () => {
-              ctx.onFocusRow(value)
-              ctx.onSelect(value)
+              ctx.onFocusRow(value);
+              ctx.onSelect(value);
             }
       }
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: 8,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing.gap,
+        padding: spacing.paddingTight,
+        minHeight: spacing.rowHeight,
         borderRadius: radii.row,
-        cursor: disabled ? 'default' : 'pointer',
-        borderWidth: isFocused ? 1 : 0,
-        borderColor: colors.accent,
-        backgroundColor: selected ? colors.accentTint : 'transparent',
+        cursor: disabled ? "default" : "pointer",
+        backgroundColor: selected ? colors.accentTint : "transparent",
         opacity: disabled ? 0.5 : 1,
-        hover: selected || disabled ? undefined : { backgroundColor: colors.accentTint },
+        hover:
+          selected || disabled
+            ? undefined
+            : { backgroundColor: hexToRgba(colors.fg, 0.04) },
+        ...focusRing,
         ...style,
       }}
     >
-      <T size="body" color={colors.fg}>
+      {icon ? (
+        <Icon
+          name={icon}
+          size={16}
+          color={selected ? colors.fg : colors.dim_fg}
+        />
+      ) : null}
+      <T
+        size="body"
+        color={colors.fg}
+        style={{
+          flexGrow: 1,
+          flexShrink: 1,
+          minWidth: 0,
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+        }}
+      >
         {children}
       </T>
     </div>
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
-
-export const ListBoxShot: ComponentShot = {
-  name: 'ListBox',
-  el: (
-    <Shot>
-      <Row label="Selection modes">
-        <ShotItem label="single (selected b, disabled d)">
-          <ListBox value="b" onValueChange={() => {}} style={{ width: 240 }}>
-            <ListBoxItem value="a">First item</ListBoxItem>
-            <ListBoxItem value="b">Second item (selected)</ListBoxItem>
-            <ListBoxItem value="c">Third item</ListBoxItem>
-            <ListBoxItem value="d" disabled>Disabled item</ListBoxItem>
-          </ListBox>
-        </ShotItem>
-        <ShotItem label="multiple (a + c selected)">
-          <ListBox multiple value={['a', 'c']} onValueChange={() => {}} style={{ width: 240 }}>
-            <ListBoxItem value="a">First item (selected)</ListBoxItem>
-            <ListBoxItem value="b">Second item</ListBoxItem>
-            <ListBoxItem value="c">Third item (selected)</ListBoxItem>
-            <ListBoxItem value="d">Fourth item</ListBoxItem>
-          </ListBox>
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
+  );
 }

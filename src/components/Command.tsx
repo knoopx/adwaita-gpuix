@@ -1,262 +1,355 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { FloatingPanel, MenuLabel, MenuRow, MenuSeparator, MenuShortcut, T, inputShellStyle } from './common'
-import { Icon } from './icons'
-import { Dialog, DialogContent } from './Dialog'
+import {
+  Children,
+  createContext,
+  isValidElement,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
+import {
+  MenuLabel,
+  MenuRow,
+  MenuSeparator,
+  MenuShortcut,
+  T,
+  inputShellStyle,
+} from "./common";
+import { Icon, type IconName } from "./icons";
+import { Dialog, DialogContent } from "./Dialog";
 
 export interface CommandProps {
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 
-  closeOnSelect?: boolean
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  closeOnSelect?: boolean;
+  
+  defaultQuery?: string;
+  
+  anchored?: boolean;
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export interface CommandInputProps {
-  value?: string
-  onChange?: (value: string) => void
-  placeholder?: string
-  style?: Partial<StyleDesc>
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  style?: Partial<StyleDesc>;
 }
 
 export interface CommandListProps {
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export interface CommandEmptyProps {
-  style?: Partial<StyleDesc>
+  style?: Partial<StyleDesc>;
 }
 
 export interface CommandGroupProps {
-  label?: string
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  label?: string;
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export interface CommandItemProps {
-  label: string
-  onSelect?: () => void
-  selected?: boolean
+  label: string;
+  icon?: IconName;
+  onSelect?: () => void;
+  selected?: boolean;
+  disabled?: boolean;
 
-  searchTerms?: string
+  searchTerms?: string;
 
-  shortcut?: string
-  style?: Partial<StyleDesc>
+  shortcut?: string;
+  
+  trailing?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export interface CommandShortcutProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export interface CommandSeparatorProps {
-  style?: Partial<StyleDesc>
+  style?: Partial<StyleDesc>;
 }
 
 export interface CommandDialogProps {
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  contained?: boolean
-  children?: ReactNode
-  style?: Partial<StyleDesc>
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  contained?: boolean;
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 interface CommandContext {
-  query: string
-  setQuery: (q: string) => void
-  onOpenChange?: (open: boolean) => void
-  closeOnSelect: boolean
+  query: string;
+  setQuery: (q: string) => void;
+  onOpenChange?: (open: boolean) => void;
+  closeOnSelect: boolean;
 }
 
-const CommandCtx = createContext<CommandContext | null>(null)
+const CommandCtx = createContext<CommandContext | null>(null);
 
 function useCommand(): CommandContext {
-  const ctx = useContext(CommandCtx)
-  if (!ctx) throw new Error('Command components must be used within <Command>')
-  return ctx
+  const ctx = useContext(CommandCtx);
+  if (!ctx) throw new Error("Command components must be used within <Command>");
+  return ctx;
 }
 
-export function Command({ open, onOpenChange, closeOnSelect, children, style }: CommandProps) {
-  const [query, setQuery] = useState('')
+function itemMatchesQuery(
+  label: string,
+  searchTerms: string | undefined,
+  query: string,
+): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const haystack = `${label} ${searchTerms ?? ""}`.toLowerCase();
+  return q
+    .split(/\s+/)
+    .filter(Boolean)
+    .every((term) => haystack.includes(term));
+}
 
-  if (open === false) return null
+export function Command({
+  open,
+  onOpenChange,
+  closeOnSelect,
+  defaultQuery,
+  anchored = true,
+  children,
+  style,
+}: CommandProps) {
+  const [query, setQuery] = useState(defaultQuery ?? "");
+  const t = useAdwaita();
+  const { colors, radii } = t;
+
+  if (open === false) return null;
+
+  const panel = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        padding: 12,
+        minWidth: 320,
+        borderRadius: radii.card,
+        borderWidth: 1,
+        borderColor: colors.border,
+        backgroundColor: colors.view_bg,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
 
   return (
-    <CommandCtx.Provider value={{ query, setQuery, onOpenChange, closeOnSelect: closeOnSelect ?? true }}>
-      <FloatingPanel minWidth={320} padding={12} style={style}>
-        {children}
-      </FloatingPanel>
+    <CommandCtx.Provider
+      value={{
+        query,
+        setQuery,
+        onOpenChange,
+        closeOnSelect: closeOnSelect ?? true,
+      }}
+    >
+      {anchored ? (
+        <anchored side="bottom" offset={{ x: 0, y: 4 }}>
+          {panel}
+        </anchored>
+      ) : (
+        panel
+      )}
     </CommandCtx.Provider>
-  )
+  );
 }
 
-export function CommandInput({ value, onChange, placeholder, style }: CommandInputProps) {
-  const { setQuery } = useCommand()
-  const t = useAdwaita()
-  const { colors } = t
+export function CommandInput({
+  value,
+  onChange,
+  placeholder,
+  style,
+}: CommandInputProps) {
+  const { query, setQuery } = useCommand();
+  const t = useAdwaita();
+  const { colors, typography } = t;
 
   return (
     <div style={inputShellStyle(t, style)}>
-      <Icon name="search" size={14} color={colors.dim_fg} />
+      <Icon
+        name="search"
+        size={14}
+        color={colors.dim_fg}
+        style={{ pointerEvents: "none" }}
+      />
       <input
-        value={value ?? ''}
-        placeholder={placeholder ?? 'Type a command…'}
+        value={value ?? query}
+        placeholder={placeholder ?? "Type a command…"}
         onChange={(event) => {
-          const v = event.value ?? ''
-          setQuery(v)
-          onChange?.(v)
+          const v = event.value ?? "";
+          setQuery(v);
+          onChange?.(v);
         }}
         style={{
           flexGrow: 1,
-          fontSize: 14,
+          fontSize: typography.body,
+          fontFamily: typography.fontFamily,
           color: colors.fg,
         }}
       />
     </div>
-  )
+  );
 }
 
 export function CommandList({ children, style }: CommandListProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', ...style }}>
-      <virtual-list estimatedItemHeight={36} style={{ maxHeight: 240, width: '100%' }}>
+    <div style={{ display: "flex", flexDirection: "column", ...style }}>
+      <virtual-list
+        estimatedItemHeight={36}
+        style={{ maxHeight: 240, width: "100%" }}
+      >
         {children}
       </virtual-list>
     </div>
-  )
+  );
 }
 
 export function CommandEmpty({ style }: CommandEmptyProps) {
-  const t = useAdwaita()
+  const t = useAdwaita();
   return (
-    <div style={{ padding: 12, ...style }}>
-      <T size="body" color={t.colors.dim_fg} align="center">
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 8,
+        padding: 16,
+        ...style,
+      }}
+    >
+      <Icon
+        name="search"
+        size={20}
+        color={t.colors.dim_fg}
+        style={{ pointerEvents: "none" }}
+      />
+      <T size="body" color={t.colors.dim_fg}>
         No results found.
       </T>
     </div>
-  )
+  );
 }
 
 export function CommandGroup({ label, children, style }: CommandGroupProps) {
+  const { query } = useCommand();
+  const active = query.trim().length > 0;
+  const visible = Children.toArray(children).filter((child) => {
+    if (!isValidElement<CommandItemProps>(child)) return true;
+    return itemMatchesQuery(child.props.label, child.props.searchTerms, query);
+  });
+  if (active && visible.length === 0) return null;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, ...style }}>
-      {label ? <MenuLabel style={{ padding: 4, paddingBottom: 2 }}>{label}</MenuLabel> : null}
-      {children}
+    <div style={{ display: "flex", flexDirection: "column", gap: 2, ...style }}>
+      {label ? (
+        <MenuLabel style={{ padding: 4, paddingBottom: 2 }}>{label}</MenuLabel>
+      ) : null}
+      {visible}
     </div>
-  )
+  );
 }
 
-export function CommandItem({ label, onSelect, selected, searchTerms, shortcut, style }: CommandItemProps) {
-  const { query, onOpenChange, closeOnSelect } = useCommand()
-  const t = useAdwaita()
-  const { colors } = t
+export function CommandItem({
+  label,
+  icon,
+  onSelect,
+  selected,
+  disabled,
+  searchTerms,
+  shortcut,
+  trailing,
+  style,
+}: CommandItemProps) {
+  const { query, onOpenChange, closeOnSelect } = useCommand();
+  const t = useAdwaita();
+  const { colors } = t;
 
-
-  const q = query.trim().toLowerCase()
-  if (q) {
-    const haystack = (searchTerms ?? label).toLowerCase()
-    const hit =
-      label.toLowerCase().includes(q) ||
-      q.split(/\s+/).some((term) => term.length > 0 && haystack.includes(term))
-    if (!hit) return null
-  }
+  if (!itemMatchesQuery(label, searchTerms, query)) return null;
 
   return (
-    <div style={{ minHeight: 36, display: 'flex', alignItems: 'center', ...style }}>
+    <div
+      style={{ minHeight: 36, display: "flex", alignItems: "center", ...style }}
+    >
       <MenuRow
         label={label}
-        onClick={() => {
-          onSelect?.()
-          if (closeOnSelect) onOpenChange?.(false)
-        }}
-        trailing={
-          shortcut ? (
-            <MenuShortcut>{shortcut}</MenuShortcut>
-          ) : selected ? (
-            <Icon name="success" size={12} color={colors.accent} />
+        leading={
+          icon ? (
+            <Icon
+              name={icon}
+              size={14}
+              color={colors.dim_fg}
+              style={{ pointerEvents: "none" }}
+            />
           ) : null
         }
+        disabled={disabled}
+        onClick={() => {
+          onSelect?.();
+          if (closeOnSelect) onOpenChange?.(false);
+        }}
+        trailing={
+          trailing ??
+          (shortcut ? (
+            <MenuShortcut>{shortcut}</MenuShortcut>
+          ) : selected ? (
+            <Icon
+              name="success"
+              size={12}
+              color={colors.accent}
+              style={{ pointerEvents: "none" }}
+            />
+          ) : null)
+        }
         style={{
-          justifyContent: 'space-between',
-          backgroundColor: selected ? colors.accentTint : 'transparent',
+          justifyContent: "space-between",
+          backgroundColor: selected ? colors.accentTint : "transparent",
         }}
       />
     </div>
-  )
+  );
 }
 
 export function CommandShortcut({ children, style }: CommandShortcutProps) {
-  return <MenuShortcut style={style}>{children}</MenuShortcut>
+  return <MenuShortcut style={style}>{children}</MenuShortcut>;
 }
 
 export function CommandSeparator({ style }: CommandSeparatorProps) {
-  return <MenuSeparator style={style} />
+  return <MenuSeparator style={style} />;
 }
 
-export function CommandDialog({ open, onOpenChange, contained, children, style }: CommandDialogProps) {
+export function CommandDialog({
+  open,
+  onOpenChange,
+  contained,
+  children,
+  style,
+}: CommandDialogProps) {
   return (
-    <Dialog open={open ?? false} onOpenChange={onOpenChange ?? (() => {})} contained={contained ?? true}>
+    <Dialog
+      open={open ?? false}
+      onOpenChange={onOpenChange ?? (() => {})}
+      contained={contained ?? true}
+    >
       <DialogContent showCloseButton={false} style={style}>
         <Command open={open} onOpenChange={onOpenChange} closeOnSelect>
           {children}
         </Command>
       </DialogContent>
     </Dialog>
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, FloatingStage, Shot, ShotItem } from './common'
-
-export const CommandShot: ComponentShot = {
-  name: 'Command',
-  el: (
-    <Shot>
-      <Row label="Open palette · item states" col>
-        <ShotItem label="groups + items (shortcut / selected / search terms) + separator">
-          <Command>
-            <CommandInput placeholder="Type a command…" />
-            <CommandList>
-              <CommandGroup label="General">
-                <CommandItem label="New file" shortcut="Ctrl+N" onSelect={() => {}} />
-                <CommandItem label="Open file" shortcut="Ctrl+O" selected onSelect={() => {}} />
-                <CommandItem label="Search files" searchTerms="find locate" onSelect={() => {}} />
-              </CommandGroup>
-              <CommandSeparator />
-              <CommandGroup label="Actions">
-                <CommandItem label="Delete" onSelect={() => {}} />
-                <CommandItem label="Rename" onSelect={() => {}} />
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </ShotItem>
-        <ShotItem label="empty state">
-          <Command>
-            <CommandInput placeholder="Type a command…" />
-            <CommandList>
-              <CommandEmpty />
-            </CommandList>
-          </Command>
-        </ShotItem>
-      </Row>
-      <Row label="Command dialog (contained, in a stage)" col>
-        <FloatingStage width={480} height={220}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <CommandDialog open={true} onOpenChange={() => {}} contained>
-              <CommandInput placeholder="Type a command…" />
-              <CommandList>
-                <CommandGroup label="General">
-                  <CommandItem label="New file" shortcut="Ctrl+N" onSelect={() => {}} />
-                  <CommandItem label="Open file" shortcut="Ctrl+O" selected onSelect={() => {}} />
-                </CommandGroup>
-              </CommandList>
-            </CommandDialog>
-          </div>
-        </FloatingStage>
-      </Row>
-    </Shot>
-  ),
+  );
 }

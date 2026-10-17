@@ -1,56 +1,38 @@
-import type { StyleDesc } from '@gpuix/react'
-import { motion } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
+import type { StyleDesc } from "@gpuix/react";
+import { motion } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
 
 export interface SkeletonProps {
-  width?: number
-  height?: number
-  variant?: 'default' | 'circle'
-  style?: Partial<StyleDesc>
+  width?: number;
+  height?: number;
+  variant?: "default" | "circle";
+  style?: Partial<StyleDesc>;
 }
 
-export function Skeleton({ width = 120, height = 16, variant = 'default', style }: SkeletonProps) {
-  const t = useAdwaita()
-  const { colors, radii } = t
+export function Skeleton({
+  width = 120,
+  height = 16,
+  variant = "default",
+  style,
+}: SkeletonProps) {
+  const t = useAdwaita();
+  const { colors, radii } = t;
 
-  const isCircle = variant === 'circle'
-  const size = isCircle ? (width ?? 16) : undefined
+  const isCircle = variant === "circle";
+  const size = isCircle ? width : undefined;
 
   return (
     <motion.div
       animate={{ opacity: 0.5 }}
-      transition={{ duration: 1.6, ease: 'easeInOut' }}
+      transition={{ duration: 1.6, ease: "easeInOut" }}
       style={{
         width: isCircle ? size : width,
         height: isCircle ? size : height,
-        borderRadius: isCircle ? radii.pill : 4,
+        borderRadius: isCircle ? radii.pill : radii.button,
         backgroundColor: colors.button_bg,
+        pointerEvents: "none",
         ...style,
       }}
     />
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
-
-export const SkeletonShot: ComponentShot = {
-  name: 'Skeleton',
-  el: (
-    <Shot>
-      <Row label="Default (rounded blocks)" col>
-        <ShotItem label="text line (120×16)">
-          <Skeleton width={120} height={16} />
-        </ShotItem>
-        <ShotItem label="wide block (240×32)">
-          <Skeleton width={240} height={32} />
-        </ShotItem>
-      </Row>
-      <Row label="Circle variant">
-        <ShotItem label="48px"><Skeleton variant="circle" width={48} /></ShotItem>
-        <ShotItem label="32px"><Skeleton variant="circle" width={32} /></ShotItem>
-        <ShotItem label="24px"><Skeleton variant="circle" width={24} /></ShotItem>
-      </Row>
-    </Shot>
-  ),
+  );
 }

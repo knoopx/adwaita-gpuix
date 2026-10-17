@@ -1,91 +1,131 @@
-import type { ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { T } from './common'
+import type { ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import {
+  useAdwaita,
+  accentForeground,
+  type AdwaitaTheme,
+} from "../theme/adwaita";
+import { T } from "./common";
+import { Icon, type IconName } from "./icons";
 
-export type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'success' | 'warning' | 'outline'
+export type BadgeVariant =
+  | "default"
+  | "secondary"
+  | "destructive"
+  | "success"
+  | "warning"
+  | "outline";
+
+export type BadgeSize = "sm" | "md";
 
 export interface BadgeProps {
-  variant?: BadgeVariant
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  variant?: BadgeVariant;
+  size?: BadgeSize;
+  icon?: IconName;
+  dot?: boolean;
+  disabled?: boolean;
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
-export function Badge({ variant = 'default', children, style }: BadgeProps) {
-  const t = useAdwaita()
-  const { colors, radii } = t
+interface BadgeVariantTheme {
+  bg: string;
+  fg: string;
+  border: string;
+}
 
-  let bg: string
-  let fg: string
-  let border = 0
-  let borderColor = 'transparent'
-
+function resolveVariantTheme(
+  variant: BadgeVariant,
+  t: AdwaitaTheme,
+): BadgeVariantTheme {
+  const { colors } = t;
   switch (variant) {
-    case 'default':
-      bg = colors.accent
-      fg = colors.accent_fg
-      break
-    case 'secondary':
-      bg = colors.button_bg
-      fg = colors.fg
-      break
-    case 'destructive':
-      bg = colors.destructive
-      fg = '#ffffff'
-      break
-    case 'success':
-      bg = colors.success
-      fg = '#ffffff'
-      break
-    case 'warning':
-      bg = colors.warning
-      fg = '#2e2e2e'
-      break
-    case 'outline':
-      bg = 'transparent'
-      fg = colors.fg
-      border = 1
-      borderColor = colors.dim_fg
-      break
+    case "secondary":
+      return { bg: colors.button_bg, fg: colors.fg, border: "transparent" };
+    case "destructive":
+      return {
+        bg: colors.destructive,
+        fg: colors.destructive_fg,
+        border: "transparent",
+      };
+    case "success":
+      return {
+        bg: colors.success,
+        fg: accentForeground(colors.success),
+        border: "transparent",
+      };
+    case "warning":
+      return {
+        bg: colors.warning,
+        fg: accentForeground(colors.warning),
+        border: "transparent",
+      };
+    case "outline":
+      return { bg: "transparent", fg: colors.fg, border: colors.border };
+    default:
+      return { bg: colors.accent, fg: colors.accent_fg, border: "transparent" };
+  }
+}
+
+export function Badge({
+  variant = "default",
+  size = "md",
+  icon,
+  dot,
+  disabled,
+  children,
+  style,
+}: BadgeProps) {
+  const t = useAdwaita();
+  const theme = resolveVariantTheme(variant, t);
+  const small = size === "sm";
+  const opacity = disabled ? 0.5 : 1;
+
+  if (dot) {
+    const d = small ? 8 : 10;
+    const outline = variant === "outline";
+    return (
+      <div
+        style={{
+          width: d,
+          height: d,
+          borderRadius: d / 2,
+          backgroundColor: outline ? "transparent" : theme.bg,
+          borderWidth: outline ? 2 : 0,
+          borderColor: theme.fg,
+          flexShrink: 0,
+          opacity,
+          ...style,
+        }}
+      />
+    );
   }
 
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        padding: 6,
-        borderRadius: radii.pill,
-        borderWidth: border,
-        borderColor: borderColor,
-        backgroundColor: bg,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: small ? 3 : 4,
+        padding: small ? 3 : 4,
+        paddingLeft: small ? 6 : 8,
+        paddingRight: small ? 6 : 8,
+        borderRadius: t.radii.pill,
+        borderWidth: theme.border === "transparent" ? 0 : 1,
+        borderColor: theme.border,
+        backgroundColor: theme.bg,
+        flexShrink: 0,
+        opacity,
         ...style,
       }}
     >
-      <T size="caption" color={fg}>
+      {icon ? (
+        <Icon name={icon} size={small ? 10 : 12} color={theme.fg} />
+      ) : null}
+      <T size="caption" weight={600} color={theme.fg} style={small ? { fontSize: 11 } : undefined}>
         {children}
       </T>
     </div>
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
-
-export const BadgeShot: ComponentShot = {
-  name: 'Badge',
-  el: (
-    <Shot>
-      <Row label="Variants">
-        <ShotItem label="default"><Badge>New</Badge></ShotItem>
-        <ShotItem label="secondary"><Badge variant="secondary">Secondary</Badge></ShotItem>
-        <ShotItem label="destructive"><Badge variant="destructive">Destructive</Badge></ShotItem>
-        <ShotItem label="success"><Badge variant="success">Success</Badge></ShotItem>
-        <ShotItem label="warning"><Badge variant="warning">Warning</Badge></ShotItem>
-        <ShotItem label="outline"><Badge variant="outline">Outline</Badge></ShotItem>
-      </Row>
-    </Shot>
-  ),
+  );
 }

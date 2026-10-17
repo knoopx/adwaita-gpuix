@@ -1,59 +1,111 @@
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
+import type { StyleDesc } from "@gpuix/react";
+import {
+  useAdwaita,
+  hexToRgba,
+  isDarkScheme,
+  shade,
+  type AdwaitaTheme,
+} from "../theme/adwaita";
+import { LabeledControl } from "./common";
 
 export interface SwitchProps {
-  checked: boolean
-  onChange: (checked: boolean) => void
-  disabled?: boolean
-  style?: Partial<StyleDesc>
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+  label?: string;
+  labelPosition?: "start" | "end";
+  style?: Partial<StyleDesc>;
 }
 
-export function Switch({ checked, onChange, disabled, style }: SwitchProps) {
-  const t = useAdwaita()
-  const { colors } = t
-  return (
+function switchTrackStyle(
+  t: AdwaitaTheme,
+  checked: boolean,
+  dimmed: boolean,
+  style?: Partial<StyleDesc>,
+): Partial<StyleDesc> {
+  const { colors, radii } = t;
+  return {
+    width: 44,
+    height: 26,
+    flexShrink: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: checked ? "flex-end" : "flex-start",
+    padding: 3,
+    borderRadius: radii.pill,
+    backgroundColor: checked ? colors.accent : colors.border,
+    cursor: dimmed ? "not-allowed" : "pointer",
+    opacity: dimmed ? 0.5 : 1,
+    ...(dimmed
+      ? {}
+      : {
+          hover: {
+            backgroundColor: checked
+              ? shade(colors.accent, -0.08)
+              : colors.accentTint,
+          },
+          active: {
+            backgroundColor: checked
+              ? shade(colors.accent, -0.18)
+              : hexToRgba(colors.accent, isDarkScheme(t.scheme) ? 0.3 : 0.2),
+          },
+        }),
+    ...style,
+  };
+}
+
+export function Switch({
+  checked,
+  onChange,
+  disabled,
+  label,
+  labelPosition = "end",
+  style,
+}: SwitchProps) {
+  const t = useAdwaita();
+  const { colors, radii } = t;
+
+  const toggle = () => onChange(!checked);
+
+  const track = (
     <div
-      onClick={disabled ? undefined : () => onChange(!checked)}
-      style={{
-        width: 44,
-        height: 26,
-        flexShrink: 0,
-        borderRadius: 13,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: checked ? 'flex-end' : 'flex-start',
-        padding: 3,
-        backgroundColor: checked ? colors.accent : colors.button_active,
-        cursor: disabled ? 'default' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        ...style,
-      }}
+      onClick={disabled ? undefined : toggle}
+      tabIndex={disabled ? -1 : 0}
+      onKeyDown={
+        disabled
+          ? undefined
+          : (event) => {
+              if (event.key === "Enter" || event.key === " ") toggle();
+            }
+      }
+      style={switchTrackStyle(
+        t,
+        checked,
+        disabled === true && label === undefined,
+        style,
+      )}
     >
+      {}
       <div
         style={{
           width: 20,
           height: 20,
-          borderRadius: 10,
-          backgroundColor: checked ? colors.accent_fg : '#ffffff',
+          borderRadius: radii.pill,
+          backgroundColor: colors.accent_fg,
+          pointerEvents: "none",
         }}
       />
     </div>
-  )
-}
+  );
 
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
+  if (label === undefined) return track;
 
-export const SwitchShot: ComponentShot = {
-  name: 'Switch',
-  el: (
-    <Shot>
-      <Row label="States">
-        <ShotItem label="off"><Switch checked={false} onChange={() => {}} /></ShotItem>
-        <ShotItem label="on"><Switch checked={true} onChange={() => {}} /></ShotItem>
-        <ShotItem label="disabled (off)"><Switch checked={false} disabled onChange={() => {}} /></ShotItem>
-        <ShotItem label="disabled (on)"><Switch checked={true} disabled onChange={() => {}} /></ShotItem>
-      </Row>
-    </Shot>
-  ),
+  return (
+    <LabeledControl
+      control={track}
+      label={label}
+      disabled={disabled}
+      labelPosition={labelPosition}
+    />
+  );
 }

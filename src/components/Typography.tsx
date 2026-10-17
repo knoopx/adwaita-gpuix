@@ -1,95 +1,127 @@
-import type { ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { CodeChip, T } from './common'
+import type { ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita, type AdwaitaTheme } from "../theme/adwaita";
+import { CodeChip, T, type TextSize } from "./common";
+
+
+export type TextTone =
+  | "default"
+  | "dim"
+  | "accent"
+  | "destructive"
+  | "success"
+  | "warning";
+
+function toneColor(t: AdwaitaTheme, tone: TextTone): string {
+  const { colors } = t;
+  return {
+    default: colors.fg,
+    dim: colors.dim_fg,
+    accent: colors.accent,
+    destructive: colors.destructive,
+    success: colors.success,
+    warning: colors.warning,
+  }[tone];
+}
+
+
+const HEADING_LEVEL_SIZES: Record<1 | 2 | 3 | 4 | 5 | 6, TextSize> = {
+  1: "title1",
+  2: "title2",
+  3: "title3",
+  4: "title4",
+  5: "body",
+  6: "caption",
+};
 
 export interface HeadingProps {
-  level?: 1 | 2 | 3 | 4 | 5 | 6
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  level?: 1 | 2 | 3 | 4 | 5 | 6;
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function Heading({ level = 2, children, style }: HeadingProps) {
-  const t = useAdwaita()
-  const { colors, typography } = t
-
-  const sizes: Record<number, number> = {
-    1: typography.title1,
-    2: typography.title2,
-    3: typography.title3,
-    4: typography.title4,
-    5: typography.body,
-    6: typography.body,
-  }
-
+  const t = useAdwaita();
   return (
-    <T size="title2" color={colors.fg} weight={700} style={{ fontSize: sizes[level], ...style }}>
+    <T
+      size={HEADING_LEVEL_SIZES[level]}
+      weight={700}
+      color={t.colors.fg}
+      style={style}
+    >
       {children}
     </T>
-  )
+  );
 }
 
 export interface ParagraphProps {
-  children: ReactNode
-  dim?: boolean
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  tone?: TextTone;
+  align?: "left" | "center" | "right";
+  style?: Partial<StyleDesc>;
 }
 
-export function Paragraph({ children, dim, style }: ParagraphProps) {
-  const t = useAdwaita()
+export function Paragraph({
+  children,
+  tone = "default",
+  align,
+  style,
+}: ParagraphProps) {
+  const t = useAdwaita();
   return (
-    <T size="body" color={dim ? t.colors.dim_fg : t.colors.fg} style={style}>
+    <T size="body" color={toneColor(t, tone)} align={align} style={style}>
       {children}
     </T>
-  )
+  );
 }
 
 export interface SmallProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  tone?: TextTone;
+  style?: Partial<StyleDesc>;
 }
 
-export function Small({ children, style }: SmallProps) {
-  const t = useAdwaita()
+export function Small({ children, tone = "dim", style }: SmallProps) {
+  const t = useAdwaita();
   return (
-    <T size="caption" color={t.colors.dim_fg} style={style}>
+    <T size="caption" color={toneColor(t, tone)} style={style}>
       {children}
     </T>
-  )
+  );
 }
 
 export interface BlockquoteProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function Blockquote({ children, style }: BlockquoteProps) {
-  const t = useAdwaita()
-  const { colors } = t
+  const t = useAdwaita();
+  const { colors, radii, spacing } = t;
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 4,
-        padding: 12,
+        display: "flex",
+        flexDirection: "column",
+        gap: spacing.gap,
+        padding: spacing.paddingTight,
         borderLeftWidth: 3,
         borderColor: colors.accent,
         backgroundColor: colors.button_bg,
-        borderRadius: 4,
+        borderRadius: radii.button,
         ...style,
       }}
     >
-      <T size="body" color={colors.dim_fg} style={{ whiteSpace: 'normal' }}>
+      <T size="body" color={colors.dim_fg} style={{ whiteSpace: "normal" }}>
         {children}
       </T>
     </div>
-  )
+  );
 }
 
 export interface InlineCodeProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function InlineCode({ children, style }: InlineCodeProps) {
@@ -97,47 +129,5 @@ export function InlineCode({ children, style }: InlineCodeProps) {
     <CodeChip padding={2} style={style}>
       {children}
     </CodeChip>
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
-
-export const TypographyShot: ComponentShot = {
-  name: 'Typography',
-  el: (
-    <Shot>
-      <Row label="Headings (levels 1–6)" col>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <Heading level={1}>Heading 1</Heading>
-          <Heading level={2}>Heading 2</Heading>
-          <Heading level={3}>Heading 3</Heading>
-          <Heading level={4}>Heading 4</Heading>
-          <Heading level={5}>Heading 5</Heading>
-          <Heading level={6}>Heading 6</Heading>
-        </div>
-      </Row>
-      <Row label="Body" col>
-        <ShotItem label="paragraph">
-          <Paragraph>A paragraph of body text.</Paragraph>
-        </ShotItem>
-        <ShotItem label="paragraph (dim)">
-          <Paragraph dim>A dim paragraph of body text.</Paragraph>
-        </ShotItem>
-        <ShotItem label="small">
-          <Small>A small caption-sized line of text.</Small>
-        </ShotItem>
-      </Row>
-      <Row label="Quote & inline code" col>
-        <ShotItem label="blockquote">
-          <Blockquote>A blockquote of wise words, quoted from the source.</Blockquote>
-        </ShotItem>
-        <ShotItem label="inline code">
-          <Paragraph>
-            A paragraph with <InlineCode>inline code</InlineCode> in the middle.
-          </Paragraph>
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
+  );
 }

@@ -1,24 +1,28 @@
-import type { ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { T } from './common'
-import { BoxedList } from './BoxedList'
+import { Children, type ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
+import { T } from "./common";
+import { BoxedList } from "./BoxedList";
 
 export interface PreferencesGroupProps {
-  title: string
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  title: string;
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
-export function PreferencesGroup({ title, children, style }: PreferencesGroupProps) {
-  const t = useAdwaita()
-  const { colors } = t
+export function PreferencesGroup({
+  title,
+  children,
+  style,
+}: PreferencesGroupProps) {
+  const t = useAdwaita();
+  const { colors, spacing } = t;
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
+        display: "flex",
+        flexDirection: "column",
+        gap: spacing.gap,
         ...style,
       }}
     >
@@ -27,57 +31,59 @@ export function PreferencesGroup({ title, children, style }: PreferencesGroupPro
       </T>
       <BoxedList>{children}</BoxedList>
     </div>
-  )
+  );
 }
 
 export interface PreferencesPageProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  
+  scrollable?: boolean;
+  
+  estimatedItemHeight?: number;
+  style?: Partial<StyleDesc>;
 }
 
-export function PreferencesPage({ children, style }: PreferencesPageProps) {
+export function PreferencesPage({
+  children,
+  scrollable = false,
+  estimatedItemHeight,
+  style,
+}: PreferencesPageProps) {
+  const t = useAdwaita();
+  const { spacing } = t;
+  const items = Children.toArray(children);
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 24,
-        padding: 16,
+        display: "flex",
+        flexDirection: "column",
+        gap: spacing.paddingTight,
+        padding: spacing.padding,
+        ...(scrollable ? { flexGrow: 1, minHeight: 0 } : {}),
         ...style,
       }}
     >
-      {children}
+      {scrollable ? (
+        <virtual-list
+          estimatedItemHeight={estimatedItemHeight ?? spacing.rowHeight}
+          style={{ flexGrow: 1, minHeight: 0 }}
+        >
+          {items.map((child, i) => (
+            <div
+              key={i}
+              style={
+                i < items.length - 1
+                  ? { marginBottom: spacing.paddingTight }
+                  : undefined
+              }
+            >
+              {child}
+            </div>
+          ))}
+        </virtual-list>
+      ) : (
+        children
+      )}
     </div>
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot } from './common'
-import { ActionRow, ButtonRow, ComboRow, EntryRow, ExpanderRow, SpinRow, SwitchRow } from './BoxedList'
-
-export const PreferencesPageShot: ComponentShot = {
-  name: 'PreferencesPage',
-  el: (
-    <Shot>
-      <Row label="All row kinds (two groups)" col>
-        <PreferencesPage>
-          <PreferencesGroup title="General">
-            <SwitchRow title="Enable sounds" checked={true} onChange={() => {}} />
-            <SwitchRow title="Do not disturb" checked={false} onChange={() => {}} />
-            <ActionRow title="Reset settings" subtitle="Restore the defaults" prefix="settings" suffix="chevronDown" onClick={() => {}} />
-            <EntryRow title="Display name" value="Ada" />
-          </PreferencesGroup>
-          <PreferencesGroup title="Appearance">
-            <SpinRow title="Zoom" value={100} min={50} max={200} step={10} onChange={() => {}} />
-            <ComboRow title="Theme" value="Auto" options={['Auto', 'Light', 'Dark']} onChange={() => {}} />
-            <ButtonRow title="Sign out" label="Sign out" onClick={() => {}} />
-            <ButtonRow title="Delete account" label="Delete" destructive onClick={() => {}} />
-            <ExpanderRow title="Advanced" subtitle="Show advanced options">
-              <T>Advanced options are revealed here.</T>
-            </ExpanderRow>
-          </PreferencesGroup>
-        </PreferencesPage>
-      </Row>
-    </Shot>
-  ),
+  );
 }

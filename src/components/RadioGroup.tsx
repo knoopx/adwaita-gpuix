@@ -1,71 +1,125 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita, hexToRgba } from '../theme/adwaita'
-import { LabeledControl } from './common'
+import { createContext, useContext, useState, type ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import type { EventPayload } from "@gpuix/native";
+import {
+  useAdwaita,
+  hexToRgba,
+  isDarkScheme,
+  type AdwaitaTheme,
+} from "../theme/adwaita";
+import { LabeledControl } from "./common";
 
-interface RadioGroupContextValue { value: string; onValueChange: (value: string) => void }
-const RadioGroupCtx = createContext<RadioGroupContextValue | null>(null)
+interface RadioGroupContextValue {
+  value: string;
+  onValueChange: (value: string) => void;
+}
+const RadioGroupCtx = createContext<RadioGroupContextValue | null>(null);
 function useRadioGroup(): RadioGroupContextValue {
-  const ctx = useContext(RadioGroupCtx)
-  return ctx ?? { value: '', onValueChange: () => {} }
+  const ctx = useContext(RadioGroupCtx);
+  return ctx ?? { value: "", onValueChange: () => {} };
 }
 
 export interface RadioGroupProps {
-  value?: string
-  onValueChange?: (value: string) => void
+  value?: string;
+  onValueChange?: (value: string) => void;
 
-  defaultValue?: string
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  defaultValue?: string;
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
-export function RadioGroup({ value, onValueChange, defaultValue, children, style }: RadioGroupProps) {
-  const [internal, setInternal] = useState<string>(defaultValue ?? value ?? '')
-  const current = value ?? internal
+export function RadioGroup({
+  value,
+  onValueChange,
+  defaultValue,
+  children,
+  style,
+}: RadioGroupProps) {
+  const t = useAdwaita();
+  const [internal, setInternal] = useState<string>(defaultValue ?? value ?? "");
+  const current = value ?? internal;
 
   const handleValueChange = (v: string) => {
-    if (value === undefined) setInternal(v)
-    onValueChange?.(v)
-  }
+    if (value === undefined) setInternal(v);
+    onValueChange?.(v);
+  };
 
   return (
-    <RadioGroupCtx.Provider value={{ value: current, onValueChange: handleValueChange }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, ...style }}>{children}</div>
+    <RadioGroupCtx.Provider
+      value={{ value: current, onValueChange: handleValueChange }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: t.spacing.gap,
+          ...style,
+        }}
+      >
+        {children}
+      </div>
     </RadioGroupCtx.Provider>
-  )
+  );
 }
 
 export interface RadioGroupItemProps {
-  value: string
-  disabled?: boolean
+  value: string;
+  disabled?: boolean;
 
-  label?: string
-  style?: Partial<StyleDesc>
+  label?: string;
+  style?: Partial<StyleDesc>;
 }
 
-export function RadioGroupItem({ value, disabled, label, style }: RadioGroupItemProps) {
-  const t = useAdwaita()
-  const { colors } = t
-  const group = useRadioGroup()
-  const selected = group.value === value
+function radioRowStyle(
+  t: AdwaitaTheme,
+  disabled: boolean | undefined,
+): Partial<StyleDesc> {
+  const { colors, radii } = t;
+  return {
+    cursor: disabled ? "not-allowed" : "pointer",
+    borderRadius: radii.button,
+    ...(disabled
+      ? {}
+      : {
+          hover: { backgroundColor: colors.accentTint },
+          active: {
+            backgroundColor: hexToRgba(
+              colors.accent,
+              isDarkScheme(t.scheme) ? 0.3 : 0.2,
+            ),
+          },
+        }),
+  };
+}
 
+export function RadioGroupItem({
+  value,
+  disabled,
+  label,
+  style,
+}: RadioGroupItemProps) {
+  const t = useAdwaita();
+  const { colors, radii } = t;
+  const group = useRadioGroup();
+  const selected = group.value === value;
+
+  const select = disabled ? undefined : () => group.onValueChange(value);
+  
+  
   const circle = (
     <div
-      onClick={disabled ? undefined : () => group.onValueChange(value)}
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         width: 18,
         height: 18,
         borderRadius: 9,
         borderWidth: 2,
-        borderColor: colors.accent,
+        borderColor: selected ? colors.accent : colors.border,
         backgroundColor: colors.view_bg,
-        cursor: disabled ? 'default' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        hover: disabled ? undefined : { backgroundColor: hexToRgba(colors.accent, 0.08) },
         flexShrink: 0,
+        pointerEvents: "none",
         ...style,
       }}
     >
@@ -76,50 +130,36 @@ export function RadioGroupItem({ value, disabled, label, style }: RadioGroupItem
             height: 8,
             borderRadius: 4,
             backgroundColor: colors.accent,
+            pointerEvents: "none",
           }}
         />
       ) : null}
     </div>
-  )
-
-  if (label === undefined) return circle
-
-
-  return <LabeledControl control={circle} label={label} disabled={disabled} />
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
-
-export const RadioGroupShot: ComponentShot = {
-  name: 'RadioGroup',
-  el: (
-    <Shot>
-      <Row label={'Selection (controlled, value="b")'}>
-        <ShotItem label="group">
-          <RadioGroup value="b" onValueChange={() => {}}>
-            <RadioGroupItem value="a" label="Option A" />
-            <RadioGroupItem value="b" label="Option B (selected)" />
-            <RadioGroupItem value="c" label="Option C" />
-          </RadioGroup>
-        </ShotItem>
-      </Row>
-      <Row label="Disabled item">
-        <ShotItem label="group">
-          <RadioGroup value="a" onValueChange={() => {}}>
-            <RadioGroupItem value="a" label="Selected" />
-            <RadioGroupItem value="b" label="Disabled" disabled />
-          </RadioGroup>
-        </ShotItem>
-      </Row>
-      <Row label={'Uncontrolled (defaultValue="c")'}>
-        <ShotItem label="group">
-          <RadioGroup defaultValue="c" onValueChange={() => {}}>
-            <RadioGroupItem value="a" label="Option A" />
-            <RadioGroupItem value="c" label="Option C (default selected)" />
-          </RadioGroup>
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
+  );
+  
+  const rowStyle = radioRowStyle(t, disabled);
+  const sharedProps = {
+    onClick: select,
+    tabIndex: disabled ? -1 : 0,
+    onKeyDown: disabled
+      ? undefined
+      : (event: EventPayload) => {
+          if (event.key === "Enter" || event.key === " ") select?.();
+        },
+  };
+  if (label === undefined) {
+    return (
+      <div
+        {...sharedProps}
+        style={{ display: "flex", opacity: disabled ? 0.5 : 1, ...rowStyle }}
+      >
+        {circle}
+      </div>
+    );
+  }
+  return (
+    <div {...sharedProps} style={rowStyle}>
+      <LabeledControl control={circle} label={label} disabled={disabled} />
+    </div>
+  );
 }

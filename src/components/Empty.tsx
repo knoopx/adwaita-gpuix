@@ -1,180 +1,170 @@
-import type { ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { T } from './common'
+import type { ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita, type AdwaitaColors } from "../theme/adwaita";
+import { T, GapRow } from "./common";
+import { Icon, type IconName } from "./icons";
+
+export type EmptyTone = "accent" | "destructive" | "success" | "warning";
+
+const TONE_TINT: Record<EmptyTone, keyof AdwaitaColors> = {
+  accent: "accentTint",
+  destructive: "destructiveTint",
+  success: "successTint",
+  warning: "warningTint",
+};
+
+const TONE_COLOR: Record<EmptyTone, keyof AdwaitaColors> = {
+  accent: "accent",
+  destructive: "destructive",
+  success: "success",
+  warning: "warning",
+};
 
 export interface EmptyProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function Empty({ children, style }: EmptyProps) {
-  const t = useAdwaita()
-  const { colors } = t
+  const t = useAdwaita();
+  const { colors, radii, spacing } = t;
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 12,
-        padding: 24,
-        borderRadius: t.radii.card,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: spacing.paddingTight,
+        padding: spacing.padding,
+        borderRadius: radii.card,
         borderWidth: 1,
         borderColor: colors.border,
+        backgroundColor: colors.view_bg,
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
 export interface EmptyMediaProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  icon?: IconName;
+  tone?: EmptyTone;
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
-export function EmptyMedia({ children, style }: EmptyMediaProps) {
+export function EmptyMedia({
+  icon,
+  tone = "accent",
+  children,
+  style,
+}: EmptyMediaProps) {
+  const t = useAdwaita();
+  const { colors, radii } = t;
   return (
     <div
       style={{
         width: 48,
         height: 48,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        borderRadius: radii.pill,
+        backgroundColor: colors[TONE_TINT[tone]],
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        pointerEvents: "none",
         ...style,
       }}
     >
-      {children}
+      {icon ? (
+        <Icon name={icon} size={24} color={colors[TONE_COLOR[tone]]} />
+      ) : (
+        children
+      )}
     </div>
-  )
+  );
 }
 
 export interface EmptyTitleProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function EmptyTitle({ children, style }: EmptyTitleProps) {
-  const t = useAdwaita()
+  const t = useAdwaita();
   return (
-    <T size="title3" weight={700} color={t.colors.fg} style={style}>
+    <T size="title2" weight={700} color={t.colors.fg} style={style}>
       {children}
     </T>
-  )
+  );
 }
 
 export interface EmptyDescriptionProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function EmptyDescription({ children, style }: EmptyDescriptionProps) {
-  const t = useAdwaita()
+  const t = useAdwaita();
   return (
-    <T size="body" color={t.colors.dim_fg} style={style}>
+    <T
+      size="body"
+      color={t.colors.dim_fg}
+      align="center"
+      style={style}
+    >
       {children}
     </T>
-  )
+  );
 }
 
 export interface EmptyContentProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
-export function EmptyContent({ children, style }: EmptyContentProps) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, ...style }}>
-      {children}
-    </div>
-  )
-}
-
-export interface EmptyHeaderProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
-}
-
-export function EmptyHeader({ children, style }: EmptyHeaderProps) {
+function EmptyStack({
+  children,
+  style,
+}: {
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
+}) {
+  const t = useAdwaita();
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 8,
-        width: 'fit-content',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: t.spacing.gap,
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
+}
+
+export function EmptyContent({ children, style }: EmptyContentProps) {
+  return <EmptyStack children={children} style={style} />;
+}
+
+export interface EmptyHeaderProps {
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
+}
+
+export function EmptyHeader({ children, style }: EmptyHeaderProps) {
+  return <EmptyStack children={children} style={style} />;
 }
 
 export interface EmptyActionProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function EmptyAction({ children, style }: EmptyActionProps) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'row', gap: 8, ...style }}>{children}</div>
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { buildTheme } from '../theme/adwaita'
-import { Row, Shot } from './common'
-import { Button } from './Button'
-import { Icon } from './icons'
-
-function SparklesIcon() {
-  return <Icon name="sparkles" size={24} color={buildTheme('dark', 'blue').colors.dim_fg} />
-}
-
-export const EmptyShot: ComponentShot = {
-  name: 'Empty',
-  el: (
-    <Shot>
-      <Row label="Full (media + title + description + content + action)" col>
-        <Empty>
-          <EmptyMedia>
-            <SparklesIcon />
-          </EmptyMedia>
-          <EmptyTitle>No items</EmptyTitle>
-          <EmptyDescription>You have nothing to show yet.</EmptyDescription>
-          <EmptyContent>
-            <EmptyAction>
-              <Button label="Add item" onClick={() => {}} />
-              <Button variant="suggested" label="Import" onClick={() => {}} />
-            </EmptyAction>
-          </EmptyContent>
-        </Empty>
-      </Row>
-      <Row label="Header + action (grouped)" col>
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia>
-              <SparklesIcon />
-            </EmptyMedia>
-            <EmptyTitle>Nothing here</EmptyTitle>
-            <EmptyDescription>Grouped header keeps media, title and description centred.</EmptyDescription>
-          </EmptyHeader>
-          <EmptyAction>
-            <Button label="Primary" onClick={() => {}} />
-            <Button variant="suggested" label="Secondary" onClick={() => {}} />
-          </EmptyAction>
-        </Empty>
-      </Row>
-      <Row label="Minimal (title only)" col>
-        <Empty>
-          <EmptyTitle>Empty</EmptyTitle>
-        </Empty>
-      </Row>
-    </Shot>
-  ),
+  return <GapRow children={children} style={style} />;
 }

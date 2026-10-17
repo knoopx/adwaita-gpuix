@@ -1,89 +1,112 @@
-import type { ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita, RADIUS, SPACE } from '../theme/adwaita'
-import { T } from './common'
+import { Children, Fragment, type ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita, RADIUS, SPACE } from "../theme/adwaita";
+import { T } from "./common";
+
+const KBD_HEIGHT = 16;
+const KBD_MIN_WIDTH = 16;
+const KBD_PAD_X = 3;
+const KBD_GAP = SPACE.xs;
 
 export interface KbdProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function Kbd({ children, style }: KbdProps) {
-  const t = useAdwaita()
-  const { colors } = t
+  const t = useAdwaita();
+  const { colors, typography } = t;
   return (
     <div
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 20,
-        minWidth: 20,
-        paddingLeft: SPACE.xs,
-        paddingRight: SPACE.xs,
-        gap: SPACE.xs,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: KBD_HEIGHT,
+        minWidth: KBD_MIN_WIDTH,
+        paddingLeft: KBD_PAD_X,
+        paddingRight: KBD_PAD_X,
+        gap: KBD_GAP,
         borderRadius: RADIUS.xs,
+        borderWidth: 1,
+        borderBottomWidth: 2,
+        borderColor: colors.border,
         backgroundColor: colors.button_bg,
-        userSelect: 'none',
-        pointerEvents: 'none',
-        color: colors.dim_fg,
+        userSelect: "none",
+        pointerEvents: "none",
         ...style,
       }}
     >
-      <T size="caption" weight={500} color={colors.dim_fg}>
+      <T
+        size="micro"
+        weight={500}
+        color={colors.dim_fg}
+        style={{ fontFamily: typography.fontFamilyMono }}
+      >
         {children}
       </T>
     </div>
-  )
+  );
 }
 
 export interface KbdGroupProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export function KbdGroup({ children, style }: KbdGroupProps) {
   return (
     <div
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: SPACE.xs,
+        display: "flex",
+        alignItems: "center",
+        gap: KBD_GAP,
         ...style,
       }}
     >
       {children}
     </div>
-  )
+  );
 }
 
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, Shot, ShotItem } from './common'
+export interface KbdComboProps {
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
+}
 
-export const KbdShot: ComponentShot = {
-  name: 'Kbd',
-  el: (
-    <Shot>
-      <Row label="Single key">
-        <ShotItem label="⌘"><Kbd>⌘</Kbd></ShotItem>
-        <ShotItem label="K"><Kbd>K</Kbd></ShotItem>
-        <ShotItem label="Enter"><Kbd>Enter</Kbd></ShotItem>
-      </Row>
-      <Row label="Groups" col>
-        <ShotItem label="two-key combo (KbdGroup)">
-          <KbdGroup>
-            <Kbd>⌘</Kbd>
-            <Kbd>K</Kbd>
-          </KbdGroup>
-        </ShotItem>
-        <ShotItem label="three-key combo (KbdGroup)">
-          <KbdGroup>
-            <Kbd>Ctrl</Kbd>
-            <Kbd>Shift</Kbd>
-            <Kbd>Enter</Kbd>
-          </KbdGroup>
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
+function KbdPlus() {
+  const t = useAdwaita();
+  return (
+    <T
+      size="micro"
+      color={t.colors.dim_fg}
+      style={{
+        flexShrink: 0,
+        fontFamily: t.typography.fontFamilyMono,
+      }}
+    >
+      +
+    </T>
+  );
+}
+
+export function KbdCombo({ children, style }: KbdComboProps) {
+  const items = Children.toArray(children).filter(Boolean);
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: KBD_GAP,
+        ...style,
+      }}
+    >
+      {items.map((child, i) => (
+        <Fragment key={i}>
+          {i > 0 ? <KbdPlus /> : null}
+          {child}
+        </Fragment>
+      ))}
+    </div>
+  );
 }

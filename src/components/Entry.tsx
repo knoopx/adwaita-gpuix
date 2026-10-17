@@ -1,8 +1,15 @@
+import type { ReactNode } from "react";
 import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
 import { AdwaitaInputBase } from "./common";
 
 export type EntryType =
-  "text" | "password" | "email" | "number" | "search" | "url";
+  | "text"
+  | "password"
+  | "email"
+  | "number"
+  | "search"
+  | "url";
 
 export interface EntryProps {
   value?: string;
@@ -10,6 +17,8 @@ export interface EntryProps {
   type?: EntryType;
   disabled?: boolean;
   invalid?: boolean;
+  leading?: ReactNode;
+  trailing?: ReactNode;
   onChange?: (value: string) => void;
   onSubmit?: () => void;
   autoFocus?: boolean;
@@ -23,12 +32,15 @@ export function Entry({
   type = "text",
   disabled,
   invalid,
+  leading,
+  trailing,
   onChange,
   onSubmit,
   autoFocus,
   style,
   testId,
 }: EntryProps) {
+  const t = useAdwaita();
   return (
     <AdwaitaInputBase
       testId={testId}
@@ -40,55 +52,13 @@ export function Entry({
       autoFocus={autoFocus}
       onSubmit={onSubmit}
       mask={type === "password"}
-      style={{ paddingLeft: 12, paddingRight: 12, ...style }}
+      leading={leading}
+      trailing={trailing}
+      style={{
+        paddingLeft: t.spacing.paddingTight,
+        paddingRight: t.spacing.paddingTight,
+        ...style,
+      }}
     />
   );
 }
-
-import type { ComponentShot } from "../../scripts/shot";
-import { Row, Shot, ShotItem } from "./common";
-
-export const EntryShot: ComponentShot = {
-  name: "Entry",
-  el: (
-    <Shot>
-      <Row label="States" col>
-        <ShotItem label="placeholder">
-          <Entry placeholder="Type here…" />
-        </ShotItem>
-        <ShotItem label="with value">
-          <Entry value="Hello world" />
-        </ShotItem>
-        <ShotItem label="invalid">
-          <Entry value="invalid value" invalid />
-        </ShotItem>
-        <ShotItem label="disabled">
-          <Entry value="Read only" disabled />
-        </ShotItem>
-      </Row>
-      <Row label="Types (password masks; the rest render plain text)" col>
-        <ShotItem label="text">
-          <Entry type="text" placeholder="Plain text" />
-        </ShotItem>
-        <ShotItem label="password">
-          <Entry type="password" value="hunter2" />
-        </ShotItem>
-        <ShotItem label="password (empty)">
-          <Entry type="password" placeholder="Password" />
-        </ShotItem>
-        <ShotItem label="email">
-          <Entry type="email" placeholder="you@example.com" />
-        </ShotItem>
-        <ShotItem label="number">
-          <Entry type="number" placeholder="42" />
-        </ShotItem>
-        <ShotItem label="search">
-          <Entry type="search" placeholder="Search…" />
-        </ShotItem>
-        <ShotItem label="url">
-          <Entry type="url" placeholder="https://…" />
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
-};

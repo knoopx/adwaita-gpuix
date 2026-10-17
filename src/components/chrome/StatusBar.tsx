@@ -39,6 +39,8 @@ export function StatusBar({
   const t = useAdwaita();
   const { colors, spacing } = t;
   const groups = hints && hints.length > 0 ? groupHints(hints) : [];
+  const hasLeading =
+    message !== undefined || progress !== undefined || trailing !== undefined;
   return (
     <div
       style={{
@@ -56,17 +58,19 @@ export function StatusBar({
         ...style,
       }}
     >
-      {message ? (
-        typeof message === "string" ? (
-          <T size="caption" color={colors.dim_fg} style={messageClamp}>
-            {message}
-          </T>
+      {hasLeading ? (
+        message ? (
+          typeof message === "string" ? (
+            <T size="caption" color={colors.dim_fg} style={messageClamp}>
+              {message}
+            </T>
+          ) : (
+            <div style={messageClamp}>{message}</div>
+          )
         ) : (
-          <div style={messageClamp}>{message}</div>
+          <div style={messageClamp} />
         )
-      ) : (
-        <div style={messageClamp} />
-      )}
+      ) : null}
       {progress !== undefined ? (
         <ProgressBar
           value={Math.min(1, Math.max(0, progress)) * 100}

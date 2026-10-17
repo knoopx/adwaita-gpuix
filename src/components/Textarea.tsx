@@ -1,25 +1,61 @@
-import type { StyleDesc } from '@gpuix/react'
-import type { EventPayload } from '@gpuix/native'
-import { useAdwaita } from '../theme/adwaita'
-import { textFieldStyle } from './common'
+import { useState } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import type { EventPayload } from "@gpuix/native";
+import {
+  useAdwaita,
+  hexToRgba,
+} from "../theme/adwaita";
+import { textFieldStyle, resolveFieldBorderColor } from "./common";
 
 export interface TextareaProps {
-  value?: string
-  onChange?: (value: string) => void
-  placeholder?: string
-  rows?: number
-  disabled?: boolean
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  rows?: number;
+  disabled?: boolean;
+  invalid?: boolean;
 
-  autoFocus?: boolean
+  autoFocus?: boolean;
 
-  onSubmit?: () => void
-  onKeyDown?: (event: EventPayload) => void
-  style?: Partial<StyleDesc>
+  onSubmit?: () => void;
+  onKeyDown?: (event: EventPayload) => void;
+  style?: Partial<StyleDesc>;
 }
 
-export function Textarea({ value, onChange, placeholder, rows = 3, disabled, autoFocus, onSubmit, onKeyDown, style }: TextareaProps) {
-  const t = useAdwaita()
-  const { colors, radii } = t
+export function Textarea({
+  value,
+  onChange,
+  placeholder,
+  rows = 3,
+  disabled,
+  invalid,
+  autoFocus,
+  onSubmit,
+  onKeyDown,
+  style,
+}: TextareaProps) {
+  const t = useAdwaita();
+  const { colors, radii, spacing } = t;
+  const [focused, setFocused] = useState(false);
+
+  const borderColor = resolveFieldBorderColor(
+    disabled,
+    focused,
+    invalid,
+    colors,
+  );
+
+  const focusRing = focused
+    ? {
+        boxShadow: {
+          offsetX: 0,
+          offsetY: 0,
+          blurRadius: 8,
+          spreadRadius: 0,
+          color: hexToRgba(colors.accent, 0.4),
+        },
+      }
+    : {};
 
   return (
     <textarea
@@ -28,36 +64,24 @@ export function Textarea({ value, onChange, placeholder, rows = 3, disabled, aut
       minRows={rows}
       readOnly={disabled}
       autoFocus={autoFocus && !disabled ? true : undefined}
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
       onSubmit={onSubmit}
       onKeyDown={onKeyDown}
-      onChange={(event) => onChange?.(event.value ?? '')}
-      theme={{ caret: colors.accent }}
-      style={textFieldStyle(t, { padding: 8, borderRadius: radii.row, opacity: disabled ? 0.5 : 1, ...style })}
+      onChange={(event) => onChange?.(event.value ?? "")}
+      theme={{ caret: colors.accent, textMuted: colors.dim_fg }}
+      style={textFieldStyle(t, {
+        paddingTop: spacing.gap,
+        paddingBottom: spacing.gap,
+        paddingLeft: spacing.paddingTight,
+        paddingRight: spacing.paddingTight,
+        borderRadius: radii.button,
+        borderColor,
+        cursor: disabled ? "not-allowed" : "text",
+        opacity: disabled ? 0.5 : 1,
+        ...focusRing,
+        ...style,
+      })}
     />
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { Row, T, Shot, ShotItem } from './common'
-
-export const TextareaShot: ComponentShot = {
-  name: 'Textarea',
-  el: (
-    <Shot>
-      <Row label="States" col>
-        <ShotItem label="placeholder">
-          <Textarea placeholder="Type a message…" />
-        </ShotItem>
-        <ShotItem label="with value (rows=3)">
-          <Textarea value="A multi-line text area with some content." rows={3} />
-        </ShotItem>
-        <ShotItem label="taller (rows=5)">
-          <Textarea value="A taller text area driven by the rows prop." rows={5} />
-        </ShotItem>
-        <ShotItem label="disabled">
-          <Textarea value="Read-only content." disabled />
-        </ShotItem>
-      </Row>
-    </Shot>
-  ),
+  );
 }

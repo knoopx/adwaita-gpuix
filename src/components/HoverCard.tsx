@@ -1,142 +1,99 @@
-import { createContext, useContext, type ReactNode } from 'react'
-import type { StyleDesc } from '@gpuix/react'
-import { useAdwaita } from '../theme/adwaita'
-import { FloatingPanel } from './common'
+import { createContext, useContext, type ReactNode } from "react";
+import type { StyleDesc } from "@gpuix/react";
+import { useAdwaita, hexToRgba } from "../theme/adwaita";
+import { FloatingPanel } from "./common";
 
 export interface HoverCardProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  children?: ReactNode
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export interface HoverCardTriggerProps {
-  children: ReactNode
-  style?: Partial<StyleDesc>
+  children: ReactNode;
+  style?: Partial<StyleDesc>;
 }
 
 export interface HoverCardContentProps {
-  children?: ReactNode
-  side?: 'top' | 'right' | 'bottom' | 'left'
-  sideOffset?: number
-  style?: Partial<StyleDesc>
+  children?: ReactNode;
+  side?: "top" | "right" | "bottom" | "left";
+  sideOffset?: number;
+  style?: Partial<StyleDesc>;
 }
 
 interface HoverCardContext {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-const HoverCardCtx = createContext<HoverCardContext | null>(null)
+const HoverCardCtx = createContext<HoverCardContext | null>(null);
 
 function useHoverCard(): HoverCardContext {
-  const ctx = useContext(HoverCardCtx)
-  if (!ctx) throw new Error('HoverCard components must be used within <HoverCard>')
-  return ctx
+  const ctx = useContext(HoverCardCtx);
+  if (!ctx)
+    throw new Error("HoverCard components must be used within <HoverCard>");
+  return ctx;
 }
 
-export function HoverCard({ open, onOpenChange, children }: HoverCardProps) {
-  return <HoverCardCtx.Provider value={{ open, onOpenChange }}>{children}</HoverCardCtx.Provider>
+export function HoverCard({ open, onOpenChange, children, style }: HoverCardProps) {
+  return (
+    <HoverCardCtx.Provider value={{ open, onOpenChange }}>
+      <div style={{ display: "flex", position: "relative", ...style }}>
+        {children}
+      </div>
+    </HoverCardCtx.Provider>
+  );
 }
 
 export function HoverCardTrigger({ children, style }: HoverCardTriggerProps) {
-  const { onOpenChange } = useHoverCard()
+  const { onOpenChange } = useHoverCard();
+  const t = useAdwaita();
   return (
     <div
       onMouseEnter={() => onOpenChange(true)}
       onMouseLeave={() => onOpenChange(false)}
-      style={{ cursor: 'pointer', ...style }}
+      style={{
+        cursor: "pointer",
+        borderRadius: t.radii.row,
+        hover: { backgroundColor: hexToRgba(t.colors.fg, 0.08) },
+        ...style,
+      }}
     >
       {children}
     </div>
-  )
+  );
 }
 
-export function HoverCardContent({ children, side = 'bottom', sideOffset = 8, style }: HoverCardContentProps) {
-  const { open } = useHoverCard()
+export function HoverCardContent({
+  children,
+  side = "bottom",
+  sideOffset = 8,
+  style,
+}: HoverCardContentProps) {
+  const { open } = useHoverCard();
 
-  if (!open) return null
+  if (!open) return null;
 
   return (
-    <FloatingPanel side={side} sideOffset={sideOffset} padding={12} gap={8} minWidth={200} style={style}>
+    <FloatingPanel
+      side={side}
+      sideOffset={sideOffset}
+      padding={8}
+      gap={8}
+      minWidth={200}
+      style={{
+        boxShadow: {
+          offsetX: 0,
+          offsetY: 4,
+          blurRadius: 16,
+          spreadRadius: 0,
+          color: "rgba(0,0,0,0.35)",
+        },
+        ...style,
+      }}
+    >
       {children}
     </FloatingPanel>
-  )
-}
-
-import type { ComponentShot } from '../../scripts/shot'
-import { T, Row, FloatingStage, Shot, ShotItem } from './common'
-import { Button } from './Button'
-import { Icon } from './icons'
-
-function SideHoverCard({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'; text: string }) {
-  return (
-    <HoverCard open={true} onOpenChange={() => {}}>
-      <HoverCardTrigger>
-        <Button label={side} onClick={() => {}} />
-      </HoverCardTrigger>
-      <HoverCardContent side={side}>
-        <T size="caption">{text}</T>
-      </HoverCardContent>
-    </HoverCard>
-  )
-}
-
-function HoverCardRichBody() {
-  const t = useAdwaita()
-  return (
-    <div style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-      <Icon name="user" size={20} color={t.colors.dim_fg} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <T size="body" weight={600}>Ada Lovelace</T>
-        <T size="caption" color={t.colors.dim_fg}>Hover card with icon + title + text.</T>
-      </div>
-    </div>
-  )
-}
-
-export const HoverCardShot: ComponentShot = {
-  name: 'HoverCard',
-  el: (
-    <Shot>
-      <Row label="Closed trigger">
-        <HoverCard open={false} onOpenChange={() => {}}>
-          <HoverCardTrigger>
-            <Button label="Hover" onClick={() => {}} />
-          </HoverCardTrigger>
-        </HoverCard>
-      </Row>
-      <Row label="Open · sides (side prop, anchored in a stage)" col>
-        <FloatingStage width={480} height={120}>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: 16, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            <ShotItem label="side=top">
-              <SideHoverCard side="top" text="Above the trigger" />
-            </ShotItem>
-            <ShotItem label="side=right">
-              <SideHoverCard side="right" text="Right of the trigger" />
-            </ShotItem>
-            <ShotItem label="side=bottom">
-              <SideHoverCard side="bottom" text="Below the trigger" />
-            </ShotItem>
-            <ShotItem label="side=left">
-              <SideHoverCard side="left" text="Left of the trigger" />
-            </ShotItem>
-          </div>
-        </FloatingStage>
-      </Row>
-      <Row label="Open · rich content" col>
-        <FloatingStage width={480} height={140}>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <HoverCard open={true} onOpenChange={() => {}}>
-              <HoverCardTrigger>
-                <Button label="Hover card" onClick={() => {}} />
-              </HoverCardTrigger>
-              <HoverCardContent>
-                <HoverCardRichBody />
-              </HoverCardContent>
-            </HoverCard>
-          </div>
-        </FloatingStage>
-      </Row>
-    </Shot>
-  ),
+  );
 }

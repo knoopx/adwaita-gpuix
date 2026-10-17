@@ -80,7 +80,7 @@ export const full = defineStory({
 export const withHints = defineStory({
   render: () => (
     <Column gap={16}>
-      <Labeled caption="hints only (right-aligned kbd hints)">
+      <Labeled caption="hints only (flush-left kbd hints)">
         <StatusBar hints={HINTS} />
       </Labeled>
     </Column>
