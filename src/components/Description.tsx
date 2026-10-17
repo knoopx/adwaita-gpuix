@@ -8,10 +8,6 @@ export interface DescriptionProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A descriptive text block: dim, body-size text used to explain a value, field,
- * or section.
- */
 export function Description({ children, style }: DescriptionProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -22,7 +18,6 @@ export function Description({ children, style }: DescriptionProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

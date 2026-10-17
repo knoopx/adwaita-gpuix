@@ -9,10 +9,6 @@ export interface SkeletonProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A pulsing rounded placeholder block (loading skeleton).
- * Uses `motion.div` with an opacity animation.
- */
 export function Skeleton({ width = 120, height = 16, variant = 'default', style }: SkeletonProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -35,7 +31,6 @@ export function Skeleton({ width = 120, height = 16, variant = 'default', style 
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

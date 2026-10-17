@@ -10,12 +10,6 @@ export interface PaginationProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * Build the visible page sequence for the data-driven `Pagination`: a window
- * of three around the current page with the first/last always visible and an
- * ellipsis where the gap to the window is > 1. When `pages <= 5` every page
- * is shown (no ellipsis needed).
- */
 export function pageSequence(page: number, pages: number): (number | 'ellipsis')[] {
   if (pages <= 5) return Array.from({ length: pages }, (_, i) => i + 1)
   const seq: (number | 'ellipsis')[] = [1]
@@ -28,10 +22,6 @@ export function pageSequence(page: number, pages: number): (number | 'ellipsis')
   return seq
 }
 
-/**
- * A row of pagination buttons: prev, numbered pages (with ellipsis for
- * truncated ranges), next. Current page = accent bg.
- */
 export function Pagination({ page, pages, onPageChange, style }: PaginationProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -62,7 +52,6 @@ export function Pagination({ page, pages, onPageChange, style }: PaginationProps
         ...style,
       }}
     >
-      {/* Previous */}
       <div
         onClick={() => onPageChange(Math.max(1, page - 1))}
         style={{
@@ -76,7 +65,6 @@ export function Pagination({ page, pages, onPageChange, style }: PaginationProps
         </T>
       </div>
 
-      {/* Page numbers + ellipses */}
       {sequence.map((n, i) =>
         n === 'ellipsis' ? (
           <PaginationEllipsis key={`e-${i}`} />
@@ -89,7 +77,6 @@ export function Pagination({ page, pages, onPageChange, style }: PaginationProps
         ),
       )}
 
-      {/* Next */}
       <div
         onClick={() => onPageChange(Math.min(pages, page + 1))}
         style={{
@@ -111,7 +98,6 @@ export interface PaginationContentProps {
   style?: Partial<StyleDesc>
 }
 
-/** Wrapper for pagination content. */
 export function PaginationContent({ children, style }: PaginationContentProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4, ...style }}>
@@ -125,7 +111,6 @@ export interface PaginationItemProps {
   style?: Partial<StyleDesc>
 }
 
-/** A single pagination item wrapper. */
 export function PaginationItem({ children, style }: PaginationItemProps) {
   return <div style={style}>{children}</div>
 }
@@ -137,7 +122,6 @@ export interface PaginationLinkProps {
   style?: Partial<StyleDesc>
 }
 
-/** A pagination page link (button). */
 export function PaginationLink({ children, active, onClick, style }: PaginationLinkProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -172,7 +156,6 @@ export interface PaginationPreviousProps {
   style?: Partial<StyleDesc>
 }
 
-/** 32×32 previous/next nav button: cursor/opacity by disabled, hover when enabled. */
 function PageNavButton({
   children,
   disabled,
@@ -207,7 +190,6 @@ function PageNavButton({
   )
 }
 
-/** Previous page button. */
 export function PaginationPrevious({ onClick, disabled, style }: PaginationPreviousProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -226,7 +208,6 @@ export interface PaginationNextProps {
   style?: Partial<StyleDesc>
 }
 
-/** Next page button. */
 export function PaginationNext({ onClick, disabled, style }: PaginationNextProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -243,7 +224,6 @@ export interface PaginationEllipsisProps {
   style?: Partial<StyleDesc>
 }
 
-/** A 36×36 centred “…” slot marking a truncated page range. */
 export function PaginationEllipsis({ style }: PaginationEllipsisProps) {
   const t = useAdwaita()
   return (
@@ -264,7 +244,6 @@ export function PaginationEllipsis({ style }: PaginationEllipsisProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

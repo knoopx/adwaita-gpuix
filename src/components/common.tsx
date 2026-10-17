@@ -15,10 +15,6 @@ export interface TextProps {
   children: ReactNode
 }
 
-/**
- * A GPUix `<text>` with an explicit colour. GPUI does not inherit colour, so
- * every text node sets one — this defaults it to the theme foreground.
- */
 export function T({ size = 'body', weight, color, align, clamp, style, children }: TextProps) {
   const t = useAdwaita()
   return (
@@ -38,7 +34,6 @@ export function T({ size = 'body', weight, color, align, clamp, style, children 
   )
 }
 
-/** A section heading used across the showcase (title4, dim). */
 export function SectionTitle({ children }: { children: ReactNode }) {
   const t = useAdwaita()
   return (
@@ -55,7 +50,6 @@ export function SectionTitle({ children }: { children: ReactNode }) {
   )
 }
 
-/** A `SectionTitle` label above a flex row (or column) of variants. */
 export function Row({ label, children, col = false }: { label: string; children: ReactNode; col?: boolean }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -67,22 +61,15 @@ export function Row({ label, children, col = false }: { label: string; children:
   )
 }
 
-/* ── Shared text building blocks ───────────────────────────────────────── */
-
 export interface TextPartProps {
   size?: TextSize
   weight?: string | number
-  /** Render in the dim foreground (description text) instead of the primary foreground. */
+
   dim?: boolean
   style?: Partial<StyleDesc>
   children: ReactNode
 }
 
-/**
- * A themed title / description text part: primary or dim foreground.
- * Shared by the libadwaita title + description pairs (AlertTitle /
- * AlertDescription, PopoverTitle / PopoverDescription).
- */
 export function TextPart({ size = 'body', weight, dim, style, children }: TextPartProps) {
   const t = useAdwaita()
   return (
@@ -92,11 +79,6 @@ export function TextPart({ size = 'body', weight, dim, style, children }: TextPa
   )
 }
 
-/**
- * A labelled control row: the control + a sibling body-text label in a
- * flex row (GPUix has no `htmlFor` — the label is a sibling `T`).
- * `disabled` dims the whole row. Shared by Checkbox and RadioGroup.
- */
 export function LabeledControl({
   control,
   label,
@@ -126,11 +108,6 @@ export function LabeledControl({
   )
 }
 
-/**
- * A bounded `position: relative` stage that contains an open floating panel
- * (Dialog/Drawer/Sheet rendered with `contained`), so the panel + scrim sit
- * fully inside the stage in static renders.
- */
 export function FloatingStage({
   children,
   width = 420,
@@ -160,17 +137,10 @@ export function FloatingStage({
   )
 }
 
-/* ── Shared showcase-shot scaffolding ──────────────────────────────────── */
-
-/**
- * The showcase-shot stage: a fixed-width (528px) column with 12px gap that
- * holds a shot's `Row` sections. The root wrapper of every `<Name>Shot`.
- */
 export function Shot({ children }: { children: ReactNode }) {
   return <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: 528 }}>{children}</div>
 }
 
-/** A captioned shot item: a small dim caption above the item. */
 export function ShotItem({ label, children }: { label: string; children: ReactNode }) {
   const t = useAdwaita()
   return (
@@ -181,9 +151,6 @@ export function ShotItem({ label, children }: { label: string; children: ReactNo
   )
 }
 
-/* ── Shared overlay / menu building blocks ─────────────────────────────── */
-
-/** Card shadow used by floating panels and dropdown lists. */
 export const cardShadow = {
   offsetX: 0,
   offsetY: 4,
@@ -192,11 +159,6 @@ export const cardShadow = {
   color: 'rgba(0,0,0,0.15)',
 } as const
 
-/**
- * A bordered card panel anchored to a positioned parent — the shared shell
- * behind Popover / HoverCard / DropdownMenu / ContextMenu / NavigationMenu
- * content and Menubar popdowns.
- */
 export function FloatingPanel({
   children,
   side = 'bottom',
@@ -241,14 +203,6 @@ export function FloatingPanel({
   )
 }
 
-/**
- * A menu row: optional leading node (indicator), optional icon, a body-text
- * label, and an optional trailing node. Shared by DropdownMenuItem,
- * ContextMenuItem, MenubarItem/Trigger, NavigationMenuLink, and CommandItem.
- *
- * `labelColor` / `iconColor` override the default foreground (destructive
- * variants); `hoverBackgroundColor` overrides the accentTint hover wash.
- */
 export function MenuRow({
   label,
   icon,
@@ -300,12 +254,6 @@ export function MenuRow({
   )
 }
 
-/**
- * The 16×16 leading indicator for checkbox / radio menu rows: a rounded box
- * (checkbox) or circle (radio) that fills with the accent and shows a check
- * icon / inner dot when active. Shared by the DropdownMenu / ContextMenu /
- * Menubar checkbox + radio items (extracted so the markup lives in one place).
- */
 export function MenuIndicator({
   kind = 'checkbox',
   active,
@@ -359,7 +307,6 @@ export function MenuIndicator({
   )
 }
 
-/** A trailing keyboard-shortcut hint for a menu row (caption, dim). */
 export function MenuShortcut({ children, style }: { children: ReactNode; style?: Partial<StyleDesc> }) {
   const t = useAdwaita()
   return (
@@ -369,7 +316,6 @@ export function MenuShortcut({ children, style }: { children: ReactNode; style?:
   )
 }
 
-/** A caption-dim label above a menu group (DropdownMenuLabel / MenubarLabel). */
 export function MenuLabel({ children, style }: { children: ReactNode; style?: Partial<StyleDesc> }) {
   const t = useAdwaita()
   return (
@@ -379,7 +325,6 @@ export function MenuLabel({ children, style }: { children: ReactNode; style?: Pa
   )
 }
 
-/** A 1px horizontal separator between menu groups. */
 export function MenuSeparator({ style }: { style?: Partial<StyleDesc> }) {
   const t = useAdwaita()
   return (
@@ -394,10 +339,6 @@ export function MenuSeparator({ style }: { style?: Partial<StyleDesc> }) {
   )
 }
 
-/* ── Menu family shared components (ContextMenu / DropdownMenu / Menubar) ── */
-
-/** A column of menu entries (flex, gap 2). Shared by the Group / RadioGroup
- *  wrappers of the ContextMenu / DropdownMenu / Menubar families. */
 export function MenuGroup({ children, style }: { children?: ReactNode; style?: Partial<StyleDesc> }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2, ...style }}>
@@ -411,19 +352,12 @@ export interface MenuRadioGroupValue {
   onSelect: (value: string) => void
 }
 
-/**
- * The shared menu radio-group context: one selection shared by all menu
- * radio items (the menu families do not nest across each other, so a
- * single context serves all three).
- */
 export const MenuRadioGroupCtx = createContext<MenuRadioGroupValue | null>(null)
 
-/** Read the surrounding menu radio-group context (null outside a group). */
 export function useMenuRadioGroup(): MenuRadioGroupValue | null {
   return useContext(MenuRadioGroupCtx)
 }
 
-/** Controlled / uncontrolled radio-selection state (the shared group logic). */
 export function useMenuRadioGroupState(
   value: string | undefined,
   defaultValue: string | undefined,
@@ -438,10 +372,6 @@ export function useMenuRadioGroupState(
   return { current, onSelect }
 }
 
-/**
- * The radio-group shell shared by the menu family: controlled / uncontrolled
- * selection state + the context provider + the column wrapper.
- */
 export function MenuRadioGroupShell({
   value,
   defaultValue,
@@ -463,10 +393,6 @@ export function MenuRadioGroupShell({
   )
 }
 
-/**
- * A radio menu row: a MenuRow with a radio MenuIndicator. The selection
- * derives from the surrounding group's state when `selected` is omitted.
- */
 export function MenuRadioRow({
   label,
   value,
@@ -481,7 +407,7 @@ export function MenuRadioRow({
   selected?: boolean
   group?: MenuRadioGroupValue | null
   onSelect?: () => void
-  /** Fired after the select (e.g. the menu's close handler). */
+
   onAfterSelect?: () => void
   style?: Partial<StyleDesc>
 }) {
@@ -508,11 +434,6 @@ export interface MenuRadioItemProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * Builds a menu family's radio-item component: a MenuRadioRow wired to the
- * surrounding menu context's close-on-select behaviour. The family hook
- * (e.g. useContextMenu / useDropdownMenu) supplies `onOpenChange`.
- */
 export function makeMenuRadioItem(useFamily: () => { onOpenChange?: (open: boolean) => void }) {
   return function MenuRadioItem({ label, value, selected, onSelect, style }: MenuRadioItemProps) {
     const { onOpenChange } = useFamily()
@@ -531,11 +452,6 @@ export function makeMenuRadioItem(useFamily: () => { onOpenChange?: (open: boole
   }
 }
 
-/**
- * A nested sub-menu shared by the menu family: a positioned column wrapper
- * that owns the open/close state of its trigger + content (GPUix has no DOM
- * sub-menu portal; the anchored panel is the idiom).
- */
 export interface MenuSubValue {
   open: boolean
   setOpen: (open: boolean) => void
@@ -560,7 +476,6 @@ export function MenuSub({ children, style }: { children?: ReactNode; style?: Par
   )
 }
 
-/** The row that toggles a sub-menu open/closed, with a chevron trailing. */
 export function MenuSubTrigger({
   label,
   icon,
@@ -569,7 +484,7 @@ export function MenuSubTrigger({
 }: {
   label: string
   icon?: IconName
-  /** Extra row style layered under the caller's `style` (e.g. Menubar's tighter padding). */
+
   rowStyle?: Partial<StyleDesc>
   style?: Partial<StyleDesc>
 }) {
@@ -587,7 +502,6 @@ export function MenuSubTrigger({
   )
 }
 
-/** The anchored panel of a sub-menu, shown only while the sub is open. */
 export function MenuSubContent({ children, style }: { children?: ReactNode; style?: Partial<StyleDesc> }) {
   const { open } = useMenuSub()
 
@@ -600,10 +514,6 @@ export function MenuSubContent({ children, style }: { children?: ReactNode; styl
   )
 }
 
-/**
- * The top bar container shared by Menubar and NavigationMenu: a view_bg row
- * with a 1px bottom border.
- */
 export function MenuBarShell({ children, style }: { children?: ReactNode; style?: Partial<StyleDesc> }) {
   const t = useAdwaita()
   const { colors } = t
@@ -627,10 +537,6 @@ export function MenuBarShell({ children, style }: { children?: ReactNode; style?
   )
 }
 
-/**
- * The scheme-aware scrim that sits behind an open Dialog / Drawer / Sheet:
- * a full-size overlay (fixed, or absolute when contained to a stage).
- */
 export function Scrim({
   position = 'fixed',
   onDismiss,
@@ -658,10 +564,6 @@ export function Scrim({
   )
 }
 
-/**
- * A full-size positioned wrapper (fixed, or absolute when contained) that
- * holds a scrim plus an open overlay panel. Shared by Drawer and Sheet.
- */
 export function OverlayShell({
   position = 'fixed',
   onDismiss,
@@ -691,11 +593,6 @@ export function OverlayShell({
   )
 }
 
-/**
- * The body of an open overlay panel: a full-size positioned view_bg flex
- * column. Shared by Drawer and Sheet (the scrim + wrapper live in
- * OverlayShell).
- */
 export function OverlayPanel({
   position = 'fixed',
   panelStyle,
@@ -721,11 +618,6 @@ export function OverlayPanel({
   )
 }
 
-/**
- * A bottom-anchored footer shared by Drawer / Sheet: a flexGrow:1 spacer
- * pushes the column of actions (gap 8, padding 16) to the panel's bottom
- * edge.
- */
 export function OverlayFooter({ children, style }: { children?: ReactNode; style?: Partial<StyleDesc> }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', ...style }}>
@@ -735,10 +627,6 @@ export function OverlayFooter({ children, style }: { children?: ReactNode; style
   )
 }
 
-/**
- * A 24×24 hoverable close button (dim close icon by default). Shared by
- * DialogClose / DrawerClose / SheetClose.
- */
 export function CloseButton({
   children,
   onClick,
@@ -770,11 +658,6 @@ export function CloseButton({
   )
 }
 
-/**
- * A chevroned disclosure row (accordion / collapsible trigger): a labelled
- * row with a rotating chevron at the start or end that toggles on click or
- * Enter/Space.
- */
 export function DisclosureTrigger({
   children,
   onToggle,
@@ -816,10 +699,6 @@ export function DisclosureTrigger({
   )
 }
 
-/**
- * A bordered monospace code chip (kbd key cap / inline code): button_bg
- * background, 1px border, radius 4, caption-mono text.
- */
 export function CodeChip({
   children,
   padding = 4,
@@ -853,13 +732,6 @@ export function CodeChip({
   )
 }
 
-/* ── Shared style factories ────────────────────────────────────────────── */
-
-/**
- * The dialog card panel style shared by Dialog / AlertDialog: a view_bg
- * column with card radius, 1px border, 480 max width, and the elevated
- * card shadow.
- */
 export function dialogCardStyle(
   t: AdwaitaTheme,
   opts: { gap?: number; minWidth?: number } = {},
@@ -882,10 +754,6 @@ export function dialogCardStyle(
   }
 }
 
-/**
- * Base style for a bordered text field (Input / Textarea / ComboboxInput):
- * 1px border, view_bg, theme font. Callers add padding, radius, opacity.
- */
 export function textFieldStyle(t: AdwaitaTheme, style?: Partial<StyleDesc>): Partial<StyleDesc> {
   const { colors, typography } = t
   return {
@@ -900,11 +768,6 @@ export function textFieldStyle(t: AdwaitaTheme, style?: Partial<StyleDesc>): Par
   }
 }
 
-/**
- * Bordered card panel style for dropdown lists (Select / Combobox /
- * NativeSelect content): card radius, 1px border, view_bg, card shadow,
- * 200px max height.
- */
 export function listPanelStyle(t: AdwaitaTheme, style?: Partial<StyleDesc>): Partial<StyleDesc> {
   const { colors, radii } = t
   return {
@@ -918,7 +781,6 @@ export function listPanelStyle(t: AdwaitaTheme, style?: Partial<StyleDesc>): Par
   }
 }
 
-/** Pill-shaped select trigger style (SelectTrigger / NativeSelect). */
 export function selectTriggerStyle(t: AdwaitaTheme, style?: Partial<StyleDesc>): Partial<StyleDesc> {
   const { colors, radii } = t
   return {
@@ -940,10 +802,6 @@ export function selectTriggerStyle(t: AdwaitaTheme, style?: Partial<StyleDesc>):
   }
 }
 
-/**
- * Pill input shell style (CommandInput, DatePicker trigger): 1px border,
- * button_bg, 8px padding with 12px left inset. Callers add cursor/hover.
- */
 export function inputShellStyle(t: AdwaitaTheme, style?: Partial<StyleDesc>): Partial<StyleDesc> {
   const { colors, radii } = t
   return {
@@ -961,10 +819,6 @@ export function inputShellStyle(t: AdwaitaTheme, style?: Partial<StyleDesc>): Pa
   }
 }
 
-/**
- * The destructive-variant colour overrides for a menu row (label / icon /
- * hover wash). Shared by DropdownMenuItem / MenubarItem.
- */
 export function destructiveRowProps(t: AdwaitaTheme) {
   const { colors } = t
   return {
@@ -973,8 +827,6 @@ export function destructiveRowProps(t: AdwaitaTheme) {
     hoverBackgroundColor: colors.destructiveTint,
   }
 }
-
-/* ── Shared input field ────────────────────────────────────────────────── */
 
 export interface AdwaitaInputBaseProps {
   value?: string
@@ -985,19 +837,15 @@ export interface AdwaitaInputBaseProps {
   autoFocus?: boolean
   onSubmit?: () => void
   style?: Partial<StyleDesc>
+  testId?: string
 }
 
-/**
- * The GPUix text-field base shared by the Input / Entry pair: rounded
- * border, view_bg, theme font, accent caret. `disabled` dims the field
- * (opacity 0.5) and makes it read-only; `invalid` switches the border to
- * destructive. Callers layer padding / radius via `style`.
- */
-export function AdwaitaInputBase({ value, onChange, placeholder, disabled, invalid, autoFocus, onSubmit, style }: AdwaitaInputBaseProps) {
+export function AdwaitaInputBase({ value, onChange, placeholder, disabled, invalid, autoFocus, onSubmit, style, testId }: AdwaitaInputBaseProps) {
   const t = useAdwaita()
   const { colors, typography, radii } = t
   return (
     <input
+      testId={testId}
       value={value}
       placeholder={placeholder}
       autoFocus={autoFocus && !disabled ? true : undefined}

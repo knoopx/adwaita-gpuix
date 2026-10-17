@@ -8,7 +8,6 @@ export interface FrameProps {
   style?: Partial<StyleDesc>
 }
 
-/** A rounded surface with a 1px border (Adwaita `frame`). */
 export function Frame({ children, style }: FrameProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -33,7 +32,6 @@ export interface CardProps {
   style?: Partial<StyleDesc>
 }
 
-/** Adwaita `card`: a bordered, rounded surface with an optional title. */
 export function Card({ title, children, style }: CardProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -57,14 +55,11 @@ export function Card({ title, children, style }: CardProps) {
   )
 }
 
-// ── shadcn Card sub-parts (thin wrappers over Card/Frame) ──────────────
-
 export interface CardHeaderProps {
   children?: ReactNode
   style?: Partial<StyleDesc>
 }
 
-/** Card header area: padding = spacing.paddingTight. */
 export function CardHeader({ children, style }: CardHeaderProps) {
   const t = useAdwaita()
   return (
@@ -87,7 +82,6 @@ export interface CardTitleProps {
   style?: Partial<StyleDesc>
 }
 
-/** Card title: title4 bold. */
 export function CardTitle({ children, style }: CardTitleProps) {
   const t = useAdwaita()
   return (
@@ -102,7 +96,6 @@ export interface CardDescriptionProps {
   style?: Partial<StyleDesc>
 }
 
-/** Card description: dim body text. */
 export function CardDescription({ children, style }: CardDescriptionProps) {
   const t = useAdwaita()
   return (
@@ -117,7 +110,6 @@ export interface CardContentProps {
   style?: Partial<StyleDesc>
 }
 
-/** Card content area: padding = spacing.paddingTight. */
 export function CardContent({ children, style }: CardContentProps) {
   const t = useAdwaita()
   return (
@@ -141,7 +133,6 @@ export interface CardFooterProps {
   style?: Partial<StyleDesc>
 }
 
-/** Card footer area: padding = spacing.paddingTight. */
 export function CardFooter({ children, style }: CardFooterProps) {
   const t = useAdwaita()
   return (
@@ -165,13 +156,6 @@ export interface CardActionProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * The top-right action slot of a card (shadcn `CardAction`). Place it as the
- * last child of a `CardHeader` (a column): `alignSelf: 'flex-end'` pins it to
- * the top-right corner. For a title + action on one line, wrap both in a
- * `display: 'flex', flexDirection: 'row', justifyContent: 'space-between'`
- * row inside the header.
- */
 export function CardAction({ children, style }: CardActionProps) {
   return (
     <div
@@ -185,7 +169,6 @@ export function CardAction({ children, style }: CardActionProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 import { Button } from './Button'

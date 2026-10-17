@@ -6,7 +6,6 @@ export interface SeparatorProps {
   style?: Partial<StyleDesc>
 }
 
-/** A 1px separator line in the theme border colour. */
 export function Separator({ orientation = 'horizontal', style }: SeparatorProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -36,7 +35,6 @@ export function Separator({ orientation = 'horizontal', style }: SeparatorProps)
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, T, Shot, ShotItem } from './common'
 

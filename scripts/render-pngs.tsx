@@ -1,24 +1,3 @@
-/**
- * render-pngs.tsx
- *
- * Headless per-component PNGs for the Adwaita/GPUix library, rendered with
- * takumi-js (JSX/CSS → PNG, no browser, native on Linux).
- *
- * Each component file owns its own showcase shot (the
- * `// ── Showcase shot ──` section at the end of `src/components/<File>.tsx`
- * exporting `<Name>Shot: ComponentShot`); this script imports those shots
- * directly. `AVATAR_IMG` comes from `./shot` (scripts/shot.ts), which also
- * carries the `ComponentShot` shape and the shared `LEVELS`.
- *
- * Pipeline: serialize each shot with `renderToStaticMarkup` (standard React
- * server render), sanitize the GPUix-only style artifacts out of the HTML, then
- * rasterize the HTML with takumi. GPUix state maps (`hover`/`active`/
- * `boxShadow`) serialize to `[object Object]` and takumi's CSS parser rejects a
- * few values, so they are normalized before the render.
- *
- * Usage:  bun scripts/render-pngs.tsx                # all 64
- *         ONLY=Button bun scripts/render-pngs.tsx    # just one
- */
 import { render } from 'takumi-js'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { writeFileSync } from 'node:fs'
@@ -27,7 +6,6 @@ import { fileURLToPath } from 'node:url'
 import { AdwaitaProvider, buildTheme } from '../src/index'
 import { AVATAR_IMG } from './shot'
 
-// ── core ─────────────────────────────────────────────────────────────────
 import { ButtonShot } from '../src/components/Button'
 import { HeaderBarShot } from '../src/components/HeaderBar'
 import { BannerShot } from '../src/components/Banner'
@@ -45,7 +23,6 @@ import { ToggleGroupShot } from '../src/components/ToggleGroup'
 import { AvatarShot } from '../src/components/Avatar'
 import { ProgressBarShot } from '../src/components/ProgressBar'
 
-// ── feedback ─────────────────────────────────────────────────────────────
 import { ViewSwitcherShot } from '../src/components/ViewSwitcher'
 import { PreferencesPageShot } from '../src/components/PreferencesPage'
 import { BadgeShot } from '../src/components/Badge'
@@ -63,7 +40,6 @@ import { TextareaShot } from '../src/components/Textarea'
 import { CheckboxShot } from '../src/components/Checkbox'
 import { RadioGroupShot } from '../src/components/RadioGroup'
 
-// ── inputs ───────────────────────────────────────────────────────────────
 import { SliderShot } from '../src/components/Slider'
 import { ToggleShot } from '../src/components/Toggle'
 import { NativeSelectShot } from '../src/components/NativeSelect'
@@ -79,7 +55,6 @@ import { ResizableShot } from '../src/components/Resizable'
 import { DialogShot } from '../src/components/Dialog'
 import { DrawerShot } from '../src/components/Drawer'
 
-// ── overlays ─────────────────────────────────────────────────────────────
 import { SheetShot } from '../src/components/Sheet'
 import { PopoverShot } from '../src/components/Popover'
 import { TooltipShot } from '../src/components/Tooltip'
@@ -90,7 +65,6 @@ import { MenubarShot } from '../src/components/Menubar'
 import { NavigationMenuShot } from '../src/components/NavigationMenu'
 import { CommandShot } from '../src/components/Command'
 
-// ── overlays-extra ───────────────────────────────────────────────────────
 import { CalendarShot, DatePickerShot } from '../src/components/Calendar'
 import { ChartShot } from '../src/components/Chart'
 import { ComboboxShot } from '../src/components/Combobox'
@@ -100,36 +74,29 @@ import { ListBoxShot } from '../src/components/ListBox'
 import { DescriptionShot } from '../src/components/Description'
 import { ToasterShot } from '../src/components/Toaster'
 
-// ── Paths / theme ─────────────────────────────────────────────────────────
 const componentsDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'components')
-// Use window_bg (the darkest Adwaita surface) as the shot backdrop so
-// view_bg / button_bg element surfaces (inputs, cards, rows, triggers) stay
-// visible — matching real libadwaita surface layering (window < view < card).
+
 const bg = buildTheme('dark', 'blue').colors.window_bg
 const only = process.env.ONLY
 
-// Valid 1×1 red PNG (the AVATAR_IMG data-uri in the Avatar shot is
-// truncated → bad CRC, which takumi's PNG decoder rejects).
 const VALID_1X1_B64 =
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAADUExURTWE5H1SYY8AAAAHdElNRQfqCg8NJhnGtSIEAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDI2LTEwLTE1VDEzOjM4OjI1KzAwOjAwXBiS9gAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyNi0xMC0xNVQxMzozODoyNSswMDowMC1FKkoAAAAodEVYdGRhdGU6dGltZXN0YW1wIDIwMjYtMTAtMTVUMTM6Mzg6MjUrMDA6MDB6UAuVAAAACklEQVQI12NgAAAAAgAB4iG8MwAAAABJRU5ErkJggg=='
 
-/** Normalize GPUix-only style artifacts so takumi's CSS parser accepts them. */
 function sanitizeHtml(html: string): string {
   let s = html
-  // Drop any inline style property whose value serialized to `[object Object]`
-  // (GPUix state/style maps: `hover`, `active`, map `boxShadow`, …). A static
-  // PNG only needs the base state, so these are safe to drop.
+
+
+
   s = s.replace(/;?\s*[a-z-]+\s*:\s*\[object Object\]/gi, '')
-  // takumi's overflow only accepts visible/clip/hidden.
+
   s = s.replace(/(overflow(?:-x|-y)?\s*:\s*)(scroll|auto)/gi, '$1hidden')
-  // Replace the truncated avatar data-uri with a valid 1×1 png (exact match).
+
   s = s.split(AVATAR_IMG).join(`data:image/png;base64,${VALID_1X1_B64}`)
   return s
 }
 
-// ── The 64 component shots (per-component file order) ────────────────────
 const COMPONENTS = [
-  // core
+
   ButtonShot,
   HeaderBarShot,
   BannerShot,
@@ -146,7 +113,7 @@ const COMPONENTS = [
   ToggleGroupShot,
   AvatarShot,
   ProgressBarShot,
-  // feedback
+
   ViewSwitcherShot,
   PreferencesPageShot,
   BadgeShot,
@@ -163,7 +130,7 @@ const COMPONENTS = [
   TextareaShot,
   CheckboxShot,
   RadioGroupShot,
-  // inputs
+
   SliderShot,
   ToggleShot,
   NativeSelectShot,
@@ -178,7 +145,7 @@ const COMPONENTS = [
   ResizableShot,
   DialogShot,
   DrawerShot,
-  // overlays
+
   SheetShot,
   PopoverShot,
   TooltipShot,
@@ -188,7 +155,7 @@ const COMPONENTS = [
   MenubarShot,
   NavigationMenuShot,
   CommandShot,
-  // overlays-extra
+
   CalendarShot,
   DatePickerShot,
   ChartShot,
@@ -200,7 +167,6 @@ const COMPONENTS = [
   ToasterShot,
 ]
 
-// ── Main ──────────────────────────────────────────────────────────────────
 async function main() {
   let ok = 0
   let fail = 0

@@ -4,22 +4,15 @@ import { AnimatePresence, motion } from '@gpuix/react'
 import { DisclosureTrigger } from './common'
 
 export interface CollapsibleProps {
-  /** Controlled open state. When `undefined`, the component is uncontrolled (see `defaultOpen`). */
+
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  /** Uncontrolled starting state (used when `open` is `undefined`). */
+
   defaultOpen?: boolean
   children: ReactNode
   style?: Partial<StyleDesc>
 }
 
-/**
- * A simple collapsible container. The trigger toggles visibility of the content.
- *
- * Supports both controlled (`open` + `onOpenChange`) and uncontrolled
- * (`defaultOpen`) modes: when `open` is `undefined`, an internal state is
- * kept (starting from `defaultOpen ?? false`).
- */
 interface CollapsibleContextValue {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -27,11 +20,6 @@ interface CollapsibleContextValue {
 
 const CollapsibleCtx = createContext<CollapsibleContextValue | null>(null)
 
-/**
- * Reads the enclosing <Collapsible> open state. Returns a safe default
- * (open, no-op) when used outside a provider so standalone renders keep
- * working.
- */
 function useCollapsible(): CollapsibleContextValue {
   const ctx = useContext(CollapsibleCtx)
   return ctx ?? { open: true, onOpenChange: () => {} }
@@ -60,7 +48,6 @@ export interface CollapsibleTriggerProps {
   style?: Partial<StyleDesc>
 }
 
-/** The trigger button for a Collapsible (row with chevron). */
 export function CollapsibleTrigger({ children, open, onToggle, style }: CollapsibleTriggerProps) {
   const ctx = useCollapsible()
   const isOpen = open ?? ctx.open
@@ -82,11 +69,6 @@ export interface CollapsibleContentProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * The collapsible body. Hidden when closed (reads the parent open state).
- * The body fades in/out via a `motion.div` opacity transition (GPUix motion
- * fixed property set — no DOM height keyframes).
- */
 export function CollapsibleContent({ children, open, style }: CollapsibleContentProps) {
   const ctx = useCollapsible()
   const isOpen = open ?? ctx.open
@@ -108,12 +90,10 @@ export function CollapsibleContent({ children, open, style }: CollapsibleContent
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { useAdwaita } from '../theme/adwaita'
 import { Row, T, Shot, ShotItem } from './common'
 
-/** A bordered frame around a collapsible instance (so open/closed are distinguishable). */
 function CollapsibleFrame({ children }: { children: ReactNode }) {
   const t = useAdwaita()
   return (

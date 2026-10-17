@@ -14,15 +14,6 @@ export interface NumberFieldProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * Adwaita number field: a pill-bordered input with +/− stepper buttons stacked
- * on the right. There is no native number input in GPUix, so this composes a
- * plain `<input>` with two clickable stepper buttons.
- *
- * While typing, the raw text is tracked as a **draft**: an out-of-range (or
- * non-numeric) draft turns the pill border destructive; on blur the draft is
- * clamped to `[min, max]` and committed. In-range edits commit live.
- */
 export function NumberField({
   value,
   defaultValue = 0,
@@ -38,7 +29,7 @@ export function NumberField({
   const [internal, setInternal] = useState<number>(defaultValue)
   const current = value ?? internal
 
-  // Draft tracking: the raw text being typed (null = show the committed value).
+
   const [draft, setDraft] = useState<string | null>(null)
   const [focused, setFocused] = useState(false)
 
@@ -59,10 +50,10 @@ export function NumberField({
     onChange?.(c)
   }
 
-  // The text shown in the input: the live draft while focused, else the value.
+
   const displayValue = focused && draft !== null ? draft : String(current)
 
-  // A non-empty draft that is non-numeric or out of range → destructive border.
+
   let draftInvalid = false
   if (focused && draft !== null && draft.trim() !== '') {
     const n = parseFloat(draft)
@@ -85,7 +76,7 @@ export function NumberField({
     if (draft !== null) {
       const n = parseFloat(draft)
       if (Number.isNaN(n)) {
-        setDraft(null) // revert to the last committed value
+        setDraft(null)
       } else {
         const c = clamp(n)
         if (value === undefined) setInternal(c)
@@ -155,7 +146,6 @@ export function NumberField({
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, T, Shot, ShotItem } from './common'
 

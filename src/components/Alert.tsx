@@ -12,14 +12,12 @@ export interface AlertProps {
   style?: Partial<StyleDesc>
 }
 
-/** Tint, accent and icon for an alert variant. */
 interface AlertVariantTheme {
   bg: string
   accent: string
   icon: IconName
 }
 
-/** Resolve the tint, accent colour and icon for an alert variant. */
 function resolveVariantTheme(variant: AlertVariant, colors: AdwaitaColors): AlertVariantTheme {
   switch (variant) {
     case 'success':
@@ -33,10 +31,6 @@ function resolveVariantTheme(variant: AlertVariant, colors: AdwaitaColors): Aler
   }
 }
 
-/**
- * Adwaita alert banner: tinted background, 3px left accent border,
- * icon + title + description in a flex row.
- */
 export function Alert({ variant = 'default', children, style }: AlertProps) {
   const t = useAdwaita()
   const { radii } = t
@@ -70,7 +64,6 @@ export interface AlertTitleProps {
   style?: Partial<StyleDesc>
 }
 
-/** Bold title4 text for alert headers. */
 export function AlertTitle({ children, style }: AlertTitleProps) {
   return (
     <TextPart size="title4" weight={700} style={style}>
@@ -84,7 +77,6 @@ export interface AlertDescriptionProps {
   style?: Partial<StyleDesc>
 }
 
-/** Dim caption text for alert descriptions. */
 export function AlertDescription({ children, style }: AlertDescriptionProps) {
   return (
     <TextPart dim style={style}>
@@ -93,7 +85,6 @@ export function AlertDescription({ children, style }: AlertDescriptionProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

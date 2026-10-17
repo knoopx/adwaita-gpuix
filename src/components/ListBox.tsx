@@ -4,9 +4,9 @@ import { useAdwaita } from '../theme/adwaita'
 import { T } from './common'
 
 interface ListBoxContextValue {
-  /** Normalized selected values (single mode → at most one entry). */
+
   selectedValues: string[]
-  /** The keyboard-focused row (accent border). */
+
   focused: string | null
   multiple: boolean
   onSelect: (value: string) => void
@@ -17,11 +17,6 @@ interface ListBoxContextValue {
 
 const ListBoxContext = createContext<ListBoxContextValue | null>(null)
 
-/**
- * A bordered list of selectable rows. Single-select by default; set
- * `multiple` for a toggle-set (`value: string[]`, click toggles in/out).
- * The discriminated `multiple` prop keeps the single-mode signature intact.
- */
 export type ListBoxProps =
   | {
       multiple?: false
@@ -40,23 +35,17 @@ export type ListBoxProps =
       style?: Partial<StyleDesc>
     }
 
-/**
- * A bordered list: a card container of rows. The selected row(s) are washed
- * with the accent tint. Keyboard nav: `tabIndex=0` + ArrowUp/Down move the
- * focused row (accent border), Enter activates it. Selection state is shared
- * through context; item order is registered by the children for arrow nav.
- */
 export function ListBox(props: ListBoxProps) {
   const t = useAdwaita()
   const { colors, radii } = t
   const multiple = props.multiple === true
 
-  // ── controlled / uncontrolled duality (per mode) ──────────────────
+
   const [internal, setInternal] = useState<string | string[] | null>(
     multiple ? (props.defaultValue ?? props.value ?? []) : (props.defaultValue ?? props.value ?? null),
   )
 
-  // ── keyboard focus + item order ──────────────────────────────────
+
   const [focused, setFocused] = useState<string | null>(null)
   const orderedRef = useRef<string[]>([])
   const register = (v: string) => {
@@ -136,11 +125,6 @@ export interface ListBoxItemProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A selectable row: hover = accentTint, selected = accentTint, focused
- * (keyboard) = accent border. Registers its value with the parent for
- * ArrowUp/Down navigation.
- */
 export function ListBoxItem({ value, disabled, children, style }: ListBoxItemProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -187,7 +171,6 @@ export function ListBoxItem({ value, disabled, children, style }: ListBoxItemPro
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

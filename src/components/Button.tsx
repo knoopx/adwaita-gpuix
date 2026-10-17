@@ -6,10 +6,8 @@ import { Icon, type IconName } from './icons'
 
 export type ButtonVariant = 'default' | 'suggested' | 'destructive' | 'pill' | 'text' | 'icon' | 'secondary'
 
-/** Button size: a height axis plus a square `icon` form. */
 export type ButtonSize = 'sm' | 'default' | 'lg' | 'icon'
 
-/** Minimum height (px) for each button size. */
 const BUTTON_SIZE_HEIGHT: Record<ButtonSize, number> = {
   sm: 28,
   default: 34,
@@ -19,7 +17,7 @@ const BUTTON_SIZE_HEIGHT: Record<ButtonSize, number> = {
 
 export interface ButtonProps {
   variant?: ButtonVariant
-  /** Height axis (`sm` 28 / `default` 34 / `lg` 40); `icon` = square (width = height, no padding). */
+
   size?: ButtonSize
   label?: string
   icon?: IconName
@@ -29,7 +27,6 @@ export interface ButtonProps {
   style?: Partial<StyleDesc>
 }
 
-/** Colour theme for a button variant (bg/fg plus hover & pressed states). */
 interface ButtonVariantTheme {
   bg: string
   fg: string
@@ -38,7 +35,6 @@ interface ButtonVariantTheme {
   border: string
 }
 
-/** Resolve the colour theme for a variant (`default` and `pill` share the base). */
 function resolveVariantTheme(variant: ButtonVariant, t: AdwaitaTheme): ButtonVariantTheme {
   const { colors, scheme } = t
   switch (variant) {
@@ -93,7 +89,6 @@ function resolveVariantTheme(variant: ButtonVariant, t: AdwaitaTheme): ButtonVar
   }
 }
 
-/** Full style for an Adwaita button: variant colours, size, pill/flat shape, disabled state. */
 function buttonStyle(
   t: AdwaitaTheme,
   variant: ButtonVariant,
@@ -129,20 +124,6 @@ function buttonStyle(
   }
 }
 
-/**
- * Adwaita button. There is no `<button>` element in GPUix — interaction is a
- * `<div onClick>` with a pointer cursor.
- *
- * **Variants:** `suggested` = accent (primary), `destructive` = red,
- * `default`/`secondary` = bordered neutral (`button_bg`), `pill` = full
- * radius shape, `text` = flat accent label, `icon` = symbolic flat.
- *
- * **Size axis** (`size`): `sm` (28) / `default` (34) / `lg` (40); `icon` is a
- * square form (width = height, no padding). Note the API-shape mismatch with
- * shadcn: here `icon` is a **size**, not a variant — a square icon button is
- * `size="icon"` (optionally with `variant="text"`/`variant="icon"` for a
- * flat look), NOT `variant="icon"`.
- */
 export function Button({
   variant = 'default',
   size = 'default',
@@ -172,7 +153,6 @@ export function Button({
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

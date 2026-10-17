@@ -17,23 +17,12 @@ export interface NativeSelectGroup {
 export interface NativeSelectProps {
   value: string
   options: NativeSelectOption[]
-  /**
-   * Optional grouped options. When provided, group headers are rendered
-   * between option blocks (each option still 36px). Takes precedence over
-   * the flat `options` list.
-   */
+
   groups?: NativeSelectGroup[]
   onChange?: (value: string) => void
   style?: Partial<StyleDesc>
 }
 
-/**
- * A **custom dropdown** — GPUix has no native `<select>` host element, so this
- * is a pill trigger + an anchored, scrollable option list (a `<virtual-list>`
- * with 36px rows, so long lists scroll per the GPUix scroller constraint).
- *
- * `groups` renders `MenuLabel`-style headers between option blocks.
- */
 export function NativeSelect({ value, options, groups, onChange, style }: NativeSelectProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -42,7 +31,7 @@ export function NativeSelect({ value, options, groups, onChange, style }: Native
   const allOptions = groups ? groups.flatMap((g) => g.options) : options
   const selected = allOptions.find((o) => o.value === value)
 
-  // Build a flat list of 36px rows (options + optional group headers).
+
   const optionRow = (option: NativeSelectOption): ReactNode => {
     const isSelected = option.value === value
     return (
@@ -89,7 +78,6 @@ export function NativeSelect({ value, options, groups, onChange, style }: Native
 
   return (
     <div style={style}>
-      {/* Trigger */}
       <div
         onClick={() => setOpen(!open)}
         style={selectTriggerStyle(t)}
@@ -100,7 +88,6 @@ export function NativeSelect({ value, options, groups, onChange, style }: Native
         <Icon name="chevronDown" size={14} color={colors.dim_fg} />
       </div>
 
-      {/* Anchored, scrollable options list (virtual-list = the only scroller) */}
       {open ? (
         <anchored side="bottom" align="start" gap={4}>
           <div style={listPanelStyle(t, { display: 'flex', flexDirection: 'column', padding: 2 })}>
@@ -114,7 +101,6 @@ export function NativeSelect({ value, options, groups, onChange, style }: Native
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import { LEVELS, type ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

@@ -9,10 +9,6 @@ export interface HeadingProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A heading that maps heading levels to Adwaita type scale:
- * 1→title1, 2→title2, 3→title3, 4→title4, 5→body, 6→body.
- */
 export function Heading({ level = 2, children, style }: HeadingProps) {
   const t = useAdwaita()
   const { colors, typography } = t
@@ -39,7 +35,6 @@ export interface ParagraphProps {
   style?: Partial<StyleDesc>
 }
 
-/** A body-size paragraph. `dim` uses the secondary foreground colour. */
 export function Paragraph({ children, dim, style }: ParagraphProps) {
   const t = useAdwaita()
   return (
@@ -54,7 +49,6 @@ export interface SmallProps {
   style?: Partial<StyleDesc>
 }
 
-/** Caption-size dim text. */
 export function Small({ children, style }: SmallProps) {
   const t = useAdwaita()
   return (
@@ -69,7 +63,6 @@ export interface BlockquoteProps {
   style?: Partial<StyleDesc>
 }
 
-/** A dimmed quote block with a 3px left accent border. */
 export function Blockquote({ children, style }: BlockquoteProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -99,7 +92,6 @@ export interface InlineCodeProps {
   style?: Partial<StyleDesc>
 }
 
-/** Inline monospace code: button_bg background, 1px border, radius 4, padding 2. */
 export function InlineCode({ children, style }: InlineCodeProps) {
   return (
     <CodeChip padding={2} style={style}>
@@ -108,7 +100,6 @@ export function InlineCode({ children, style }: InlineCodeProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

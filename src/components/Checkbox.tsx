@@ -6,20 +6,15 @@ import { Icon } from './icons'
 export type CheckboxState = boolean | 'indeterminate'
 
 export interface CheckboxProps {
-  /** `true` = checked, `false` = unchecked, `'indeterminate'` = dash. */
+
   checked?: CheckboxState
   onCheckedChange: (checked: boolean) => void
   disabled?: boolean
-  /**
-   * Optional label rendered as a sibling `T` (8px gap). GPUix has no
-   * `htmlFor`, so label association is structural (the label is a sibling
-   * of the box inside this component).
-   */
+
   label?: string
   style?: Partial<StyleDesc>
 }
 
-/** 18px square checkbox style: accent when checked, dimmed when disabled. */
 function checkboxStyle(t: AdwaitaTheme, filled: boolean, disabled?: boolean, style?: Partial<StyleDesc>): Partial<StyleDesc> {
   const { colors } = t
   return {
@@ -40,13 +35,6 @@ function checkboxStyle(t: AdwaitaTheme, filled: boolean, disabled?: boolean, sty
   }
 }
 
-/**
- * An 18px square checkbox.
- * - `checked=true` = accent bg + white check icon.
- * - `checked='indeterminate'` = accent bg + 10px horizontal bar.
- * Clickable and keyboard-toggleable (Enter/Space). Toggling an indeterminate
- * checkbox checks it (`onCheckedChange(true)`).
- */
 export function Checkbox({ checked = false, onCheckedChange, disabled, label, style }: CheckboxProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -85,11 +73,10 @@ export function Checkbox({ checked = false, onCheckedChange, disabled, label, st
 
   if (label === undefined) return box
 
-  // Label association: a sibling `T` in a flex row (GPUix has no htmlFor).
+
   return <LabeledControl control={box} label={label} disabled={disabled} />
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

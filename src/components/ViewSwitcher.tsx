@@ -13,16 +13,11 @@ export interface ViewSwitcherProps {
   items: ViewSwitcherItem[]
   value: string
   onChange: (id: string) => void
-  /** Show the text label under each icon (default). Set false for a compact icon-only row. */
+
   showLabels?: boolean
   style?: Partial<StyleDesc>
 }
 
-/**
- * Adwaita view switcher: a row of icon-over-label pills. The selected pill is
- * tinted with the accent; the rest are flat and dimmed. With `showLabels`
- * false it renders a compact icon-only row.
- */
 export function ViewSwitcher({ items, value, onChange, showLabels = true, style }: ViewSwitcherProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -69,7 +64,6 @@ export function ViewSwitcher({ items, value, onChange, showLabels = true, style 
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

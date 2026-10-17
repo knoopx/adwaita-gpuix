@@ -7,13 +7,8 @@ import { Icon, type IconName } from './icons'
 
 export type BannerTone = 'info' | 'warning' | 'error' | 'success'
 
-/**
- * A shadcn-style `variant` alias for `tone`: `default` → `info`,
- * `destructive` → `error`. `tone` remains the adwaita-native vocabulary.
- */
 export type BannerVariant = 'default' | 'destructive'
 
-/** Resolve a shadcn `variant` alias to an adwaita `tone`. */
 function variantToTone(variant: BannerVariant): BannerTone {
   return variant === 'destructive' ? 'error' : 'info'
 }
@@ -22,24 +17,22 @@ export interface BannerProps {
   title: string
   body?: string
   tone?: BannerTone
-  /** shadcn alias for `tone` (`default` → info, `destructive` → error). */
+
   variant?: BannerVariant
   actionLabel?: string
   onAction?: () => void
   onClose?: () => void
-  /** When true the action button drops below the title (Adwaita's narrow layout). */
+
   narrow?: boolean
   style?: Partial<StyleDesc>
 }
 
-/** Tinted colours + icon for a banner tone. */
 interface BannerToneTheme {
   bg: string
   fg: string
   icon: IconName
 }
 
-/** Resolve the tint, foreground and icon for a banner tone. */
 function resolveToneTheme(tone: BannerTone, colors: AdwaitaColors): BannerToneTheme {
   switch (tone) {
     case 'warning':
@@ -53,7 +46,6 @@ function resolveToneTheme(tone: BannerTone, colors: AdwaitaColors): BannerToneTh
   }
 }
 
-/** Title + optional body text, with the tone icon leading. */
 function BannerBody({ title, body, tone }: { title: string; body?: string; tone: BannerToneTheme }) {
   const t = useAdwaita()
   const { colors } = t
@@ -74,7 +66,6 @@ function BannerBody({ title, body, tone }: { title: string; body?: string; tone:
   )
 }
 
-/** 24×24 fully-round close button. */
 function BannerClose({ onClick }: { onClick: () => void }) {
   const t = useAdwaita()
   const { colors } = t
@@ -102,7 +93,6 @@ export interface BannerTitleProps {
   style?: Partial<StyleDesc>
 }
 
-/** A banner heading (thin compound export for shadcn-parity layouts). */
 export function BannerTitle({ children, style }: BannerTitleProps) {
   const t = useAdwaita()
   return (
@@ -117,7 +107,6 @@ export interface BannerDescriptionProps {
   style?: Partial<StyleDesc>
 }
 
-/** A banner body/description line (thin compound export). */
 export function BannerDescription({ children, style }: BannerDescriptionProps) {
   const t = useAdwaita()
   return (
@@ -127,7 +116,6 @@ export function BannerDescription({ children, style }: BannerDescriptionProps) {
   )
 }
 
-/** Tinted Adwaita banner strip with an optional action and close button. */
 export function Banner({
   title,
   body,
@@ -180,7 +168,6 @@ export function Banner({
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

@@ -16,23 +16,10 @@ export interface EntryProps {
   testId?: string
 }
 
-/**
- * Adwaita text entry: rounded border, placeholder, accent caret.
- * Mirrors the sibling `Input` prop shape (`type` / `disabled` / `invalid`)
- * so the two entry components stay interchangeable.
- *
- * - `type` is accepted for shadcn porting parity. **GPUix has no native
- *   input `type` attribute** (its `input` host only carries
- *   `value` / `placeholder` / `readOnly` / `theme`), so `type` documents
- *   intent and is not forwarded to the element — the field always renders
- *   plain text. Constraint-bounded, like the Spinner's static arc.
- * - `disabled` dims the entry (opacity 0.5) and skips `onChange`/`onSubmit`.
- * - `invalid` switches the border to the destructive colour.
- */
 export function Entry({ value, placeholder, type = 'text', disabled, invalid, onChange, onSubmit, autoFocus, style, testId }: EntryProps) {
-  // `type` is intentionally not forwarded: the GPUix `input` host element has
-  // no `type` attribute (see the doc comment above). The parameter is kept in
-  // the destructure so callers get a typed, documented surface.
+
+
+
   void type
   return (
     <AdwaitaInputBase
@@ -49,7 +36,6 @@ export function Entry({ value, placeholder, type = 'text', disabled, invalid, on
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { useAdwaita } from '../theme/adwaita'
 import { Row, T, Shot, ShotItem } from './common'

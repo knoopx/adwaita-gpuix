@@ -1,11 +1,3 @@
-/**
- * adwaita-gpuix — a libadwaita-styled component library for GPUix.
- *
- * Public entry. `import { AdwaitaProvider, Button, ... } from 'adwaita-gpuix'`
- * re-exports the theme system and every component in `./components`.
- */
-
-// ── Theme ────────────────────────────────────────────────────────────────
 export {
   AdwaitaProvider,
   useAdwaita,
@@ -35,13 +27,11 @@ export type {
   SemanticTokens,
 } from './theme/adwaita'
 
-// ── Text / icons ─────────────────────────────────────────────────────────
 export { T, SectionTitle, MenuIndicator, MenuShortcut } from './components/common'
 export type { TextProps, TextSize } from './components/common'
 export { Icon, ICONS } from './components/icons'
 export type { IconName, IconProps } from './components/icons'
 
-// ── Components ───────────────────────────────────────────────────────────
 export { Button } from './components/Button'
 export type { ButtonVariant, ButtonSize, ButtonProps } from './components/Button'
 export { HeaderBar } from './components/HeaderBar'
@@ -111,7 +101,6 @@ export type { ViewSwitcherProps, ViewSwitcherItem } from './components/ViewSwitc
 export { PreferencesPage, PreferencesGroup } from './components/PreferencesPage'
 export type { PreferencesPageProps, PreferencesGroupProps } from './components/PreferencesPage'
 
-// ── shadcn primitives (delegation 1) ─────────────────────────────────
 export { Badge } from './components/Badge'
 export type { BadgeVariant, BadgeProps } from './components/Badge'
 export { Label } from './components/Label'
@@ -305,7 +294,6 @@ export type {
   ResizablePanelGroupProps,
 } from './components/Resizable'
 
-// ── shadcn overlays & heavy components (delegation 2) ─────────────
 export { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogShowcase } from './components/Dialog'
 export type {
   DialogRootProps,
@@ -545,7 +533,6 @@ export type {
   ChartLegendProps,
 } from './components/Chart'
 
-// ── Additional components (delegation 3) ─────────────────────────────
 export {
   Combobox,
   ComboboxInput,

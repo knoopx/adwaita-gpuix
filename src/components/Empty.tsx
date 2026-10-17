@@ -8,7 +8,6 @@ export interface EmptyProps {
   style?: Partial<StyleDesc>
 }
 
-/** A centered empty-state column (icon area, title, description, action). */
 export function Empty({ children, style }: EmptyProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -36,7 +35,6 @@ export interface EmptyMediaProps {
   style?: Partial<StyleDesc>
 }
 
-/** The icon area of an empty state (~48px). */
 export function EmptyMedia({ children, style }: EmptyMediaProps) {
   return (
     <div
@@ -59,7 +57,6 @@ export interface EmptyTitleProps {
   style?: Partial<StyleDesc>
 }
 
-/** Title3 text for empty state headings. */
 export function EmptyTitle({ children, style }: EmptyTitleProps) {
   const t = useAdwaita()
   return (
@@ -74,7 +71,6 @@ export interface EmptyDescriptionProps {
   style?: Partial<StyleDesc>
 }
 
-/** Dim body text for empty state descriptions. */
 export function EmptyDescription({ children, style }: EmptyDescriptionProps) {
   const t = useAdwaita()
   return (
@@ -89,7 +85,6 @@ export interface EmptyContentProps {
   style?: Partial<StyleDesc>
 }
 
-/** Wrapper for additional content in an empty state. */
 export function EmptyContent({ children, style }: EmptyContentProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, ...style }}>
@@ -103,10 +98,6 @@ export interface EmptyHeaderProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * Groups an empty state's media + title + description in a centred,
- * fit-content column (shadcn `EmptyHeader`).
- */
 export function EmptyHeader({ children, style }: EmptyHeaderProps) {
   return (
     <div
@@ -129,21 +120,18 @@ export interface EmptyActionProps {
   style?: Partial<StyleDesc>
 }
 
-/** The action area (buttons) in an empty state. */
 export function EmptyAction({ children, style }: EmptyActionProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'row', gap: 8, ...style }}>{children}</div>
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { buildTheme } from '../theme/adwaita'
 import { Row, Shot } from './common'
 import { Button } from './Button'
 import { Icon } from './icons'
 
-/** A dim sparkles icon (the empty-state media). */
 function SparklesIcon() {
   return <Icon name="sparkles" size={24} color={buildTheme('dark', 'blue').colors.dim_fg} />
 }

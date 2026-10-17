@@ -19,10 +19,7 @@ import { T, listPanelStyle, textFieldStyle } from './common'
 import { Icon } from './icons'
 
 export interface ComboboxProps {
-  /**
-   * String backward-compat guard: string entries pass through, object
-   * entries use `.value` (the primitive expects `readonly string[]`).
-   */
+
   items?: readonly ComboboxItemEntry[]
   value?: ComboboxValueType
   defaultValue?: ComboboxValueType
@@ -39,14 +36,9 @@ export interface ComboboxProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * Adwaita-styled compound Combobox using the `@gpuix/react/combobox` headless
- * primitive. A searchable dropdown: a pill input + chevron trigger, with an
- * anchored list of items below.
- */
 export function Combobox({ items, style, ...props }: ComboboxProps) {
-  // String backward-compat guard: string entries pass through, object
-  // entries use .value (the primitive expects readonly string[]).
+
+
   const stringItems = items?.map((item) => (typeof item === 'string' ? item : item.value))
   return <ComboboxRootPrimitive {...props} items={stringItems} style={style} />
 }
@@ -61,20 +53,15 @@ export type ComboboxItemEntry = string | ComboboxItemObject
 export interface ComboboxInputProps {
   placeholder?: string
   disabled?: boolean
-  /** Show a 28x28 close-icon suffix when true and `value` is non-empty. */
+
   showClear?: boolean
-  /** The consumer-supplied value (drives clear-button visibility). */
+
   value?: string
-  /** Called when the clear icon is clicked. */
+
   onClear?: () => void
   style?: Partial<StyleDesc>
 }
 
-/**
- * A pill text field (view_bg, 1px border) that drives the combobox query,
- * with an optional 28x28 close-icon suffix shown when showClear and the
- * (consumer-supplied) value is non-empty.
- */
 export function ComboboxInput({ placeholder, disabled, showClear, value, onClear, style }: ComboboxInputProps) {
   const t = useAdwaita()
   const { radii, colors } = t
@@ -120,7 +107,6 @@ export interface ComboboxTriggerProps {
   style?: Partial<StyleDesc>
 }
 
-/** A pill toggle with a chevron that opens the list. */
 export function ComboboxTrigger({ disabled, style }: ComboboxTriggerProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -152,7 +138,6 @@ export interface ComboboxValueProps {
   children?: ReactNode
 }
 
-/** Shows the selected value (or a placeholder) inside a trigger. */
 export function ComboboxValue({ placeholder, children }: ComboboxValueProps) {
   const t = useAdwaita()
   const { colors, typography } = t
@@ -176,7 +161,6 @@ export interface ComboboxContentProps {
   style?: Partial<StyleDesc>
 }
 
-/** Anchored dropdown list: 1px border, card radius, shadow, scrollable. */
 export function ComboboxContent({ children, side, style }: ComboboxContentProps) {
   const t = useAdwaita()
   return (
@@ -191,7 +175,6 @@ export interface ComboboxListProps {
   style?: Partial<StyleDesc>
 }
 
-/** The list of filtered items inside the content. */
 export function ComboboxList({ children, style }: ComboboxListProps) {
   return (
     <ComboboxListPrimitive
@@ -205,13 +188,12 @@ export function ComboboxList({ children, style }: ComboboxListProps) {
 export interface ComboboxItemProps {
   value: string
   disabled?: boolean
-  /** Show a 12px success check after the label (same pattern CommandItem uses). */
+
   selected?: boolean
   children?: ReactNode
   style?: Partial<StyleDesc>
 }
 
-/** An option row: hover/highlighted = accentTint, selected = accentTint. */
 export function ComboboxItem({ value, disabled, selected, children, style }: ComboboxItemProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -243,7 +225,6 @@ export interface ComboboxEmptyProps {
   style?: Partial<StyleDesc>
 }
 
-/** A dim "no results" row shown when the list is empty. */
 export function ComboboxEmpty({ children = 'No results', style }: ComboboxEmptyProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -261,7 +242,6 @@ export interface ComboboxLabelProps {
   style?: Partial<StyleDesc>
 }
 
-/** A caption-dim label above a group. */
 export function ComboboxLabel({ children, style }: ComboboxLabelProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -279,7 +259,6 @@ export interface ComboboxGroupProps {
   style?: Partial<StyleDesc>
 }
 
-/** A group of combobox items. */
 export function ComboboxGroup({ children, style }: ComboboxGroupProps) {
   return (
     <ComboboxGroupPrimitive style={style}>
@@ -292,7 +271,6 @@ export interface ComboboxSeparatorProps {
   style?: Partial<StyleDesc>
 }
 
-/** A 1px separator between groups. */
 export function ComboboxSeparator({ style }: ComboboxSeparatorProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -316,10 +294,6 @@ export interface ComboboxChipsProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * GPUix-idiomatic multi-select chip row: flex-wrap pill chips (button_bg)
- * with a 16px close icon per chip + a trailing borderless query input.
- */
 export function ComboboxChips({ values, onRemove, inputValue, onInputChange, placeholder, style }: ComboboxChipsProps) {
   const t = useAdwaita()
   const { colors, radii, typography } = t
@@ -378,13 +352,11 @@ export function ComboboxChips({ values, onRemove, inputValue, onInputChange, pla
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, FloatingStage, Shot, ShotItem } from './common'
 
 const COMBO_ITEMS = ['low', 'medium', 'high']
 
-/** A closed combobox trigger in one of the shot's states (default / empty / disabled / clear). */
 function TriggerStateShot({ value, disabled, showClear }: { value?: string; disabled?: boolean; showClear?: boolean }) {
   return (
     <Combobox
@@ -410,7 +382,6 @@ function TriggerStateShot({ value, disabled, showClear }: { value?: string; disa
   )
 }
 
-/** An open combobox in a centered floating stage (item-states / empty shots). */
 function OpenComboboxStage({ height, value, inputValue, children }: { height: number; value: string; inputValue: string; children: ReactNode }) {
   return (
     <FloatingStage width={480} height={height}>

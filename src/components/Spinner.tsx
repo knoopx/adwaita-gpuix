@@ -4,25 +4,11 @@ import { T } from './common'
 
 export interface SpinnerProps {
   size?: 16 | 32 | 64
-  /** Render a visually-hidden "Loading" label for a11y (default true). */
+
   label?: boolean
   style?: Partial<StyleDesc>
 }
 
-/**
- * Adwaita spinner. GPUix `motion` only animates a fixed set of properties (no
- * rotation), so this is a **static 270° accent arc** — the documented
- * substitute for a spinning indicator.
- *
- * Rendered as an SVG data-URI `<img>` so it rasterises portably (a CSS
- * border-arc is not rasterised by the static takumi renderer, which made the
- * spinner invisible in PNGs).
- *
- * A visually-hidden sibling `T` "Loading" label is rendered for a11y parity
- * with the reference `role="status" aria-label="Loading"` (GPUix has no
- * `role`/`aria-label` host attributes, so a zero-size, zero-opacity text
- * node is the equivalent). Set `label={false}` to suppress it.
- */
 export function Spinner({ size = 32, label = true, style }: SpinnerProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -49,7 +35,6 @@ export function Spinner({ size = 32, label = true, style }: SpinnerProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

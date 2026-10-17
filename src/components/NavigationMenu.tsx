@@ -4,8 +4,6 @@ import { useAdwaita } from '../theme/adwaita'
 import { MenuBarShell, FloatingPanel, MenuRow } from './common'
 import { Icon } from './icons'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface NavigationMenuProps {
   children?: ReactNode
   style?: Partial<StyleDesc>
@@ -47,8 +45,6 @@ export interface NavigationMenuLinkProps {
   style?: Partial<StyleDesc>
 }
 
-/* ── Context ──────────────────────────────────────────────────────────── */
-
 interface NavigationMenuContextValue {
   open: string | null
   setOpen: (item: string | null) => void
@@ -56,17 +52,10 @@ interface NavigationMenuContextValue {
 
 const NavMenuCtx = createContext<NavigationMenuContextValue | null>(null)
 
-/** Read the NavigationMenu open-state context (null outside a NavigationMenu). */
 function useNavigationMenu(): NavigationMenuContextValue | null {
   return useContext(NavMenuCtx)
 }
 
-/* ── Components ───────────────────────────────────────────────────────── */
-
-/**
- * A NavigationMenu bar: provides the open-item context. The open item id
- * lives in the context; a Trigger toggles it and a Content gates on it.
- */
 export function NavigationMenu({ children, style }: NavigationMenuProps) {
   const [open, setOpen] = useState<string | null>(null)
   return (
@@ -76,7 +65,6 @@ export function NavigationMenu({ children, style }: NavigationMenuProps) {
   )
 }
 
-/** A horizontal row of menu items (the bar's content). */
 export function NavigationMenuList({ children, style }: NavigationMenuListProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4, ...style }}>
@@ -85,7 +73,6 @@ export function NavigationMenuList({ children, style }: NavigationMenuListProps)
   )
 }
 
-/** A 12px-wide 3px accent underline shown beneath the open item. */
 export function NavigationMenuIndicator({ style }: NavigationMenuIndicatorProps) {
   const t = useAdwaita()
   return (
@@ -101,7 +88,6 @@ export function NavigationMenuIndicator({ style }: NavigationMenuIndicatorProps)
   )
 }
 
-/** A menu item slot: an optional `item` id gates the open underline. */
 export function NavigationMenuItem({ children, item, style }: NavigationMenuItemProps) {
   const ctx = useNavigationMenu()
   return (
@@ -120,7 +106,6 @@ export function NavigationMenuItem({ children, item, style }: NavigationMenuItem
   )
 }
 
-/** A hoverable pill trigger (+ chevron) that toggles its `item`'s open state. */
 export function NavigationMenuTrigger({ children, item, style }: NavigationMenuTriggerProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -151,7 +136,6 @@ export function NavigationMenuTrigger({ children, item, style }: NavigationMenuT
   )
 }
 
-/** An anchored popdown, gated: renders only when its `item` is the open one. */
 export function NavigationMenuContent({ children, item, side = 'bottom', sideOffset = 4, style }: NavigationMenuContentProps) {
   const ctx = useNavigationMenu()
   if (item !== undefined && ctx?.open !== item) return null
@@ -162,7 +146,6 @@ export function NavigationMenuContent({ children, item, side = 'bottom', sideOff
   )
 }
 
-/** A flat menu link; `active` tints the row + label with the accent. */
 export function NavigationMenuLink({ label, onClick, active, style }: NavigationMenuLinkProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -180,7 +163,6 @@ export function NavigationMenuLink({ label, onClick, active, style }: Navigation
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { T, Row, FloatingStage, Shot, ShotItem } from './common'
 

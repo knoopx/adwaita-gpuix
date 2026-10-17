@@ -10,13 +10,7 @@ export interface SheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   side?: SheetSide
-  /**
-   * Contain the open panel (and scrim) to a positioned ancestor instead of
-   * the viewport: switches `position: fixed` to `position: absolute`. Used by
-   * static renders (takumi PNGs) that place the sheet inside a bounded
-   * `position: relative` stage. Default false keeps real GPUix viewport
-   * behaviour.
-   */
+
   contained?: boolean
   children?: ReactNode
   style?: Partial<StyleDesc>
@@ -24,7 +18,7 @@ export interface SheetProps {
 
 export interface SheetContentProps {
   children?: ReactNode
-  /** Render the auto close button in the top-right corner (default true). */
+
   showCloseButton?: boolean
   style?: Partial<StyleDesc>
 }
@@ -59,8 +53,6 @@ export interface SheetCloseProps {
   style?: Partial<StyleDesc>
 }
 
-/* ── Context ─────────────────────────────────────────────────────────── */
-
 interface SheetContextValue {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -76,8 +68,6 @@ function useSheet(): SheetContextValue {
   return ctx
 }
 
-/* ── Sheet: slimmer side panel (fixed width ~320) ─────────────────────── */
-
 export function Sheet({ open, onOpenChange, side = 'right', contained = false, children, style }: SheetProps) {
   const t = useAdwaita()
   const ctxValue: SheetContextValue = { open, onOpenChange, contained, side }
@@ -89,10 +79,6 @@ export function Sheet({ open, onOpenChange, side = 'right', contained = false, c
   )
 }
 
-/**
- * The sheet shell (scrim + edge-attached panel), extracted from the root so
- * the context provider stays mounted while the sheet is closed.
- */
 function renderSheetShell(
   onOpenChange: (open: boolean) => void,
   contained: boolean,
@@ -101,8 +87,8 @@ function renderSheetShell(
   style: Partial<StyleDesc> | undefined,
   colors: { border: string },
 ): ReactNode {
-  // contained → the panel is anchored to a positioned ancestor (static renders);
-  // otherwise it floats over the whole viewport (real GPUix).
+
+
   const pos = contained ? 'absolute' : 'fixed'
 
   let panelStyle: Partial<StyleDesc>
@@ -148,7 +134,6 @@ function renderSheetShell(
 
   return (
     <OverlayShell position={pos} onDismiss={() => onOpenChange(false)} style={style}>
-      {/* Panel */}
       <OverlayPanel position={pos} panelStyle={panelStyle}>
         {children}
       </OverlayPanel>
@@ -156,13 +141,6 @@ function renderSheetShell(
   )
 }
 
-/* ── Sub-components ───────────────────────────────────────────────────── */
-
-/**
- * Opens the sheet on click (div onClick -> onOpenChange(true)), the same
- * idiom as DialogTrigger. Requires the sheet root context, so it must sit
- * inside <Sheet>.
- */
 export function SheetTrigger({ children, style }: SheetTriggerProps) {
   const { onOpenChange } = useSheet()
   return (
@@ -224,7 +202,6 @@ export function SheetTitle({ children, style }: SheetTitleProps) {
   )
 }
 
-/** A dim body-text description under the sheet title. */
 export function SheetDescription({ children, style }: SheetDescriptionProps) {
   const t = useAdwaita()
   return (
@@ -234,10 +211,6 @@ export function SheetDescription({ children, style }: SheetDescriptionProps) {
   )
 }
 
-/**
- * A bottom-anchored footer: a flexGrow:1 spacer pushes the column of
- * actions (gap 8, padding 16) to the panel's bottom edge.
- */
 export function SheetFooter({ children, style }: SheetFooterProps) {
   return <OverlayFooter children={children} style={style} />
 }
@@ -251,11 +224,8 @@ export function SheetClose({ children, style }: SheetCloseProps) {
   )
 }
 
-/* ── Showcase ─────────────────────────────────────────────────────────── */
-
 const noop = () => {}
 
-/** The shared open-sheet body: header (title + close), content, footer. */
 function SheetBody({ title }: { title: string }) {
   return (
     <SheetContent>
@@ -271,9 +241,6 @@ function SheetBody({ title }: { title: string }) {
   )
 }
 
-/** Full Sheet shot for static renders / playground: closed (renders
- *  nothing) + all four `side` variants + the showCloseButton=false
- *  custom-close variant, each contained in a bounded stage. */
 export function SheetShowcase(): ReactNode {
   return (
     <Shot>
@@ -333,7 +300,6 @@ export function SheetShowcase(): ReactNode {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Shot, ShotItem } from './common'
 

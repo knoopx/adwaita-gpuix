@@ -7,19 +7,11 @@ import { Textarea } from './Textarea'
 
 export interface InputGroupProps {
   children: ReactNode
-  /**
-   * Layout axis. `'row'` (default) lays the children in a horizontal row.
-   * `'block-start'` / `'block-end'` switch to a column; GPUix has no CSS
-   * `order`, so which side the addon sits on is expressed by the caller's
-   * child ordering (block-start = addon first, block-end = addon last).
-   */
+
   align?: 'row' | 'block-start' | 'block-end'
   style?: Partial<StyleDesc>
 }
 
-/**
- * Pill container wrapping an Input + addon(s). 1px border, view_bg background.
- */
 export function InputGroup({ children, align = 'row', style }: InputGroupProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -50,7 +42,6 @@ export interface InputGroupInputProps {
   style?: Partial<StyleDesc>
 }
 
-/** An input inside an InputGroup (no own border/radius, grows to fill). */
 export function InputGroupInput({ value, onChange, placeholder, type, style }: InputGroupInputProps) {
   return (
     <Input
@@ -73,7 +64,6 @@ export interface InputGroupAddonProps {
   style?: Partial<StyleDesc>
 }
 
-/** A dim text slot (padding 8) inside an InputGroup. */
 function InputGroupTextSlot({ children, style }: InputGroupTextProps) {
   const t = useAdwaita()
   return (
@@ -92,7 +82,6 @@ function InputGroupTextSlot({ children, style }: InputGroupTextProps) {
   )
 }
 
-/** A dim addon (prefix/suffix) inside an InputGroup. */
 export function InputGroupAddon({ children, style }: InputGroupAddonProps) {
   return <InputGroupTextSlot children={children} style={style} />
 }
@@ -103,10 +92,6 @@ export interface InputGroupButtonProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A 28×28 flat icon button addon inside an InputGroup (GPUix has no `<button>`,
- * so this is a `div onClick` with a hover wash).
- */
 export function InputGroupButton({ onClick, children, style }: InputGroupButtonProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -136,7 +121,6 @@ export interface InputGroupTextProps {
   style?: Partial<StyleDesc>
 }
 
-/** A dim text slot (padding 8) inside an InputGroup. */
 export function InputGroupText({ children, style }: InputGroupTextProps) {
   return <InputGroupTextSlot children={children} style={style} />
 }
@@ -149,7 +133,6 @@ export interface InputGroupTextareaProps {
   style?: Partial<StyleDesc>
 }
 
-/** A borderless Textarea inside an InputGroup (grows to fill, no radius). */
 export function InputGroupTextarea({ value, onChange, placeholder, rows, style }: InputGroupTextareaProps) {
   return (
     <Textarea
@@ -167,12 +150,10 @@ export function InputGroupTextarea({ value, onChange, placeholder, rows, style }
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 import { Icon } from './icons'
 
-/** A dim 14px icon for the button-addon examples (theme colour needs a hook). */
 function AddonIcon({ name }: { name: 'search' | 'plus' }) {
   const t = useAdwaita()
   return <Icon name={name} size={14} color={t.colors.dim_fg} />

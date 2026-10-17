@@ -10,7 +10,7 @@ export interface ToggleProps {
   pressed: boolean
   onPressed: () => void
   variant?: ToggleVariant
-  /** `sm` = 28, `default` = 32, `lg` = 40 (minHeight). */
+
   size?: ToggleSize
   children: ReactNode
   style?: Partial<StyleDesc>
@@ -18,18 +18,14 @@ export interface ToggleProps {
 
 const TOGGLE_MIN_HEIGHT: Record<ToggleSize, number> = { sm: 28, default: 32, lg: 40 }
 
-/**
- * A single toggle button (like a small Button). When pressed = accentTint bg + accent text.
- * Complements the existing ToggleGroup.
- */
 export function Toggle({ pressed, onPressed, variant = 'default', size = 'default', children, style }: ToggleProps) {
   const t = useAdwaita()
   const { colors, radii } = t
 
   const isOutline = variant === 'outline'
-  // A default-variant toggle is a raised button: visible in both states
-  // (unpressed = button_bg, pressed = accentTint) with a 1px border. The
-  // outline variant stays flat (transparent) until pressed.
+
+
+
   const bg = pressed ? colors.accentTint : isOutline ? 'transparent' : colors.button_bg
   const fg = pressed ? colors.accent : colors.fg
   const border = colors.border
@@ -66,7 +62,6 @@ export function Toggle({ pressed, onPressed, variant = 'default', size = 'defaul
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

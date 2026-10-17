@@ -8,42 +8,21 @@ export interface SliderProps {
   max?: number
   step?: number
   onValueChange?: (value: number | number[]) => void
-  /** Uncontrolled mode: when `value` is undefined, the slider starts here. */
+
   defaultValue?: number | number[]
   orientation?: 'horizontal' | 'vertical'
   disabled?: boolean
-  /** Track length for the horizontal orientation (default 200). */
+
   width?: number
-  /** Track length for the vertical orientation (default 200). */
+
   height?: number
   style?: Partial<StyleDesc>
 }
 
-/** The short (cross) dimension of the track container, in px. */
 const CROSS = 20
-/** Thumb diameter, in px. */
+
 const THUMB = 18
 
-/**
- * A slider with a track, filled portion, and thumb(s).
- *
- * Drag is **relative**: on `onMouseDown` the pointer coordinate and the
- * grabbed thumb's value are captured; on move, `delta = (coord - start) /
- * track * (max - min)` is added to the start value (snapped + clamped). This
- * is correct in any layout (the old absolute-coordinate math broke anywhere
- * the slider was not at x=0).
- *
- * All mouse handlers live on the **container** only. The track line, fill,
- * and thumbs are each `position: 'absolute'` + filled, so each would block
- * hits behind it by default and swallow `mousedown`/`mousemove`/`mouseUp`
- * (the drag only worked when the pointer was over the container's bare area).
- * Marking all of them `pointerEvents: 'none'` makes the container the sole
- * hit target in the slider box, so it receives the whole gesture — grabbing a
- * thumb and dragging works identically to dragging the track.
- *
- * `orientation` swaps the axes (vertical uses `row-resize`). `defaultValue`
- * gives an uncontrolled mode. Arrow keys step the value on the focused track.
- */
 export function Slider({
   value,
   min = 0,
@@ -62,7 +41,7 @@ export function Slider({
   const vertical = orientation === 'vertical'
   const trackSize = vertical ? height : width
 
-  // ── controlled / uncontrolled duality ──────────────────────────────
+
   const [internal, setInternal] = useState<number | number[]>(defaultValue ?? value ?? min)
   const current = value ?? internal
   const isMulti = Array.isArray(current)
@@ -76,7 +55,7 @@ export function Slider({
     onValueChange?.(next)
   }
 
-  // ── relative drag state ────────────────────────────────────────────
+
   interface DragState {
     startCoord: number
     startValue: number
@@ -114,7 +93,7 @@ export function Slider({
 
   const endDrag = () => setDrag(null)
 
-  // ── keyboard stepping ──────────────────────────────────────────────
+
   const onKeyDown = (event: EventPayload) => {
     if (disabled) return
     const dir =
@@ -132,7 +111,7 @@ export function Slider({
     }
   }
 
-  // ── geometry ───────────────────────────────────────────────────────
+
   const pct = (v: number) => ((v - min) / (max - min)) * trackSize
   const fillPct = Math.round(pct(values[values.length - 1]))
 
@@ -147,10 +126,10 @@ export function Slider({
     ...style,
   }
 
-  // The track line, fill, and thumbs are all positioned + filled, so each
-  // blocks hits behind it by default. Mark them all pointerEvents:'none' so
-  // every mouse event in the container falls through to the container itself
-  // (the only hit target that owns the drag handlers).
+
+
+
+
   const trackLineStyle: Partial<StyleDesc> = vertical
     ? { position: 'absolute', left: 8, top: 0, width: 4, height: trackSize, borderRadius: 2, backgroundColor: colors.button_active, pointerEvents: 'none' }
     : { position: 'absolute', top: 8, left: 0, width: trackSize, height: 4, borderRadius: 2, backgroundColor: colors.button_active, pointerEvents: 'none' }
@@ -173,8 +152,8 @@ export function Slider({
       borderWidth: 2,
       borderColor: '#ffffff',
       boxShadow: { offsetX: 0, offsetY: 1, blurRadius: 2, spreadRadius: 0, color: 'rgba(0,0,0,0.2)' },
-      // Never the hit target: let mousedown/mousemove/mouseup fall through to
-      // the container so the drag works when the pointer is over a thumb.
+
+
       pointerEvents: 'none',
     }
     return vertical ? { ...base, left: 1, top: p - THUMB / 2 } : { ...base, top: 1, left: p - THUMB / 2 }
@@ -198,7 +177,6 @@ export function Slider({
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

@@ -4,8 +4,6 @@ import { useAdwaita } from '../theme/adwaita'
 import { FloatingPanel, MenuRow, MenuIndicator, MenuShortcut, MenuLabel, MenuSeparator, MenuGroup, MenuRadioGroupShell, MenuSub, MenuSubTrigger, MenuSubContent, makeMenuRadioItem } from './common'
 import { type IconName } from './icons'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface ContextMenuProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -88,8 +86,6 @@ export interface ContextMenuSubContentProps {
   style?: Partial<StyleDesc>
 }
 
-/* ── Context ──────────────────────────────────────────────────────────── */
-
 interface ContextMenuContext {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -102,8 +98,6 @@ function useContextMenu(): ContextMenuContext {
   if (!ctx) throw new Error('ContextMenu components must be used within <ContextMenu>')
   return ctx
 }
-
-/* ── Components ───────────────────────────────────────────────────────── */
 
 export function ContextMenu({ open, onOpenChange, children }: ContextMenuProps) {
   return <CtxMenuCtx.Provider value={{ open, onOpenChange }}>{children}</CtxMenuCtx.Provider>
@@ -152,27 +146,22 @@ export function ContextMenuItem({ label, icon, onClick, disabled, style }: Conte
   )
 }
 
-/** A column of context-menu entries. */
 export function ContextMenuGroup({ children, style }: ContextMenuGroupProps) {
   return <MenuGroup style={style}>{children}</MenuGroup>
 }
 
-/** A caption-dim label above a menu group. */
 export function ContextMenuLabel({ children, style }: ContextMenuLabelProps) {
   return <MenuLabel style={style}>{children}</MenuLabel>
 }
 
-/** A 1px horizontal separator between menu groups. */
 export function ContextMenuSeparator({ style }: ContextMenuSeparatorProps) {
   return <MenuSeparator style={style} />
 }
 
-/** A trailing keyboard-shortcut hint for a menu row. */
 export function ContextMenuShortcut({ children, style }: ContextMenuShortcutProps) {
   return <MenuShortcut style={style}>{children}</MenuShortcut>
 }
 
-/** A toggleable menu row with a 16×16 checkbox indicator. */
 export function ContextMenuCheckboxItem({ label, checked, onCheckedChange, style }: ContextMenuCheckboxItemProps) {
   const { onOpenChange } = useContextMenu()
   return (
@@ -188,52 +177,32 @@ export function ContextMenuCheckboxItem({ label, checked, onCheckedChange, style
   )
 }
 
-/* ── Radio group ──────────────────────────────────────────────────────── */
-
-/**
- * A group of radio items sharing one selection. Controlled via `value` +
- * `onValueChange`, uncontrolled via `defaultValue`; items without an
- * explicit `selected` derive it from the group's current value.
- */
 export function ContextMenuRadioGroup({ value, defaultValue, onValueChange, children, style }: ContextMenuRadioGroupProps) {
   return <MenuRadioGroupShell value={value} defaultValue={defaultValue} onValueChange={onValueChange} children={children} style={style} />
 }
 
 const ContextMenuRadioItemBase = makeMenuRadioItem(useContextMenu)
 
-/** A radio menu row; selection comes from its ContextMenuRadioGroup when no explicit `selected` is given. */
 export function ContextMenuRadioItem(props: ContextMenuRadioItemProps) {
   return <ContextMenuRadioItemBase {...props} />
 }
 
-/* ── Sub-menu ─────────────────────────────────────────────────────────── */
-
-/**
- * A nested sub-menu: a positioned column wrapper that owns the open/close
- * state of its trigger + content (GPUix has no DOM sub-menu portal; the
- * anchored panel is the idiom).
- */
 export function ContextMenuSub({ children, style }: ContextMenuSubProps) {
   return <MenuSub style={style}>{children}</MenuSub>
 }
 
-/** The row that toggles a sub-menu open/closed, with a chevron trailing. */
 export function ContextMenuSubTrigger({ label, icon, style }: ContextMenuSubTriggerProps) {
   return <MenuSubTrigger label={label} icon={icon} style={style} />
 }
 
-/** The anchored panel of a sub-menu, shown only while the sub is open. */
 export function ContextMenuSubContent({ children, style }: ContextMenuSubContentProps) {
   return <MenuSubContent style={style}>{children}</MenuSubContent>
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { T, Row, FloatingStage, Shot, ShotItem } from './common'
 import { buildTheme } from '../theme/adwaita'
 
-/** The full open context menu: every row kind the API exposes
- *  (label, items, disabled, checkbox checked/unchecked, radio group, sub-trigger). */
 function CtxMenuFull() {
   return (
     <ContextMenu open={true} onOpenChange={() => {}}>

@@ -3,12 +3,11 @@ import type { ReactNode } from 'react'
 import type { StyleDesc, EventPayload } from '@gpuix/react'
 import { useAdwaita } from '../theme/adwaita'
 
-/** Fallback pane size (px) when a panel has no `defaultSize`. */
 const DEFAULT_SIZE = 300
-/** Fallback min/max pane size (px) when a panel specifies none. */
+
 const DEFAULT_MIN = 100
 const DEFAULT_MAX = 600
-/** Handle thickness (px). */
+
 const HANDLE = 6
 
 interface PanelConfig {
@@ -19,9 +18,9 @@ interface PanelConfig {
 
 interface ResizableGroupContextValue {
   orientation: 'horizontal' | 'vertical'
-  /** Per-panel sizes (px), in registration order. */
+
   sizes: number[]
-  /** Number of registered panels (the last one is flexible). */
+
   panelCount: number
   registerPanel: (cfg: PanelConfig) => number
   unregisterPanel: (index: number) => void
@@ -52,22 +51,6 @@ export interface ResizablePanelGroupProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A group of resizable panes separated by draggable handles (the
- * react-resizable-panels shape: group + panels + handles).
- *
- * Panels register with the group in child order (React context); the group
- * owns the per-panel sizes in state. A `ResizableHandle`'s `onMouseDown`
- * starts a **relative** drag (the Slider pattern): the pointer's starting
- * coordinate and the pane's current size are captured, and on move
- * `size = clamp(startSize + (coord - startCoord), min, max)` — correct in
- * any layout (the old absolute-coordinate math only worked at x=0 of the
- * event space).
- *
- * `orientation: 'vertical'` lays the panes out in a column, clamps on
- * `event.y`, and uses a `row-resize` cursor. The last panel is flexible
- * (`flexGrow: 1`); the others use their state size.
- */
 export function ResizablePanelGroup({ orientation = 'horizontal', children, style }: ResizablePanelGroupProps) {
   const vertical = orientation === 'vertical'
   const [sizes, setSizes] = useState<number[]>([])
@@ -111,7 +94,7 @@ export function ResizablePanelGroup({ orientation = 'horizontal', children, styl
 
   const handleMouseMove = (event: EventPayload) => {
     if (!drag) return
-    // Relative drag: delta from the pointer's start position (Slider pattern).
+
     const coord = vertical ? (event.y ?? drag.startCoord) : (event.x ?? drag.startCoord)
     const next = Math.max(drag.min, Math.min(drag.max, drag.startSize + (coord - drag.startCoord)))
     setPanelSize(drag.index, next)
@@ -148,22 +131,17 @@ export function ResizablePanelGroup({ orientation = 'horizontal', children, styl
 
 export interface ResizablePanelProps {
   children?: ReactNode
-  /** Minimum size of this pane in px (default 100). */
+
   min?: number
-  /** Maximum size of this pane in px (default 600). */
+
   max?: number
-  /** Initial size of this pane in px (default 300). */
+
   defaultSize?: number
-  /** Kept for compatibility — position is determined by child order in the group. */
+
   side?: 'left' | 'right'
   style?: Partial<StyleDesc>
 }
 
-/**
- * A pane inside a `ResizablePanelGroup`. Registers itself (with its
- * min/max/defaultSize) and renders its state size; the group's last panel
- * is flexible (`flexGrow: 1`) so the group always fills its container.
- */
 export function ResizablePanel({ children, min, max, defaultSize, side, style }: ResizablePanelProps) {
   void side
   const ctx = useResizableGroup()
@@ -176,7 +154,7 @@ export function ResizablePanel({ children, min, max, defaultSize, side, style }:
     const index = ctx.registerPanel(cfgRef.current)
     indexRef.current = index
     return () => ctx.unregisterPanel(index)
-    // register once on mount; the ctx functions are ref-backed and stable
+
   }, [])
 
   const index = indexRef.current
@@ -193,15 +171,11 @@ export function ResizablePanel({ children, min, max, defaultSize, side, style }:
 }
 
 export interface ResizableHandleProps {
-  /** The index of the pane this handle resizes (the pane to its left/above). Default 0. */
+
   panel?: number
   style?: Partial<StyleDesc>
 }
 
-/**
- * The draggable handle between panes. Its `onMouseDown` starts the
- * relative drag; the group container tracks `onMouseMove`/`onMouseUp`.
- */
 export function ResizableHandle({ panel = 0, style }: ResizableHandleProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -229,20 +203,10 @@ export function ResizableHandle({ panel = 0, style }: ResizableHandleProps) {
 export interface ResizableProps {
   children: ReactNode
   style?: Partial<StyleDesc>
-  /** Initial left pane width in px. */
+
   initialLeftWidth?: number
 }
 
-/**
- * Two horizontal panes with a draggable vertical handle (legacy export,
- * kept for compatibility — now a `ResizablePanelGroup` composition).
- * `children` is the left pane; the right pane is a flexible empty pane.
- *
- * The drag is **relative**: on `onMouseDown` the pointer's starting
- * position and the pane's current width are captured; on move,
- * `width = clamp(startWidth + (event.x - startX))` — correct in any
- * layout (the old absolute-coordinate math only worked at x=0).
- */
 export function Resizable({ children, style, initialLeftWidth = 300 }: ResizableProps) {
   return (
     <ResizablePanelGroup style={style}>
@@ -253,11 +217,9 @@ export function Resizable({ children, style, initialLeftWidth = 300 }: Resizable
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, T, Shot, ShotItem } from './common'
 
-/** A tinted pane body (theme colour needs a hook, so it is a component). */
 function Pane({ label, height = 64 }: { label: string; height?: number }) {
   const t = useAdwaita()
   return (

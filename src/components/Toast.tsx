@@ -6,7 +6,6 @@ import { Icon, type IconName } from './icons'
 
 export type ToastType = 'default' | 'success' | 'info' | 'warning' | 'error' | 'loading'
 
-/** Leading icon per toast `type` (`default` renders no icon). */
 const TOAST_TYPE_ICONS: Record<Exclude<ToastType, 'default'>, IconName> = {
   success: 'success',
   info: 'info',
@@ -19,20 +18,13 @@ export interface ToastProps {
   message: string
   actionLabel?: string
   onAction?: () => void
-  /** Toast kind: leading 14px icon (`success`/`info`/`warning`/`error`/`loading`). */
+
   type?: ToastType
-  /** Per-toast close: shows a 16×16 `close` icon button at the pill end. */
+
   onDismiss?: () => void
   style?: Partial<StyleDesc>
 }
 
-/**
- * Adwaita toast: a dark pill that floats at the bottom of the window.
- *
- * `type` adds a leading 14px icon (success/info/warning/error/loading);
- * `onDismiss` adds a 16×16 close icon at the pill end (the Toaster wires it
- * to `dismiss(id)`); `message` / `actionLabel` / `onAction` are unchanged.
- */
 export function Toast({ message, actionLabel, onAction, type = 'default', onDismiss, style }: ToastProps) {
   const t = useAdwaita()
   const typeIcon = type === 'default' ? null : TOAST_TYPE_ICONS[type]
@@ -77,7 +69,6 @@ export function Toast({ message, actionLabel, onAction, type = 'default', onDism
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

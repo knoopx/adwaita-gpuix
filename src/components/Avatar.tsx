@@ -10,17 +10,12 @@ export interface AvatarProps {
   style?: Partial<StyleDesc>
 }
 
-/** Up to two initials from the first words of a name. */
 function initials(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean)
   const letters = words.slice(0, 2).map((w) => w[0])
   return letters.join('').toUpperCase() || '?'
 }
 
-/**
- * Circular avatar: a photo when `src` is given, otherwise an accent-tinted
- * disc with the name's initials.
- */
 export function Avatar({ name, size = 32, src, style }: AvatarProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -65,27 +60,15 @@ export function Avatar({ name, size = 32, src, style }: AvatarProps) {
 }
 
 export interface AvatarBadgeProps {
-  /** Optional content (e.g. a 4×4 coloured dot); defaults to a solid disc. */
+
   children?: ReactNode
-  /** Diameter in px (default 12). */
+
   size?: number
-  /** Disc colour (defaults to the theme accent). */
+
   color?: string
   style?: Partial<StyleDesc>
 }
 
-/**
- * A presence/indicator badge for an avatar: a small disc anchored to the
- * bottom-right corner with a 2px `view_bg` ring. Place it inside a
- * `position: 'relative'` wrapper around an `Avatar`:
- *
- * ```
- * <div style={{ position: 'relative' }}>
- *   <Avatar name="Ada" size={40} />
- *   <AvatarBadge />
- * </div>
- * ```
- */
 export function AvatarBadge({ children, size = 12, color, style }: AvatarBadgeProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -114,18 +97,13 @@ export function AvatarBadge({ children, size = 12, color, style }: AvatarBadgePr
 
 export interface AvatarGroupProps {
   children: ReactNode
-  /** Reference avatar size in px (children set their own; this sizes the group height). */
+
   size?: number
-  /** Overlap in px between stacked children (default 8). */
+
   overlap?: number
   style?: Partial<StyleDesc>
 }
 
-/**
- * An overlapping stack of avatars: a flex row where each child is wrapped
- * `position: relative` + `flexShrink: 0` and pulled left by `overlap` (via
- * negative `marginRight`), so the discs stack.
- */
 export function AvatarGroup({ children, size = 32, overlap = 8, style }: AvatarGroupProps) {
   const kids = Children.toArray(children)
   return (
@@ -155,17 +133,13 @@ export function AvatarGroup({ children, size = 32, overlap = 8, style }: AvatarG
 }
 
 export interface AvatarGroupCountProps {
-  /** The number to show (rendered as `+N`). */
+
   count: number
-  /** Disc diameter in px (default 32). */
+
   size?: number
   style?: Partial<StyleDesc>
 }
 
-/**
- * The "+N" disc at the end of an `AvatarGroup`: a `button_bg` disc with a
- * centred caption.
- */
 export function AvatarGroupCount({ count, size = 32, style }: AvatarGroupCountProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -192,7 +166,6 @@ export function AvatarGroupCount({ count, size = 32, style }: AvatarGroupCountPr
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import { AVATAR_IMG, type ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

@@ -11,11 +11,6 @@ export interface BadgeProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * Adwaita pill badge. Variants map to theme colours:
- * default=accent, secondary=button_bg, destructive=destructive,
- * success=success, warning=warning, outline=transparent+border.
- */
 export function Badge({ variant = 'default', children, style }: BadgeProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -76,7 +71,6 @@ export function Badge({ variant = 'default', children, style }: BadgeProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

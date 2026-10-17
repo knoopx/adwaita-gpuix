@@ -4,8 +4,6 @@ import { useAdwaita, hexToRgba, isDarkScheme } from '../theme/adwaita'
 import { T } from './common'
 import { Icon, type IconName } from './icons'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface TabItem {
   id: string
   label: string
@@ -14,51 +12,38 @@ export interface TabItem {
 }
 
 export interface TabsProps {
-  /** Data-driven tab strip (adwaita native). Omit to use the compound API. */
+
   items?: TabItem[]
-  /** Controlled active tab id. */
+
   value?: string
-  /** Uncontrolled starting tab id (used when `value` is undefined). */
+
   defaultValue?: string
-  /** Called when a tab is selected (data-driven `items` + compound triggers). */
+
   onSelect?: (id: string) => void
-  /** Called when a closable tab's close button is pressed. */
+
   onClose?: (id: string) => void
-  /** `horizontal` (default): row strip, 3px accent underline on the bottom edge.
-   * `vertical`: column strip, 3px accent indicator on the right edge. */
+
   orientation?: 'horizontal' | 'vertical'
-  /** Compound children (TabsList / TabsTrigger / TabsContent). */
+
   children?: ReactNode
   style?: Partial<StyleDesc>
 }
 
-/* ── Context ──────────────────────────────────────────────────────────── */
-
 export interface TabsCtxValue {
-  /** The active tab id. */
+
   value: string
-  /** Select a tab by id. */
+
   setValue: (value: string) => void
   orientation: 'horizontal' | 'vertical'
   onClose?: (id: string) => void
 }
 
-/**
- * The context shared by `Tabs` / `TabsList` / `TabsTrigger` / `TabsContent`.
- * The `Tabs` root provides it; `TabsTrigger` calls `setValue` on click;
- * `TabsContent` reads `value` to decide what to render.
- */
 export const TabsCtx = createContext<TabsCtxValue | null>(null)
 
-/** Read the surrounding Tabs context (null outside a `Tabs` root). */
 export function useTabs(): TabsCtxValue | null {
   return useContext(TabsCtx)
 }
 
-/* ── Data-driven tab ──────────────────────────────────────────────────── */
-
-/** A single data-driven tab: icon + label, optional close button, and the
- *  3px accent indicator (bottom bar horizontal, right bar vertical). */
 function Tab({
   item,
   selected,
@@ -115,9 +100,6 @@ function Tab({
   )
 }
 
-/* ── Compound pieces ──────────────────────────────────────────────────── */
-
-/** The 3px accent indicator bar under a horizontal tab. */
 function TabIndicator({ selected }: { selected: boolean }) {
   const t = useAdwaita()
   const { colors } = t
@@ -132,8 +114,6 @@ function TabIndicator({ selected }: { selected: boolean }) {
   )
 }
 
-/** The shared tab container: an orientation-aware flex shell with the hover
- *  wash, the vertical right-edge indicator, and the horizontal bottom bar. */
 function TabShell({
   vertical,
   selected,
@@ -177,11 +157,6 @@ export interface TabsListProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * The strip container: a row (horizontal) or column (vertical) of tabs with
- * a 1px edge border (bottom in horizontal, right in vertical) that the 3px
- * accent indicator sits on.
- */
 export function TabsList({ children, style }: TabsListProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -204,17 +179,12 @@ export function TabsList({ children, style }: TabsListProps) {
 }
 
 export interface TabsTriggerProps {
-  /** The tab id this trigger selects. */
+
   value: string
   children?: ReactNode
   style?: Partial<StyleDesc>
 }
 
-/**
- * A single compound tab: a label that selects its `value` on click. The 3px
- * accent indicator sits on the bottom edge (horizontal) or the right edge
- * (vertical) when selected.
- */
 export function TabsTrigger({ value, children, style }: TabsTriggerProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -243,16 +213,12 @@ export function TabsTrigger({ value, children, style }: TabsTriggerProps) {
 }
 
 export interface TabsContentProps {
-  /** The tab id this panel belongs to. */
+
   value: string
   children?: ReactNode
   style?: Partial<StyleDesc>
 }
 
-/**
- * The content panel for a tab `value`: renders its children only while that
- * tab is the active one (read from the surrounding Tabs context).
- */
 export function TabsContent({ value, children, style }: TabsContentProps) {
   const ctx = useTabs()
   const active = ctx?.value === value
@@ -270,19 +236,6 @@ export function TabsContent({ value, children, style }: TabsContentProps) {
   )
 }
 
-/* ── Root ─────────────────────────────────────────────────────────────── */
-
-/**
- * Adwaita tab strip with a dual API:
- * - **Data-driven**: pass `items` (icon + label + closable tabs) with
- *   `value` / `onSelect` / `onClose` — the adwaita-native strip.
- * - **Compound**: pass `TabsList` / `TabsTrigger` / `TabsContent` children —
- *   the shadcn-style decomposition (context-backed, `orientation` aware).
- *
- * Both can coexist. `orientation='vertical'` turns the strip into a column
- * with the 3px accent indicator on the right edge. `defaultValue` gives an
- * uncontrolled mode when `value` is omitted.
- */
 export function Tabs({
   items,
   value,
@@ -293,7 +246,7 @@ export function Tabs({
   children,
   style,
 }: TabsProps) {
-  // ── controlled / uncontrolled duality ──────────────────────────────
+
   const [internal, setInternal] = useState<string>(defaultValue ?? value ?? '')
   const current = value ?? internal
   const setValue = (v: string) => {
@@ -332,10 +285,8 @@ export function Tabs({
   )
 }
 
-/** Alias of Tabs (tab strip / tab bar are used interchangeably). */
 export const TabBar = Tabs
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

@@ -3,8 +3,6 @@ import type { StyleDesc } from '@gpuix/react'
 import { useAdwaita } from '../theme/adwaita'
 import { T } from './common'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface ChartDataPoint {
   label: string
   value: number
@@ -20,54 +18,27 @@ export interface ChartSeriesPoint {
   values: ChartSeriesValue[]
 }
 
-/**
- * Single-series `{label, value}[]` (legacy shape, keeps compiling) or
- * multi-series `{label, values: {name, value}[]}[]`.
- */
 export type ChartData = ChartDataPoint[] | ChartSeriesPoint[]
 
 export interface ChartProps {
   data: ChartData
   type?: 'bar' | 'line'
-  /** Single-series colour (defaults to the theme accent). */
+
   color?: string
-  /** Multi-series colour palette (defaults to accent/success/warning/destructive, cycling). */
+
   colors?: string[]
   height?: number
   style?: Partial<StyleDesc>
 }
 
-/** Runtime detection: the first element carries a `values` array. */
 function isMultiSeriesData(data: ChartData): data is ChartSeriesPoint[] {
   return data.length > 0 && Array.isArray((data[0] as ChartSeriesPoint).values)
 }
 
-/** A series colour from the palette, cycling when there are more series than colours. */
 function seriesColor(palette: string[], index: number): string {
   return palette[index % palette.length]
 }
 
-/* ── Chart ────────────────────────────────────────────────────────────── */
-
-/**
- * A static GPUix bar/line chart (Recharts is not available in GPUix).
- *
- * `data` is a union: single-series `{ label, value }[]` keeps compiling as
- * before (`color` sets the bar/line colour, defaulting to the theme accent);
- * multi-series `{ label, values: { name, value }[] }[]` is detected at
- * runtime (the first element has a `values` array) and renders grouped bars
- * (a flex row per label, one bar per series inside) or per-series
- * polylines, coloured from the `colors` palette (default
- * accent/success/warning/destructive, cycling).
- *
- * The line chart is fluid: the SVG data-URI `<img>` scales to
- * `width: '100%'` (the data-URI rasterization is kept for takumi PNG
- * compatibility).
- *
- * Interactive tooltips are out of scope in GPUix (no hover hit-testing);
- * static caption value labels above each bar are the idiomatic substitute.
- * Compose `ChartLegend` for a per-series key.
- */
 export function Chart({ data, type = 'bar', color, colors, height = 120, style }: ChartProps) {
   const t = useAdwaita()
   const { colors: themeColors } = t
@@ -93,8 +64,6 @@ export function Chart({ data, type = 'bar', color, colors, height = 120, style }
   return <BarChart data={data} color={chartColor} height={height} style={style} />
 }
 
-/* ── ChartLegend ───────────────────────────────────────────────────────── */
-
 export interface ChartLegendItem {
   name: string
   color: string
@@ -105,10 +74,6 @@ export interface ChartLegendProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A per-series key: a flex row of 10×10 colour swatch divs (borderRadius 2)
- * + a `T` caption per series. Compose under a multi-series `Chart`.
- */
 export function ChartLegend({ items, style }: ChartLegendProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -126,8 +91,6 @@ export function ChartLegend({ items, style }: ChartLegendProps) {
   )
 }
 
-/* ── Shared chart building blocks ──────────────────────────────────────── */
-
 interface ChartRendererProps {
   data: ChartDataPoint[]
   color: string
@@ -135,7 +98,6 @@ interface ChartRendererProps {
   style?: Partial<StyleDesc>
 }
 
-/** A flex row of flexGrow-1 centred caption-dim labels under the plot. */
 function ChartLabels({ labels }: { labels: ChartData }) {
   const t = useAdwaita()
   const { colors } = t
@@ -152,7 +114,6 @@ function ChartLabels({ labels }: { labels: ChartData }) {
   )
 }
 
-/** Shared chart frame: a column of a plot area + optional caption labels. */
 function ChartFrame({ children, labels, style }: { children: ReactNode; labels?: ChartData; style?: Partial<StyleDesc> }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, ...style }}>
@@ -162,7 +123,6 @@ function ChartFrame({ children, labels, style }: { children: ReactNode; labels?:
   )
 }
 
-/** A flex-end row of bars (the shared plot-area row). */
 function BarRow({ height, gap, children }: { height: number; gap: number; children: ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap, height }}>
@@ -171,7 +131,6 @@ function BarRow({ height, gap, children }: { height: number; gap: number; childr
   )
 }
 
-/** Shared line-chart geometry: maps (index, value) to x/y in a fixed logical canvas. */
 function makeLinePointAt(count: number, maxValue: number, width: number, height: number, padding: number) {
   return (index: number, value: number) => {
     const x = padding + (index / Math.max(count - 1, 1)) * (width - padding * 2)
@@ -180,7 +139,6 @@ function makeLinePointAt(count: number, maxValue: number, width: number, height:
   }
 }
 
-/** Builds the SVG data-URI <img> source for a polyline series (the shared rasterization path). */
 function buildLineSvgSeries(params: {
   width: number
   height: number
@@ -188,7 +146,7 @@ function buildLineSvgSeries(params: {
   color: string
   points: string
   dots: string
-  /** Axis line colour; omit to render no axis (multi-series draws it only for the first series). */
+
   axisColor?: string
 }): string {
   const { width, height, padding, color, points, dots, axisColor } = params
@@ -200,18 +158,15 @@ function buildLineSvgSeries(params: {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svgSource)}`
 }
 
-/* ── Bar chart: flex row of vertical bars ─────────────────────────────── */
-
 function BarChart({ data, color, height, style }: ChartRendererProps) {
   const t = useAdwaita()
   const { colors } = t
-  // Reserve headroom so the value labels sit above the plot area.
+
   const plotHeight = Math.max(height - 16, 8)
   const maxValue = Math.max(...data.map((d) => d.value), 1)
 
   return (
     <ChartFrame labels={data} style={style}>
-      {/* Bars, each with a caption value label above it */}
       <BarRow height={height} gap={4}>
         {data.map((d, i) => {
           const barHeight = Math.max(4, Math.round((d.value / maxValue) * plotHeight))
@@ -247,8 +202,6 @@ function BarChart({ data, color, height, style }: ChartRendererProps) {
   )
 }
 
-/* ── Multi-series grouped bar chart ───────────────────────────────────── */
-
 function MultiBarChart({
   data,
   palette,
@@ -267,7 +220,6 @@ function MultiBarChart({
 
   return (
     <ChartFrame style={style}>
-      {/* One flex row per label; the inner row holds one bar per series */}
       <BarRow height={height} gap={8}>
         {data.map((d, i) => (
           <div
@@ -327,13 +279,11 @@ function MultiBarChart({
   )
 }
 
-/* ── Line chart: SVG delivered as a fluid <img> data-URI ─────────────── */
-
 function LineChart({ data, color, height, style }: ChartRendererProps) {
   const t = useAdwaita()
   const { colors } = t
   const maxValue = Math.max(...data.map((d) => d.value), 1)
-  // Logical SVG width; the <img> scales it fluidly to width: '100%'.
+
   const width = 300
   const padding = 10
 
@@ -353,9 +303,9 @@ function LineChart({ data, color, height, style }: ChartRendererProps) {
     })
     .join('')
 
-  // Delivered as an <img> data-URI so it rasterizes in both the GPUix
-  // runtime (which supports data-URI img sources) and takumi's static
-  // HTML→PNG pipeline (which does NOT rasterize the GPUix <svg source> prop).
+
+
+
   const imgSrc = buildLineSvgSeries({ width, height, padding, color, points, dots, axisColor: colors.border })
 
   return (
@@ -364,8 +314,6 @@ function LineChart({ data, color, height, style }: ChartRendererProps) {
     </ChartFrame>
   )
 }
-
-/* ── Multi-series line chart: one overlaid polyline <img> per series ─── */
 
 function MultiLineChart({
   data,
@@ -389,7 +337,6 @@ function MultiLineChart({
 
   return (
     <ChartFrame labels={data} style={style}>
-      {/* The series polylines overlay in a positioned plot area */}
       <div style={{ position: 'relative', height }}>
         {Array.from({ length: seriesCount }, (_, s) => {
           const points: string[] = []
@@ -423,7 +370,6 @@ function MultiLineChart({
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 
@@ -449,7 +395,6 @@ const PALETTE_LEGEND = [
   { name: 'C', color: '#e5a50a' },
 ]
 
-/** One "Bar" / "Line" row of the shot: single + custom-color + multi-series items. */
 function ChartTypeRow({ type }: { type: 'bar' | 'line' }) {
   return (
     <Row label={type === 'bar' ? 'Bar' : 'Line'} col>

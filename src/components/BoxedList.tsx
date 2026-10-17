@@ -6,7 +6,6 @@ import { Icon, type IconName } from "./icons";
 import { Switch } from "./Switch";
 import { Entry } from "./Entry";
 
-/** Adwaita `boxed-list`: a rounded, bordered group that stacks rows with hairlines. */
 export function BoxedList({
   children,
   style,
@@ -53,7 +52,6 @@ interface RowShellProps {
   height?: number;
 }
 
-/** Shared row layout: prefix + title/subtitle + suffix, hover highlight. */
 function RowShell({
   title,
   subtitle,
@@ -109,8 +107,6 @@ function RowShell({
   );
 }
 
-/* ── ActionRow ─────────────────────────────────────────────────────────── */
-
 export interface ActionRowProps {
   title: string;
   subtitle?: string;
@@ -119,7 +115,6 @@ export interface ActionRowProps {
   onClick?: () => void;
 }
 
-/** Title + subtitle with optional prefix/suffix icons. */
 export function ActionRow({
   title,
   subtitle,
@@ -148,8 +143,6 @@ export function ActionRow({
   );
 }
 
-/* ── EntryRow ──────────────────────────────────────────────────────────── */
-
 export interface EntryRowProps {
   title: string;
   value?: string;
@@ -157,7 +150,6 @@ export interface EntryRowProps {
   onChange?: (value: string) => void;
 }
 
-/** A row with an inline text entry on the right. */
 export function EntryRow({
   title,
   value,
@@ -185,8 +177,6 @@ export function EntryRow({
   );
 }
 
-/* ── SwitchRow ─────────────────────────────────────────────────────────── */
-
 export interface SwitchRowProps {
   title: string;
   subtitle?: string;
@@ -194,7 +184,6 @@ export interface SwitchRowProps {
   onChange: (checked: boolean) => void;
 }
 
-/** A row with a toggle switch on the right. */
 export function SwitchRow({
   title,
   subtitle,
@@ -210,8 +199,6 @@ export function SwitchRow({
   );
 }
 
-/* ── SpinRow ───────────────────────────────────────────────────────────── */
-
 export interface SpinRowProps {
   title: string;
   value: number;
@@ -221,7 +208,6 @@ export interface SpinRowProps {
   onChange: (value: number) => void;
 }
 
-/** A numeric stepper row (− value +). */
 export function SpinRow({
   title,
   value,
@@ -283,8 +269,6 @@ export function SpinRow({
   );
 }
 
-/* ── ComboRow ──────────────────────────────────────────────────────────── */
-
 export interface ComboRowProps {
   title: string;
   value: string;
@@ -292,7 +276,6 @@ export interface ComboRowProps {
   onChange: (value: string) => void;
 }
 
-/** A dropdown row: a pill showing the current value + chevron (click cycles). */
 export function ComboRow({ title, value, options, onChange }: ComboRowProps) {
   const t = useAdwaita();
   const { colors } = t;
@@ -331,15 +314,12 @@ export function ComboRow({ title, value, options, onChange }: ComboRowProps) {
   );
 }
 
-/* ── ExpanderRow ───────────────────────────────────────────────────────── */
-
 export interface ExpanderRowProps {
   title: string;
   subtitle?: string;
   children: ReactNode;
 }
 
-/** A collapsible row: chevron toggles the revealed content below. */
 export function ExpanderRow({ title, subtitle, children }: ExpanderRowProps) {
   const t = useAdwaita();
   const { colors } = t;
@@ -369,8 +349,6 @@ export function ExpanderRow({ title, subtitle, children }: ExpanderRowProps) {
   );
 }
 
-/* ── ButtonRow ─────────────────────────────────────────────────────────── */
-
 export interface ButtonRowProps {
   title: string;
   label: string;
@@ -378,7 +356,6 @@ export interface ButtonRowProps {
   onClick?: () => void;
 }
 
-/** A button-styled row (whole row is the button), optionally destructive. */
 export function ButtonRow({
   title,
   label,
@@ -414,7 +391,6 @@ export function ButtonRow({
   );
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from "../../scripts/shot";
 import { Row, Shot, ShotItem } from "./common";
 

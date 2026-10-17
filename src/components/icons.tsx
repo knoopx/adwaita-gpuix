@@ -50,10 +50,6 @@ import {
   X,
 } from 'lucide-static'
 
-/**
- * Curated lucide icons as raw SVG strings. Lucide icons are stroke-based with
- * `stroke="currentColor"`, so GPUix tints them through `style.color`.
- */
 export const ICONS = {
   close: X,
   plus: Plus,
@@ -114,15 +110,6 @@ export interface IconProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A lucide icon, tinted via `color`, sized in px.
- *
- * Rendered as an `<img>` with a colour-baked SVG data-URI: lucide stroke icons
- * use `stroke="currentColor"`, so we substitute the requested `color` into the
- * markup before encoding. An `<img>` rasterises portably across both the GPUix
- * native runtime and the static takumi renderer (GPUix's `<svg source>` element
- * is not rasterised by takumi, which made every icon invisible in PNGs).
- */
 export function Icon({ name, size = 16, color, style }: IconProps) {
   const svg = ICONS[name].replace(/currentColor/g, color)
   const src = `data:image/svg+xml,${encodeURIComponent(svg)}`

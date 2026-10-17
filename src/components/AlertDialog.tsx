@@ -4,8 +4,6 @@ import { useAdwaita } from '../theme/adwaita'
 import { T, OverlayShell, dialogCardStyle } from './common'
 import { Button, type ButtonVariant } from './Button'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface AlertDialogAction {
   label: string
   variant?: 'default' | 'suggested' | 'destructive'
@@ -13,30 +11,22 @@ export interface AlertDialogAction {
 }
 
 export interface AlertDialogProps {
-  /** Heading text (flat `actions[]` mode). */
+
   heading?: string
-  /** Body text (flat `actions[]` mode). */
+
   body?: string
-  /** Flat data-driven action buttons (convenience API, kept alongside the compound form). */
+
   actions?: AlertDialogAction[]
-  /** A 64×64 icon/media block rendered above the heading (button_bg disc). */
+
   media?: ReactNode
-  /** Panel size: `'default'` (minWidth 320) or `'sm'` (minWidth 288). */
+
   size?: 'default' | 'sm'
-  /**
-   * Overlay mode. When `open` is provided the dialog renders as an overlay —
-   * scrim + centered panel with click-outside dismiss (via `OverlayShell`)
-   * and Escape-only keyboard dismissal. When omitted the dialog renders as
-   * an inline card (the legacy flat rendering, kept for static renders).
-   */
+
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  /**
-   * Contain the open panel (and scrim) to a positioned ancestor instead of
-   * the viewport (static renders). Default false.
-   */
+
   contained?: boolean
-  /** Compound content (Header/Title/Description/Footer/Action/Cancel). */
+
   children?: ReactNode
   style?: Partial<StyleDesc>
 }
@@ -63,7 +53,7 @@ export interface AlertDialogDescriptionProps {
 
 export interface AlertDialogActionProps {
   label?: string
-  /** Button variant — `suggested` by default (the reference AlertDialogAction). */
+
   variant?: ButtonVariant
   onClick?: () => void
   disabled?: boolean
@@ -79,8 +69,6 @@ export interface AlertDialogCancelProps {
   style?: Partial<StyleDesc>
 }
 
-/* ── Context ──────────────────────────────────────────────────────────── */
-
 interface AlertDialogContextValue {
   onOpenChange?: (open: boolean) => void
 }
@@ -90,8 +78,6 @@ const AlertDialogCtx = createContext<AlertDialogContextValue | null>(null)
 function useAlertDialog(): AlertDialogContextValue {
   return useContext(AlertDialogCtx) ?? {}
 }
-
-/* ── Card body (shared by inline + overlay modes) ────────────────────── */
 
 const variantMap: Record<NonNullable<AlertDialogAction['variant']>, ButtonVariant> = {
   suggested: 'suggested',
@@ -160,14 +146,6 @@ function AlertDialogCardBody({
   )
 }
 
-/* ── Components ───────────────────────────────────────────────────────── */
-
-/**
- * Adwaita alert dialog. Flat data API (`heading` / `body` / `actions[]`) kept
- * alongside the compound sub-exports; `open` switches the rendering from an
- * inline card (legacy) to a scrimmed, centered overlay with click-outside and
- * Escape dismissal.
- */
 export function AlertDialog({
   open,
   onOpenChange,
@@ -176,7 +154,7 @@ export function AlertDialog({
 }: AlertDialogProps) {
   const ctxValue: AlertDialogContextValue = { onOpenChange }
 
-  // Legacy inline mode: no `open` provided → render the card in flow.
+
   if (open === undefined) {
     return (
       <AlertDialogCtx.Provider value={ctxValue}>
@@ -187,8 +165,8 @@ export function AlertDialog({
 
   if (!open) return null
 
-  // contained → the panel + scrim are anchored to a positioned ancestor
-  // (static renders); otherwise they float over the whole viewport.
+
+
   const pos = contained ? 'absolute' : 'fixed'
 
   return (
@@ -204,7 +182,7 @@ export function AlertDialog({
             pointerEvents: 'auto',
           }}
           onKeyDown={(e: EventPayload) => {
-            // Escape-only dismissal (any-keydown closing is the anti-pattern).
+
             if (e.key === 'Escape') onOpenChange?.(false)
           }}
         >
@@ -215,7 +193,6 @@ export function AlertDialog({
   )
 }
 
-/** A header block: column of title + description (gap 4). */
 export function AlertDialogHeader({ children, style }: AlertDialogHeaderProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, ...style }}>
@@ -224,7 +201,6 @@ export function AlertDialogHeader({ children, style }: AlertDialogHeaderProps) {
   )
 }
 
-/** A footer block: column of full-width action buttons (gap 8, adwaita idiom). */
 export function AlertDialogFooter({ children, style }: AlertDialogFooterProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, ...style }}>
@@ -233,7 +209,6 @@ export function AlertDialogFooter({ children, style }: AlertDialogFooterProps) {
   )
 }
 
-/** The dialog heading (title2, bold). */
 export function AlertDialogTitle({ children, style }: AlertDialogTitleProps) {
   const t = useAdwaita()
   return (
@@ -243,7 +218,6 @@ export function AlertDialogTitle({ children, style }: AlertDialogTitleProps) {
   )
 }
 
-/** The dialog description (body, dim). */
 export function AlertDialogDescription({ children, style }: AlertDialogDescriptionProps) {
   const t = useAdwaita()
   return (
@@ -253,10 +227,6 @@ export function AlertDialogDescription({ children, style }: AlertDialogDescripti
   )
 }
 
-/**
- * A thin wrapper over `Button` (variant `suggested` by default) that closes
- * the alert dialog after firing `onClick`.
- */
 export function AlertDialogAction({ label, variant = 'suggested', onClick, disabled, children, style }: AlertDialogActionProps) {
   const { onOpenChange } = useAlertDialog()
   return (
@@ -275,10 +245,6 @@ export function AlertDialogAction({ label, variant = 'suggested', onClick, disab
   )
 }
 
-/**
- * A thin wrapper over `Button` (variant `default`) that closes the alert
- * dialog after firing `onClick`.
- */
 export function AlertDialogCancel({ label, onClick, disabled, children, style }: AlertDialogCancelProps) {
   const { onOpenChange } = useAlertDialog()
   return (
@@ -297,10 +263,8 @@ export function AlertDialogCancel({ label, onClick, disabled, children, style }:
   )
 }
 
-/** Alias of AlertDialog (libadwaita names both dialog flavours similarly). */
 export const MessageDialog = AlertDialog
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 import { Icon } from './icons'

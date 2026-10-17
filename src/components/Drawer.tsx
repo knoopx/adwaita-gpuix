@@ -10,13 +10,7 @@ export interface DrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   side?: DrawerSide
-  /**
-   * Contain the open panel (and scrim) to a positioned ancestor instead of
-   * the viewport: switches `position: fixed` to `position: absolute`. Used by
-   * static renders (takumi PNGs) that place the drawer inside a bounded
-   * `position: relative` stage. Default false keeps real GPUix viewport
-   * behaviour.
-   */
+
   contained?: boolean
   children?: ReactNode
   style?: Partial<StyleDesc>
@@ -59,8 +53,6 @@ export interface DrawerFooterProps {
 
 const noop = () => {}
 
-/* ── Context ─────────────────────────────────────────────────────────── */
-
 interface DrawerContextValue {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -76,8 +68,6 @@ function useDrawer(): DrawerContextValue {
   return ctx
 }
 
-/* ── Drawer: edge-attached panel over a scrim ─────────────────────────── */
-
 export function Drawer({ open, onOpenChange, side = 'right', contained = false, children, style }: DrawerProps) {
   const t = useAdwaita()
   const ctxValue: DrawerContextValue = { open, onOpenChange, contained, side }
@@ -89,10 +79,6 @@ export function Drawer({ open, onOpenChange, side = 'right', contained = false, 
   )
 }
 
-/**
- * The drawer shell (scrim + edge-attached panel), extracted from the root so
- * the context provider stays mounted while the drawer is closed.
- */
 function renderDrawerShell(
   _open: boolean,
   onOpenChange: (open: boolean) => void,
@@ -102,8 +88,8 @@ function renderDrawerShell(
   style: Partial<StyleDesc> | undefined,
   colors: { border: string },
 ): ReactNode {
-  // contained → the panel is anchored to a positioned ancestor (static renders);
-  // otherwise it floats over the whole viewport (real GPUix).
+
+
   const pos = contained ? 'absolute' : 'fixed'
 
   let panelStyle: Partial<StyleDesc>
@@ -119,7 +105,6 @@ function renderDrawerShell(
 
   return (
     <OverlayShell position={pos} onDismiss={() => onOpenChange(false)} style={style}>
-      {/* Panel */}
       <OverlayPanel
         position={pos}
         panelStyle={{
@@ -127,7 +112,6 @@ function renderDrawerShell(
           ...panelStyle,
         }}
       >
-        {/* Drag handle for bottom sheet */}
         {side === 'bottom' ? (
           <div
             style={{
@@ -153,13 +137,6 @@ function renderDrawerShell(
   )
 }
 
-/* ── Sub-components ───────────────────────────────────────────────────── */
-
-/**
- * Opens the drawer on click (div onClick -> onOpenChange(true)), the same
- * idiom as DialogTrigger. Requires the drawer root context, so it must sit
- * inside <Drawer>.
- */
 export function DrawerTrigger({ children, style }: DrawerTriggerProps) {
   const { onOpenChange } = useDrawer()
   return (
@@ -194,7 +171,6 @@ export function DrawerTitle({ children, style }: DrawerTitleProps) {
   )
 }
 
-/** A dim body-text description under the drawer title. */
 export function DrawerDescription({ children, style }: DrawerDescriptionProps) {
   const t = useAdwaita()
   return (
@@ -204,10 +180,6 @@ export function DrawerDescription({ children, style }: DrawerDescriptionProps) {
   )
 }
 
-/**
- * A bottom-anchored footer: a flexGrow:1 spacer pushes the column of
- * actions (gap 8, padding 16) to the panel's bottom edge.
- */
 export function DrawerFooter({ children, style }: DrawerFooterProps) {
   return <OverlayFooter children={children} style={style} />
 }
@@ -221,9 +193,6 @@ export function DrawerClose({ children, style }: DrawerCloseProps) {
   )
 }
 
-/* ── Showcase ─────────────────────────────────────────────────────────── */
-
-/** The shared open-drawer body: header (title + close), content, footer. */
 function DrawerBody({ title }: { title: string }) {
   return (
     <>
@@ -241,8 +210,6 @@ function DrawerBody({ title }: { title: string }) {
   )
 }
 
-/** Full Drawer shot for static renders / playground: closed (renders
- *  nothing) + all four `side` variants contained in bounded stages. */
 export function DrawerShowcase(): ReactNode {
   return (
     <Shot>
@@ -287,7 +254,6 @@ export function DrawerShowcase(): ReactNode {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Shot, ShotItem } from './common'
 

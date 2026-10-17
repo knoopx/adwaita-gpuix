@@ -10,10 +10,6 @@ export interface PreferencesGroupProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A titled boxed list: a small dimmed section title above a `BoxedList` of
- * rows — the standard preferences page block.
- */
 export function PreferencesGroup({ title, children, style }: PreferencesGroupProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -39,10 +35,6 @@ export interface PreferencesPageProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A scrollable preferences page: a vertical column of `PreferencesGroup`
- * blocks.
- */
 export function PreferencesPage({ children, style }: PreferencesPageProps) {
   return (
     <div
@@ -59,7 +51,6 @@ export function PreferencesPage({ children, style }: PreferencesPageProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot } from './common'
 import { ActionRow, ButtonRow, ComboRow, EntryRow, ExpanderRow, SpinRow, SwitchRow } from './BoxedList'

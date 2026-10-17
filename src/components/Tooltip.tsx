@@ -3,8 +3,6 @@ import type { StyleDesc } from '@gpuix/react'
 import { useAdwaita, isDarkScheme } from '../theme/adwaita'
 import { T } from './common'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface TooltipProviderProps {
   children: ReactNode
   delayDuration?: number
@@ -32,8 +30,6 @@ export interface TooltipContentProps {
   style?: Partial<StyleDesc>
 }
 
-/* ── Context ──────────────────────────────────────────────────────────── */
-
 const TooltipProviderCtx = createContext<number>(0)
 
 interface TooltipContextValue {
@@ -51,9 +47,6 @@ function useTooltip(): TooltipContextValue {
   return ctx
 }
 
-/* ── Components ───────────────────────────────────────────────────────── */
-
-/** A delay context: the default show delay (ms) for tooltips in its subtree. */
 export function TooltipProvider({ children, delayDuration = 0 }: TooltipProviderProps) {
   return (
     <TooltipProviderCtx.Provider value={delayDuration}>
@@ -62,11 +55,6 @@ export function TooltipProvider({ children, delayDuration = 0 }: TooltipProvider
   )
 }
 
-/**
- * A tooltip: controlled (open/onOpenChange) or uncontrolled (defaultOpen)
- * duality. The open state, show delay, and side live in the context; the
- * Trigger toggles and the Content gates on open.
- */
 export function Tooltip({ children, open, onOpenChange, defaultOpen, delayDuration, side, style }: TooltipProps) {
   const providerDelay = useContext(TooltipProviderCtx)
   const [internal, setInternal] = useState(defaultOpen ?? false)
@@ -83,11 +71,6 @@ export function Tooltip({ children, open, onOpenChange, defaultOpen, delayDurati
   )
 }
 
-/**
- * The tooltip's anchor: mouse enter/leave + focus/blur toggling. The
- * delayDuration is honoured via a useRef timer (GPUix-idiomatic — no CSS
- * delays on host elements).
- */
 export function TooltipTrigger({ children, style }: TooltipTriggerProps) {
   const { open, setOpen, delayDuration } = useTooltip()
   void open
@@ -120,12 +103,6 @@ export function TooltipTrigger({ children, style }: TooltipTriggerProps) {
   )
 }
 
-/**
- * The tooltip bubble: a scheme-aware pill with a 12px diamond arrow for the
- * top/bottom sides (the arrow is an svg data-URI img — GPUix transform is
- * unsupported on host elements, so the rotation happens inside the
- * rasterized SVG). Gated on the context's open state.
- */
 export function TooltipContent({ children, side, sideOffset = 4, style }: TooltipContentProps) {
   const ctx = useTooltip()
   const t = useAdwaita()
@@ -165,12 +142,10 @@ export function TooltipContent({ children, side, sideOffset = 4, style }: Toolti
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 import { Button } from './Button'
 
-/** An open tooltip on a given side (the `side` prop on the root). */
 function SideTooltip({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'; text: string }) {
   return (
     <TooltipProvider>

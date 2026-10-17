@@ -7,22 +7,13 @@ export interface InputOTPProps {
   length: number
   value: string
   onChange: (value: string) => void
-  /** Fired once when `value.length === length`. */
+
   onComplete?: () => void
   autoFocus?: boolean
   disabled?: boolean
   style?: Partial<StyleDesc>
 }
 
-/**
- * An OTP (one-time passcode) input: a row of single-character boxes fed by a
- * single GPUix `<input>`.
- *
- * GPUix has one caret, so focus stays on the hidden `<input>` (autoFocus,
- * value, onChange) which drives the visual mask boxes; the box at index
- * `value.length` carries the accent border as the fake-caret affordance.
- * `onComplete` fires when `value.length === length`.
- */
 export function InputOTP({ length, value, onChange, onComplete, autoFocus, disabled, style }: InputOTPProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -39,7 +30,6 @@ export function InputOTP({ length, value, onChange, onComplete, autoFocus, disab
         ...style,
       }}
     >
-      {/* The real input: hidden, owns focus + caret, feeds the mask boxes. */}
       <input
         value={value}
         autoFocus={autoFocus && !disabled ? true : undefined}
@@ -76,7 +66,6 @@ export interface InputOTPGroupProps {
   style?: Partial<StyleDesc>
 }
 
-/** A flex row (gap 8) grouping OTP slots. */
 export function InputOTPGroup({ children, style }: InputOTPGroupProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'row', gap: 8, ...style }}>{children}</div>
@@ -84,19 +73,18 @@ export function InputOTPGroup({ children, style }: InputOTPGroupProps) {
 }
 
 export interface InputOTPSlotProps {
-  /** Slot position (shadcn parity; used as a stable key by the parent). */
+
   index: number
-  /** The character shown in the box. */
+
   char?: string
-  /** Filled (accent wash + accent border). */
+
   filled?: boolean
-  /** Active = the fake-caret slot (accent border, no wash). */
+
   active?: boolean
   disabled?: boolean
   style?: Partial<StyleDesc>
 }
 
-/** A 40×44 single-character OTP box (the visual mask cell). */
 export function InputOTPSlot({ index, char = '', filled, active, disabled, style }: InputOTPSlotProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -128,7 +116,6 @@ export interface InputOTPSeparatorProps {
   style?: Partial<StyleDesc>
 }
 
-/** A dim "-" separator between OTP groups. */
 export function InputOTPSeparator({ style }: InputOTPSeparatorProps) {
   const t = useAdwaita()
   return (
@@ -140,7 +127,6 @@ export function InputOTPSeparator({ style }: InputOTPSeparatorProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

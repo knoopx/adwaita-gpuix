@@ -12,8 +12,6 @@ import type { StyleDesc } from '@gpuix/react'
 import { useAdwaita } from '../theme/adwaita'
 import { Icon } from './icons'
 
-/* ── Context ──────────────────────────────────────────────────────────── */
-
 interface CarouselContextValue {
   offset: number
   setOffset: (offset: number) => void
@@ -31,39 +29,22 @@ function useCarousel(): CarouselContextValue {
   return ctx
 }
 
-/* ── Carousel ─────────────────────────────────────────────────────────── */
-
 export interface CarouselProps {
   children: ReactNode
-  /** Number of items in the fixed visible window (default 3). */
+
   visible?: number
-  /**
-   * @deprecated Inert legacy prop (kept so existing call sites keep
-   * compiling). The visible window is driven by `visible`; use
-   * `CarouselPrevious` / `CarouselNext` to page.
-   */
+
   items?: number
   style?: Partial<StyleDesc>
 }
 
-/**
- * A horizontally-paged carousel.
- *
- * GPUix's `<virtual-list>` has no programmatic scroll API (and it is the
- * only scroller — a plain `overflowX` div is a constraint violation), so
- * this is the idiomatic manual-paging substitute: a state-tracked
- * `offset` re-slices a fixed window of `visible` items from the children.
- * The root renders a non-scrolling flex row of `visible` items starting
- * at `offset`; `CarouselPrevious` / `CarouselNext` step the window by the
- * visible count and disable at the ends.
- */
 export function Carousel({ children, visible = 3, items: _items, style }: CarouselProps) {
   void _items
   const [offset, setOffsetRaw] = useState(0)
 
-  // Split children: `CarouselItem`s are the paged window; anything else
-  // (e.g. `CarouselPrevious` / `CarouselNext` controls) is rendered outside
-  // the window so it is not miscounted as an item.
+
+
+
   const all = Children.toArray(children)
   const itemChildren = all.filter((c) => isValidElement(c) && c.type === CarouselItem)
   const controlChildren = all.filter((c) => !(isValidElement(c) && c.type === CarouselItem))
@@ -107,17 +88,10 @@ export function Carousel({ children, visible = 3, items: _items, style }: Carous
   )
 }
 
-/* ── CarouselPrevious / CarouselNext ──────────────────────────────────── */
-
 interface CarouselNavProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A 32×32 outline icon-button row (div onClick, 14px arrow icon) that
- * pages the carousel by the visible count; disabled at the end via
- * `opacity: 0.4, cursor: 'default'`.
- */
 function CarouselNavButton({
   direction,
   style,
@@ -154,17 +128,13 @@ function CarouselNavButton({
   )
 }
 
-/** Pages the carousel back by the visible count (disabled at the start). */
 export function CarouselPrevious({ style }: CarouselNavProps) {
   return <CarouselNavButton direction="prev" style={style} />
 }
 
-/** Pages the carousel forward by the visible count (disabled at the end). */
 export function CarouselNext({ style }: CarouselNavProps) {
   return <CarouselNavButton direction="next" style={style} />
 }
-
-/* ── CarouselItem ─────────────────────────────────────────────────────── */
 
 export interface CarouselItemProps {
   children: ReactNode
@@ -172,7 +142,6 @@ export interface CarouselItemProps {
   style?: Partial<StyleDesc>
 }
 
-/** A fixed-width card inside a Carousel (flexShrink: 0). */
 export function CarouselItem({ children, width = 200, style }: CarouselItemProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -197,7 +166,6 @@ export function CarouselItem({ children, width = 200, style }: CarouselItemProps
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, T, Shot, ShotItem } from './common'
 

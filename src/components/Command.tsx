@@ -5,15 +5,10 @@ import { FloatingPanel, MenuLabel, MenuRow, MenuSeparator, MenuShortcut, T, inpu
 import { Icon } from './icons'
 import { Dialog, DialogContent } from './Dialog'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface CommandProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  /**
-   * Default true — after a CommandItem.onSelect the root calls
-   * onOpenChange(false), closing the palette.
-   */
+
   closeOnSelect?: boolean
   children?: ReactNode
   style?: Partial<StyleDesc>
@@ -45,9 +40,9 @@ export interface CommandItemProps {
   label: string
   onSelect?: () => void
   selected?: boolean
-  /** Space-separated search terms (any-term match) — a cheap cmdk stand-in. */
+
   searchTerms?: string
-  /** A trailing keyboard-shortcut hint (caption, dim). */
+
   shortcut?: string
   style?: Partial<StyleDesc>
 }
@@ -69,8 +64,6 @@ export interface CommandDialogProps {
   style?: Partial<StyleDesc>
 }
 
-/* ── Context ──────────────────────────────────────────────────────────── */
-
 interface CommandContext {
   query: string
   setQuery: (q: string) => void
@@ -85,8 +78,6 @@ function useCommand(): CommandContext {
   if (!ctx) throw new Error('Command components must be used within <Command>')
   return ctx
 }
-
-/* ── Components ───────────────────────────────────────────────────────── */
 
 export function Command({ open, onOpenChange, closeOnSelect, children, style }: CommandProps) {
   const [query, setQuery] = useState('')
@@ -163,7 +154,7 @@ export function CommandItem({ label, onSelect, selected, searchTerms, shortcut, 
   const t = useAdwaita()
   const { colors } = t
 
-  // Filter by query (label + optional search terms, any-term match)
+
   const q = query.trim().toLowerCase()
   if (q) {
     const haystack = (searchTerms ?? label).toLowerCase()
@@ -197,20 +188,14 @@ export function CommandItem({ label, onSelect, selected, searchTerms, shortcut, 
   )
 }
 
-/** A trailing keyboard-shortcut hint (caption, dim) for a command row. */
 export function CommandShortcut({ children, style }: CommandShortcutProps) {
   return <MenuShortcut style={style}>{children}</MenuShortcut>
 }
 
-/** A 1px separator between command groups. */
 export function CommandSeparator({ style }: CommandSeparatorProps) {
   return <MenuSeparator style={style} />
 }
 
-/**
- * Dialog (contained mode) + Command composition — the GPUix-idiomatic
- * command palette: a dialog card hosting the command input + list.
- */
 export function CommandDialog({ open, onOpenChange, contained, children, style }: CommandDialogProps) {
   return (
     <Dialog open={open ?? false} onOpenChange={onOpenChange ?? (() => {})} contained={contained ?? true}>
@@ -223,7 +208,6 @@ export function CommandDialog({ open, onOpenChange, contained, children, style }
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, FloatingStage, Shot, ShotItem } from './common'
 

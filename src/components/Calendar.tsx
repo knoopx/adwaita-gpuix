@@ -4,20 +4,18 @@ import { useAdwaita } from '../theme/adwaita'
 import { T, inputShellStyle, listPanelStyle } from './common'
 import { Icon } from './icons'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export type CalendarMode = 'single' | 'multiple' | 'range'
 
 export interface CalendarProps {
-  /** Selection behaviour (default `single`). */
+
   mode?: CalendarMode
-  /** `multiple` mode: the selected dates (membership toggled on click). */
+
   value?: Date | Date[]
-  /** `single` mode: the selected date; `range` mode: `[start, end]`. */
+
   selected?: Date | [Date, Date]
-  /** `single` mode: fires with the clicked date. */
+
   onSelect?: (date: Date) => void
-  /** `multiple` / `range` mode: reports the (re)selected set. */
+
   onValueChange?: (dates: Date[]) => void
   month?: Date
   style?: Partial<StyleDesc>
@@ -30,8 +28,6 @@ export interface DatePickerProps {
   onOpenChange?: (open: boolean) => void
   style?: Partial<StyleDesc>
 }
-
-/* ── Helpers ──────────────────────────────────────────────────────────── */
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
 
@@ -55,17 +51,13 @@ interface GridCell {
   inMonth: boolean
 }
 
-/**
- * A 6×7 (42-cell) month grid. Every cell carries a concrete `date` (so
- * neighbour-month days are real dates, not blanks) and an `inMonth` flag.
- */
 function getMonthGrid(year: number, month: number): GridCell[] {
   const first = new Date(year, month, 1)
-  // Day of week (0=Sun..6=Sat) → Mon=0
+
   let startDay = first.getDay() - 1
   if (startDay < 0) startDay = 6
 
-  // The grid's first cell is `startDay` days before the 1st of the month.
+
   const start = new Date(year, month, 1 - startDay)
   const cells: GridCell[] = []
   for (let i = 0; i < 42; i++) {
@@ -79,12 +71,10 @@ function formatDate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-/** Compare two dates by year/month/day (time-independent). */
 function sameDate(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
 }
 
-/** A time-independent sortable key for a date. */
 function dayKey(d: Date): number {
   return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate()
 }
@@ -97,16 +87,12 @@ function isSingleDate(x: unknown): x is Date {
   return x instanceof Date
 }
 
-/** The initial view month from a (possibly array) `value`. */
 function initialMonth(value?: Date | Date[]): Date | undefined {
   if (isSingleDate(value)) return value
   if (Array.isArray(value) && value.length > 0) return value[0]
   return undefined
 }
 
-/* ── Calendar ─────────────────────────────────────────────────────────── */
-
-/** 24×24 icon button for the month header (prev/next). */
 function MonthNavButton({ direction, onClick }: { direction: 'left' | 'right'; onClick: () => void }) {
   const t = useAdwaita()
   const { colors } = t
@@ -129,8 +115,6 @@ function MonthNavButton({ direction, onClick }: { direction: 'left' | 'right'; o
   )
 }
 
-/** A single day cell: accent when selected / a range endpoint, accent-tint
- *  wash for in-range days, accent text for today, dimmed for outside days. */
 function DayCell({
   date,
   inMonth,
@@ -182,7 +166,6 @@ function DayCell({
   )
 }
 
-/** A small anchored list cell (month / year picker row). */
 function PickerCell({
   label,
   active,
@@ -229,15 +212,15 @@ export function Calendar({
   const currentMonth = monthProp ?? viewMonth
   const today = new Date()
 
-  // ── month / year dropdown pickers ─────────────────────────────────
+
   const [picker, setPicker] = useState<'month' | 'year' | null>(null)
   const baseYear = new Date().getFullYear()
   const years = Array.from({ length: 11 }, (_, i) => baseYear - 5 + i)
 
-  // ── range draft (start chosen, end not yet) ───────────────────────
+
   const [rangeDraft, setRangeDraft] = useState<{ start: Date; end?: Date } | null>(null)
 
-  // ── selection state per mode ──────────────────────────────────────
+
   const multipleSet: Date[] = mode === 'multiple' ? (Array.isArray(value) ? value : []) : []
   const singleSelected = mode === 'single' && isSingleDate(selected) ? selected : undefined
   const activeRange: [Date, Date] | null =
@@ -257,10 +240,10 @@ export function Calendar({
       return
     }
     if (mode === 'range') {
-      // An in-progress draft exists when we have a draft and no controlled full pair.
+
       const inProgress = !isDatePair(selected) && rangeDraft
       if (!inProgress) {
-        // No in-progress draft → start a new one (start chosen, end pending).
+
         setRangeDraft({ start: date })
         onValueChange?.([date])
         return
@@ -275,7 +258,7 @@ export function Calendar({
       onValueChange?.([start, end])
       return
     }
-    // single
+
     onSelect?.(date)
   }
 
@@ -298,7 +281,6 @@ export function Calendar({
         ...style,
       }}
     >
-      {/* Month header */}
       <div
         style={{
           display: 'flex',
@@ -311,7 +293,6 @@ export function Calendar({
           direction="left"
           onClick={() => setViewMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
         />
-        {/* Month / year caption — click each to open its picker. */}
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
           <div
             onClick={() => setPicker(picker === 'month' ? null : 'month')}
@@ -336,7 +317,6 @@ export function Calendar({
         />
       </div>
 
-      {/* Month picker (anchored above the calendar) */}
       {picker === 'month' ? (
         <anchored side="top" offset={{ x: 0, y: -4 }}>
           <div style={listPanelStyle(t, { display: 'flex', flexDirection: 'column', gap: 2, padding: 4, width: 120 })}>
@@ -355,7 +335,6 @@ export function Calendar({
         </anchored>
       ) : null}
 
-      {/* Year picker (anchored above the calendar) */}
       {picker === 'year' ? (
         <anchored side="top" offset={{ x: 0, y: -4 }}>
           <div style={listPanelStyle(t, { display: 'flex', flexDirection: 'column', gap: 2, padding: 4, width: 80 })}>
@@ -374,7 +353,6 @@ export function Calendar({
         </anchored>
       ) : null}
 
-      {/* Weekday header */}
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         {WEEKDAYS.map((day) => (
           <div key={day} style={{ flexGrow: 1, display: 'flex', justifyContent: 'center', padding: 4 }}>
@@ -385,7 +363,6 @@ export function Calendar({
         ))}
       </div>
 
-      {/* Day cells (42, neighbour-month days dimmed) */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {Array.from({ length: 6 }, (_, w) => (
           <div key={w} style={{ display: 'flex', flexDirection: 'row' }}>
@@ -426,8 +403,6 @@ export function Calendar({
   )
 }
 
-/* ── DatePicker ───────────────────────────────────────────────────────── */
-
 export function DatePicker({ value, onChange, open, onOpenChange, style }: DatePickerProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -436,7 +411,6 @@ export function DatePicker({ value, onChange, open, onOpenChange, style }: DateP
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, ...style }}>
-      {/* Trigger */}
       <div
         onClick={() => {
           setLocalOpen(!isOpen)
@@ -450,7 +424,6 @@ export function DatePicker({ value, onChange, open, onOpenChange, style }: DateP
         </T>
       </div>
 
-      {/* Anchored calendar */}
       {isOpen ? (
         <anchored side="bottom" offset={{ x: 0, y: 4 }}>
           <Calendar
@@ -468,7 +441,6 @@ export function DatePicker({ value, onChange, open, onOpenChange, style }: DateP
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

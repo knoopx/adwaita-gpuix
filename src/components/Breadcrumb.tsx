@@ -8,7 +8,6 @@ export interface BreadcrumbProps {
   style?: Partial<StyleDesc>
 }
 
-/** A horizontal breadcrumb trail. */
 export function Breadcrumb({ children, style }: BreadcrumbProps) {
   return (
     <div
@@ -29,7 +28,6 @@ export interface BreadcrumbListProps {
   style?: Partial<StyleDesc>
 }
 
-/** The list of breadcrumb items. */
 export function BreadcrumbList({ children, style }: BreadcrumbListProps) {
   return (
     <div
@@ -51,7 +49,6 @@ export interface BreadcrumbItemProps {
   style?: Partial<StyleDesc>
 }
 
-/** A single breadcrumb item (link or page). */
 export function BreadcrumbItem({ children, style }: BreadcrumbItemProps) {
   return (
     <div
@@ -73,7 +70,6 @@ export interface BreadcrumbLinkProps {
   style?: Partial<StyleDesc>
 }
 
-/** A clickable breadcrumb link: accent text, hover underline. */
 export function BreadcrumbLink({ children, onClick, style }: BreadcrumbLinkProps) {
   const t = useAdwaita()
   return (
@@ -97,7 +93,6 @@ export interface BreadcrumbPageProps {
   style?: Partial<StyleDesc>
 }
 
-/** The current page in a breadcrumb: fg colour. */
 export function BreadcrumbPage({ children, style }: BreadcrumbPageProps) {
   const t = useAdwaita()
   return (
@@ -111,7 +106,6 @@ export interface BreadcrumbSeparatorProps {
   style?: Partial<StyleDesc>
 }
 
-/** A dim `/` separator between breadcrumb items. */
 export function BreadcrumbSeparator({ style }: BreadcrumbSeparatorProps) {
   const t = useAdwaita()
   return (
@@ -125,7 +119,6 @@ export interface BreadcrumbEllipsisProps {
   style?: Partial<StyleDesc>
 }
 
-/** A 36×36 centred “…” slot for truncated breadcrumb trails. */
 export function BreadcrumbEllipsis({ style }: BreadcrumbEllipsisProps) {
   const t = useAdwaita()
   return (
@@ -146,7 +139,6 @@ export function BreadcrumbEllipsis({ style }: BreadcrumbEllipsisProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row } from './common'
 

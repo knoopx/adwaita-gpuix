@@ -4,8 +4,6 @@ import { useAdwaita } from '../theme/adwaita'
 import { MenuBarShell, FloatingPanel, MenuRow, MenuLabel, MenuSeparator, MenuIndicator, MenuShortcut, MenuRadioGroupShell, useMenuRadioGroup, MenuRadioRow, MenuSub, MenuSubTrigger, MenuSubContent, destructiveRowProps } from './common'
 import { Icon, type IconName } from './icons'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface MenubarProps {
   children?: ReactNode
   style?: Partial<StyleDesc>
@@ -21,11 +19,11 @@ export interface MenubarItemProps {
   label: string
   icon?: IconName
   onClick?: () => void
-  /** Indented row (32px left padding) for nested / grouped items. */
+
   inset?: boolean
-  /** 'destructive' renders the row in the destructive color. */
+
   variant?: 'default' | 'destructive'
-  /** Trailing keyboard-shortcut hint. */
+
   shortcut?: string
   style?: Partial<StyleDesc>
 }
@@ -94,8 +92,6 @@ export interface MenubarShortcutProps {
   style?: Partial<StyleDesc>
 }
 
-/* ── Components ───────────────────────────────────────────────────────── */
-
 export function Menubar({ children, style }: MenubarProps) {
   return (
     <MenuBarShell style={style}>
@@ -104,7 +100,6 @@ export function Menubar({ children, style }: MenubarProps) {
   )
 }
 
-/** Shared body of MenubarMenu / MenubarTrigger: a self-contained openable top-bar item with an anchored panel. */
 function MenubarDropdown({ label, children, style }: MenubarMenuProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -127,7 +122,6 @@ function MenubarDropdown({ label, children, style }: MenubarMenuProps) {
   )
 }
 
-/** A self-contained trigger+content pairing: an openable top-bar item whose anchored panel holds the menu content. */
 export function MenubarMenu(props: MenubarMenuProps) {
   return <MenubarDropdown {...props} />
 }
@@ -167,7 +161,6 @@ export function MenubarSeparator({ style }: MenubarSeparatorProps) {
   return <MenuSeparator style={style} />
 }
 
-/** A toggleable menubar row with a 16×16 checkbox indicator. */
 export function MenubarCheckboxItem({ label, checked, onCheckedChange, style }: MenubarCheckboxItemProps) {
   return (
     <MenuRow
@@ -179,18 +172,10 @@ export function MenubarCheckboxItem({ label, checked, onCheckedChange, style }: 
   )
 }
 
-/* ── Radio group ──────────────────────────────────────────────────────── */
-
-/**
- * A group of radio items sharing one selection. Controlled via `value` +
- * `onValueChange`, uncontrolled via `defaultValue`; items without an
- * explicit `selected` derive it from the group's current value.
- */
 export function MenubarRadioGroup({ value, defaultValue, onValueChange, children, style }: MenubarRadioGroupProps) {
   return <MenuRadioGroupShell value={value} defaultValue={defaultValue} onValueChange={onValueChange} children={children} style={style} />
 }
 
-/** A radio menubar row; selection comes from its MenubarRadioGroup when no explicit `selected` is given. */
 export function MenubarRadioItem({ label, value, selected, onSelect, style }: MenubarRadioItemProps) {
   const group = useMenuRadioGroup()
   return (
@@ -205,37 +190,25 @@ export function MenubarRadioItem({ label, value, selected, onSelect, style }: Me
   )
 }
 
-/* ── Sub-menu ─────────────────────────────────────────────────────────── */
-
-/**
- * A nested sub-menu: a positioned column wrapper that owns the open/close
- * state of its trigger + content (GPUix has no DOM sub-menu portal; the
- * anchored panel is the idiom).
- */
 export function MenubarSub({ children, style }: MenubarSubProps) {
   return <MenuSub style={style}>{children}</MenuSub>
 }
 
-/** The row that toggles a sub-menu open/closed, with a chevron trailing. */
 export function MenubarSubTrigger({ label, icon, style }: MenubarSubTriggerProps) {
   return <MenuSubTrigger label={label} icon={icon} rowStyle={{ gap: 6, padding: 6, paddingLeft: 10, paddingRight: 10 }} style={style} />
 }
 
-/** The anchored panel of a sub-menu, shown only while the sub is open. */
 export function MenubarSubContent({ children, style }: MenubarSubContentProps) {
   return <MenuSubContent style={style}>{children}</MenuSubContent>
 }
 
-/** A trailing keyboard-shortcut hint for a menubar row. */
 export function MenubarShortcut({ children, style }: MenubarShortcutProps) {
   return <MenuShortcut style={style}>{children}</MenuShortcut>
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot } from './common'
 
-/** A bordered card frame for the standalone content block. */
 function MenubarContentFrame({ children }: { children: ReactNode }) {
   const t = useAdwaita()
   return (

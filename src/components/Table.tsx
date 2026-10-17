@@ -8,7 +8,6 @@ export interface TableProps {
   style?: Partial<StyleDesc>
 }
 
-/** An Adwaita table container: outer card radius, border. */
 export function Table({ children, style }: TableProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -35,7 +34,6 @@ export interface TableHeaderProps {
   style?: Partial<StyleDesc>
 }
 
-/** The header row area of a table. */
 export function TableHeader({ children, style }: TableHeaderProps) {
   return (
     <div
@@ -56,7 +54,6 @@ export interface TableBodyProps {
   style?: Partial<StyleDesc>
 }
 
-/** The body rows of a table. */
 export function TableBody({ children, style }: TableBodyProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', ...style }}>{children}</div>
@@ -68,10 +65,6 @@ export interface TableFooterProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * A table footer row area: a top hairline + a muted wash
- * (`fg` @ 4%) with medium-weight cells (shadcn `TableFooter`).
- */
 export function TableFooter({ children, style }: TableFooterProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -96,7 +89,6 @@ export interface TableFootCellProps {
   style?: Partial<StyleDesc>
 }
 
-/** A footer cell: body text at weight 500, 8px padding. */
 export function TableFootCell({ children, style }: TableFootCellProps) {
   const t = useAdwaita()
   return (
@@ -121,7 +113,6 @@ export interface TableRowProps {
   style?: Partial<StyleDesc>
 }
 
-/** A table row: flex row with 1px bottom border and hover accentTint. */
 export function TableRow({ children, style }: TableRowProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -146,7 +137,6 @@ export interface TableHeadProps {
   style?: Partial<StyleDesc>
 }
 
-/** A header cell: caption dim bold, 8px padding. */
 export function TableHead({ children, style }: TableHeadProps) {
   const t = useAdwaita()
   return (
@@ -171,7 +161,6 @@ export interface TableCellProps {
   style?: Partial<StyleDesc>
 }
 
-/** A body cell: body text, 8px padding. */
 export function TableCell({ children, style }: TableCellProps) {
   const t = useAdwaita()
   return (
@@ -196,7 +185,6 @@ export interface TableCaptionProps {
   style?: Partial<StyleDesc>
 }
 
-/** A table caption below the table: dim caption text. */
 export function TableCaption({ children, style }: TableCaptionProps) {
   const t = useAdwaita()
   return (
@@ -208,7 +196,6 @@ export function TableCaption({ children, style }: TableCaptionProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

@@ -12,7 +12,6 @@ export interface StatusPageProps {
   style?: Partial<StyleDesc>
 }
 
-/** Centred Adwaita status page: icon, title, description, optional content. */
 export function StatusPage({ icon = 'sparkles', title, description, children, style }: StatusPageProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -48,7 +47,6 @@ export function StatusPage({ icon = 'sparkles', title, description, children, st
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 import { Spinner } from './Spinner'

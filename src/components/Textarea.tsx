@@ -9,18 +9,14 @@ export interface TextareaProps {
   placeholder?: string
   rows?: number
   disabled?: boolean
-  /** Take keyboard focus on mount — without it (or a click) the field never receives key events. */
+
   autoFocus?: boolean
-  /** Enter on `<textarea>` submits only while this listener is set (bare Enter inserts a newline). */
+
   onSubmit?: () => void
   onKeyDown?: (event: EventPayload) => void
   style?: Partial<StyleDesc>
 }
 
-/**
- * A multi-line text area: rounded border like Input, 8px padding,
- * minRows controls the minimum line count.
- */
 export function Textarea({ value, onChange, placeholder, rows = 3, disabled, autoFocus, onSubmit, onKeyDown, style }: TextareaProps) {
   const t = useAdwaita()
   const { colors, radii } = t
@@ -41,7 +37,6 @@ export function Textarea({ value, onChange, placeholder, rows = 3, disabled, aut
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, T, Shot, ShotItem } from './common'
 

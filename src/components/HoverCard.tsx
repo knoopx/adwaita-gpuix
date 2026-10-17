@@ -3,8 +3,6 @@ import type { StyleDesc } from '@gpuix/react'
 import { useAdwaita } from '../theme/adwaita'
 import { FloatingPanel } from './common'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface HoverCardProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -23,8 +21,6 @@ export interface HoverCardContentProps {
   style?: Partial<StyleDesc>
 }
 
-/* ── Context ──────────────────────────────────────────────────────────── */
-
 interface HoverCardContext {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -37,8 +33,6 @@ function useHoverCard(): HoverCardContext {
   if (!ctx) throw new Error('HoverCard components must be used within <HoverCard>')
   return ctx
 }
-
-/* ── Components ───────────────────────────────────────────────────────── */
 
 export function HoverCard({ open, onOpenChange, children }: HoverCardProps) {
   return <HoverCardCtx.Provider value={{ open, onOpenChange }}>{children}</HoverCardCtx.Provider>
@@ -69,13 +63,11 @@ export function HoverCardContent({ children, side = 'bottom', sideOffset = 8, st
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { T, Row, FloatingStage, Shot, ShotItem } from './common'
 import { Button } from './Button'
 import { Icon } from './icons'
 
-/** A compact open hover card: trigger button + anchored content on a side. */
 function SideHoverCard({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'; text: string }) {
   return (
     <HoverCard open={true} onOpenChange={() => {}}>
@@ -89,7 +81,6 @@ function SideHoverCard({ side, text }: { side: 'top' | 'right' | 'bottom' | 'lef
   )
 }
 
-/** The rich hover-card body (icon + title + text). */
 function HoverCardRichBody() {
   const t = useAdwaita()
   return (

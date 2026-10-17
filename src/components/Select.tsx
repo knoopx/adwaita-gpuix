@@ -28,9 +28,6 @@ export interface SelectProps {
   style?: Partial<StyleDesc>
 }
 
-/**
- * Adwaita-styled compound Select using the `@gpuix/react/select` headless primitive.
- */
 export function Select({ style, ...props }: SelectProps) {
   return <SelectRootPrimitive {...props} style={style} />
 }
@@ -38,12 +35,11 @@ export function Select({ style, ...props }: SelectProps) {
 export interface SelectTriggerProps {
   children?: ReactNode
   disabled?: boolean
-  /** Trigger height: `sm` = 28px minHeight, `default` = 34px. */
+
   size?: 'sm' | 'default'
   style?: Partial<StyleDesc>
 }
 
-/** Pill trigger with a chevron icon. `size` maps to a 28 / 34px minHeight. */
 export function SelectTrigger({ children, disabled, size = 'default', style }: SelectTriggerProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -63,7 +59,6 @@ export interface SelectValueProps {
   children?: ReactNode
 }
 
-/** Shows the selected label or a placeholder. */
 export function SelectValue({ placeholder, children }: SelectValueProps) {
   const t = useAdwaita()
   void t
@@ -74,23 +69,11 @@ export interface SelectContentProps {
   children?: ReactNode
   side?: 'top' | 'right' | 'bottom' | 'left'
   sideOffset?: number
-  /**
-   * Render the items as fixed-height (36px) `<virtual-list>` rows — the
-   * GPUix-idiomatic scroller for very long (50+) item lists. Each item is
-   * wrapped in a 36px row div (the `virtual-list`'s estimatedItemHeight).
-   */
+
   virtual?: boolean
   style?: Partial<StyleDesc>
 }
 
-/**
- * Anchored dropdown list with 1px border, card radius, shadow.
- *
- * `position: 'item-aligned' | 'popper'` (shadcn) is **N/A**: the `@gpuix/react`
- * `SelectContent` primitive only exposes `side` / `sideOffset` / `align` /
- * `alignOffset` / `collisionPadding` (it extends `FloatingContentProps`) and
- * has no item-aligned/popper distinction — anchoring is always via `side`.
- */
 export function SelectContent({ children, side = 'bottom', sideOffset = 4, virtual = false, style }: SelectContentProps) {
   const t = useAdwaita()
   return (
@@ -115,7 +98,6 @@ export interface SelectItemProps {
   style?: Partial<StyleDesc>
 }
 
-/** An option row: hover=accentTint, selected=accentTint bg. */
 export function SelectItem({ value, disabled, children, style }: SelectItemProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -136,8 +118,6 @@ export function SelectItem({ value, disabled, children, style }: SelectItemProps
         ...style,
       })}
     >
-      {/* children via the primitive's state render function: a trailing 12px
-          accent check indicator shows only while this item is selected */}
       {({ selected }) => (
         <>
           <T size="body" color={colors.fg}>
@@ -155,7 +135,6 @@ export interface SelectGroupProps {
   style?: Partial<StyleDesc>
 }
 
-/** A group of select items. */
 export function SelectGroup({ children, style }: SelectGroupProps) {
   return (
     <SelectGroupPrimitive style={style}>
@@ -169,7 +148,6 @@ export interface SelectLabelProps {
   style?: Partial<StyleDesc>
 }
 
-/** A caption-dim label above a group. */
 export function SelectLabel({ children, style }: SelectLabelProps) {
   const t = useAdwaita()
   return (
@@ -191,7 +169,6 @@ export interface SelectSeparatorProps {
   style?: Partial<StyleDesc>
 }
 
-/** A 1px separator between groups. */
 export function SelectSeparator({ style }: SelectSeparatorProps) {
   const t = useAdwaita()
   return (
@@ -205,21 +182,13 @@ export function SelectSeparator({ style }: SelectSeparatorProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import { LEVELS, type ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 
-/**
- * A left-aligned fixed-width stage that contains one open Select. In static
- * renders the anchored `<SelectContent>` panel flows beside its trigger (it
- * cannot overlap it), so a bounded 240px wrapper keeps the trigger + panel
- * adjacent and fully inside the 560px shot canvas.
- */
 function SelectStage({ width = 240, children }: { width?: number; children: ReactNode }) {
   return <div style={{ width }}>{children}</div>
 }
 
-/** A theme-coloured `SelectValue` label (GPUI text does not inherit colour). */
 function ShotSelectValue({ text, dim = false }: { text: string; dim?: boolean }) {
   const t = useAdwaita()
   return (
@@ -231,13 +200,11 @@ function ShotSelectValue({ text, dim = false }: { text: string; dim?: boolean })
   )
 }
 
-/** A theme-coloured `SelectValue` placeholder (dim, like an unselected field). */
 function ShotSelectValuePlaceholder() {
   const t = useAdwaita()
   return <SelectValue placeholder={<T size="body" color={t.colors.dim_fg}>Select…</T>} />
 }
 
-/** An open select with a two-item content list anchored to one side. */
 function SideSelect({ side }: { side: 'top' | 'right' | 'left' }) {
   return (
     <SelectStage>

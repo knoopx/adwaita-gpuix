@@ -4,14 +4,13 @@ import { useAdwaita } from '../theme/adwaita'
 import { T } from './common'
 
 export interface HeaderBarProps {
-  /** Centre slot. A string renders as bold title3; a ReactNode (e.g. a ViewSwitcher) is placed as-is. */
+
   title?: ReactNode
   left?: ReactNode
   right?: ReactNode
   style?: Partial<StyleDesc>
 }
 
-/** Flat Adwaita header bar: centred title (string or node) with left/right slots. */
 export function HeaderBar({ title, left, right, style }: HeaderBarProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -30,8 +29,6 @@ export function HeaderBar({ title, left, right, style }: HeaderBarProps) {
         ...style,
       }}
     >
-      {/* Three equal zones (flex: 1 each) so the centre zone is truly
-          centred in the bar regardless of left/right content width. */}
       <div
         style={{
           flexGrow: 1,
@@ -85,7 +82,6 @@ export function HeaderBar({ title, left, right, style }: HeaderBarProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 import { Button } from './Button'

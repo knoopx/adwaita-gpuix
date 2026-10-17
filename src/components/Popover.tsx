@@ -2,8 +2,6 @@ import { createContext, useContext, type ReactNode } from 'react'
 import type { StyleDesc } from '@gpuix/react'
 import { FloatingPanel, T, TextPart } from './common'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface PopoverProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -42,8 +40,6 @@ export interface PopoverDescriptionProps {
   style?: Partial<StyleDesc>
 }
 
-/* ── Context ──────────────────────────────────────────────────────────── */
-
 interface PopoverContext {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -56,8 +52,6 @@ function usePopover(): PopoverContext {
   if (!ctx) throw new Error('Popover components must be used within <Popover>')
   return ctx
 }
-
-/* ── Components ───────────────────────────────────────────────────────── */
 
 export function Popover({ open, onOpenChange, children }: PopoverProps) {
   return <PopoverCtx.Provider value={{ open, onOpenChange }}>{children}</PopoverCtx.Provider>
@@ -84,11 +78,6 @@ export function PopoverContent({ children, side = 'bottom', sideOffset = 8, styl
   )
 }
 
-/**
- * GPUix anchored panels resolve against the nearest positioned ancestor;
- * this wrapper is the positioning context for an anchored PopoverContent —
- * place the trigger (and content) inside it.
- */
 export function PopoverAnchor({ children, style }: PopoverAnchorProps) {
   return (
     <div style={{ position: 'relative', display: 'flex', ...style }}>{children}</div>
@@ -117,12 +106,10 @@ export function PopoverDescription({ children, style }: PopoverDescriptionProps)
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, FloatingStage, Shot, ShotItem } from './common'
 import { Button } from './Button'
 
-/** A compact open-popover anchor: trigger button + anchored content on a side. */
 function SidePopover({ side, text }: { side: 'top' | 'right' | 'bottom' | 'left'; text: string }) {
   return (
     <Popover open={true} onOpenChange={() => {}}>

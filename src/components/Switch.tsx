@@ -8,7 +8,6 @@ export interface SwitchProps {
   style?: Partial<StyleDesc>
 }
 
-/** Adwaita pill toggle: accent track when on, white thumb. */
 export function Switch({ checked, onChange, disabled, style }: SwitchProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -43,7 +42,6 @@ export function Switch({ checked, onChange, disabled, style }: SwitchProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

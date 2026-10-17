@@ -13,16 +13,12 @@ function useRadioGroup(): RadioGroupContextValue {
 export interface RadioGroupProps {
   value?: string
   onValueChange?: (value: string) => void
-  /** Uncontrolled mode: when `value` is undefined, the group starts here. */
+
   defaultValue?: string
   children: ReactNode
   style?: Partial<StyleDesc>
 }
 
-/**
- * A vertical group of radio buttons (column, gap 8).
- * Controlled (`value` + `onValueChange`) or uncontrolled (`defaultValue`).
- */
 export function RadioGroup({ value, onValueChange, defaultValue, children, style }: RadioGroupProps) {
   const [internal, setInternal] = useState<string>(defaultValue ?? value ?? '')
   const current = value ?? internal
@@ -42,20 +38,11 @@ export function RadioGroup({ value, onValueChange, defaultValue, children, style
 export interface RadioGroupItemProps {
   value: string
   disabled?: boolean
-  /**
-   * Optional label rendered as a sibling `T` (8px gap). GPUix has no
-   * `htmlFor`, so association is structural (the label is a sibling of the
-   * circle inside this item).
-   */
+
   label?: string
   style?: Partial<StyleDesc>
 }
 
-/**
- * An 18px radio circle. Selected = ring + accent inner dot. An optional
- * `label` renders as a sibling text (flex row, gap 8). Selecting calls the
- * parent RadioGroup's onValueChange via context.
- */
 export function RadioGroupItem({ value, disabled, label, style }: RadioGroupItemProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -97,11 +84,10 @@ export function RadioGroupItem({ value, disabled, label, style }: RadioGroupItem
 
   if (label === undefined) return circle
 
-  // Label association: a sibling `T` in a flex row (GPUix has no htmlFor).
+
   return <LabeledControl control={circle} label={label} disabled={disabled} />
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 

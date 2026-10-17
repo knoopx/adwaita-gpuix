@@ -6,19 +6,17 @@ import { T, MenuRow } from './common'
 import { Icon, type IconName } from './icons'
 import { Sheet, SheetContent } from './Sheet'
 
-/* ── Context ─────────────────────────────────────────────────────────── */
-
 interface SidebarContextValue {
-  /** The controlled open state (default true). */
+
   open: boolean
-  /** True while the sidebar is in icon-only rail mode. */
+
   collapsed: boolean
-  /** The keyboard-focused row id (accent border). */
+
   focused: string | null
   onFocusRow: (id: string) => void
   register: (id: string) => void
   unregister: (id: string) => void
-  /** Registered row ids in registration order (for ArrowUp/Down nav). */
+
   ordered: () => string[]
 }
 
@@ -34,47 +32,29 @@ const FALLBACK_CTX: SidebarContextValue = {
   ordered: () => [],
 }
 
-/** The sidebar context; falls back to an expanded, no-op context outside `<Sidebar>`. */
 function useSidebarCtx(): SidebarContextValue {
   return useContext(SidebarCtx) ?? FALLBACK_CTX
 }
 
-/* ── Sidebar: navigation panel (expandable / collapsed / mobile) ────── */
-
-/** Width (px) of the expanded sidebar (the reference `14rem` ≈ 220). */
 const EXPANDED_WIDTH = 220
-/** Width (px) of the collapsed icon-only rail (the reference `3.5rem` ≈ 56). */
+
 const COLLAPSED_WIDTH = 56
 
 export interface SidebarProps {
-  /** Width in px when expanded (default 220). */
+
   width?: number
-  /**
-   * Controlled open state. Inline mode defaults to `true` (expanded);
-   * `mobile` mode defaults to `false` (off-canvas sheet closed). When
-   * `false` (inline), the sidebar collapses to a 56px icon-only rail.
-   */
+
   open?: boolean
-  /** Called when the open state changes (scrim dismiss / close button). */
+
   onOpenChange?: (open: boolean) => void
-  /** Render as an off-canvas `Sheet` (side="left") instead of an inline panel. */
+
   mobile?: boolean
-  /** Contain the mobile sheet to a positioned ancestor (static renders). */
+
   contained?: boolean
   children?: ReactNode
   style?: Partial<StyleDesc>
 }
 
-/**
- * An Adwaita navigation panel: a `sidebar_bg` column with header,
- * scrollable content, and footer sections.
- *
- * `open` (default true) toggles the expanded (220px) / collapsed (56px
- * icon-only rail) modes; sub-components read the mode from `SidebarCtx`
- * and hide text labels when collapsed. With `mobile`, the sidebar is
- * composed as an off-canvas `Sheet` (side="left") — the GPUix-idiomatic
- * small-screen variant.
- */
 export function Sidebar({
   width = EXPANDED_WIDTH,
   open,
@@ -87,13 +67,13 @@ export function Sidebar({
   const t = useAdwaita()
   const { colors, radii } = t
 
-  // controlled / uncontrolled: inline defaults to expanded,
-  // mobile (off-canvas) defaults to closed.
+
+
   const [internalOpen, setInternalOpen] = useState(mobile ? (open ?? false) : (open ?? true))
   const effectiveOpen = open ?? internalOpen
   const collapsed = !effectiveOpen
 
-  // keyboard row ordering (ListBox pattern)
+
   const [focused, setFocused] = useState<string | null>(null)
   const orderedRef = useRef<string[]>([])
   const register = (id: string) => {
@@ -137,9 +117,9 @@ export function Sidebar({
   )
 
   if (mobile) {
-    // Off-canvas: a left-side Sheet carrying the (always-expanded) sidebar
-    // content — the GPUix-idiomatic mobile variant of the reference's
-    // `useIsMobile` sheet composition.
+
+
+
     return (
       <Sheet open={effectiveOpen} onOpenChange={handleOpenChange} side="left" contained={contained}>
         <SheetContent style={{ padding: 0, gap: 0 }}>
@@ -161,7 +141,6 @@ export interface SidebarHeaderProps {
   style?: Partial<StyleDesc>
 }
 
-/** The top of the sidebar (brand, search, etc.). */
 export function SidebarHeader({ children, style }: SidebarHeaderProps) {
   return (
     <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8, ...style }}>
@@ -175,7 +154,6 @@ export interface SidebarContentProps {
   style?: Partial<StyleDesc>
 }
 
-/** The scrollable middle of the sidebar (flex-grows to fill). */
 export function SidebarContent({ children, style }: SidebarContentProps) {
   return (
     <div
@@ -198,7 +176,6 @@ export interface SidebarGroupProps {
   style?: Partial<StyleDesc>
 }
 
-/** A labelled group of sidebar items. */
 export function SidebarGroup({ children, style }: SidebarGroupProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, ...style }}>
@@ -209,12 +186,11 @@ export function SidebarGroup({ children, style }: SidebarGroupProps) {
 
 export interface SidebarGroupLabelProps {
   children?: ReactNode
-  /** Rendered (centered) in place of the text label when the sidebar is collapsed. */
+
   icon?: IconName
   style?: Partial<StyleDesc>
 }
 
-/** A caption-dim label above a group's items; icon-only when collapsed. */
 export function SidebarGroupLabel({ children, icon, style }: SidebarGroupLabelProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -242,7 +218,6 @@ export interface SidebarGroupContentProps {
   style?: Partial<StyleDesc>
 }
 
-/** The items of a sidebar group. */
 export function SidebarGroupContent({ children, style }: SidebarGroupContentProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 2, ...style }}>
@@ -256,7 +231,6 @@ export interface SidebarFooterProps {
   style?: Partial<StyleDesc>
 }
 
-/** The bottom of the sidebar (user, settings), separated from content. */
 export function SidebarFooter({ children, style }: SidebarFooterProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -268,14 +242,12 @@ export function SidebarFooter({ children, style }: SidebarFooterProps) {
   )
 }
 
-/* ── SidebarMenuItem: structured nav row ─────────────────────────────── */
-
 export interface SidebarMenuItemProps {
-  /** The row's leading icon (the only thing shown when collapsed). */
+
   icon?: IconName
-  /** The row's label (hidden when collapsed). */
+
   label?: string
-  /** Selected: accentTint background + accent icon/label. */
+
   selected?: boolean
   onClick?: () => void
   style?: Partial<StyleDesc>
@@ -283,15 +255,6 @@ export interface SidebarMenuItemProps {
 
 let nextSidebarItemId = 0
 
-/**
- * A structured navigation row (a `MenuRow`-based row): hover = accentTint,
- * selected = accentTint background + accent icon/label. In collapsed mode
- * only the centered icon is shown (the label is hidden).
- *
- * Keyboard (ListBox pattern): `tabIndex={0}` + ArrowUp/Down move the
- * focused row (accent border) among the sidebar's registered items, and
- * Enter/Space activates the focused row.
- */
 export function SidebarMenuItem({ icon, label, selected, onClick, style }: SidebarMenuItemProps) {
   const t = useAdwaita()
   const { colors } = t
@@ -305,7 +268,7 @@ export function SidebarMenuItem({ icon, label, selected, onClick, style }: Sideb
   useEffect(() => {
     ctx.register(id)
     return () => ctx.unregister(id)
-    // register once per row; the ctx functions are ref-backed and stable
+
   }, [id])
 
   const isFocused = ctx.focused === id
@@ -349,11 +312,9 @@ export function SidebarMenuItem({ icon, label, selected, onClick, style }: Sideb
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, FloatingStage, Shot, ShotItem } from './common'
 
-/** The shared sidebar body: header + two labelled groups + a footer user row. */
 function ShotSideContent({ collapsed }: { collapsed: boolean }) {
   return (
     <>

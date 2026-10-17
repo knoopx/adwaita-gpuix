@@ -5,18 +5,10 @@ import { useAdwaita } from '../theme/adwaita'
 import { T, Row, FloatingStage, Scrim, CloseButton, dialogCardStyle } from './common'
 import { Button } from './Button'
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 export interface DialogRootProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  /**
-   * Contain the open panel (and scrim) to a positioned ancestor instead of
-   * the viewport: switches `position: fixed` to `position: absolute`. Used by
-   * static renders (takumi PNGs) that place the dialog inside a bounded
-   * `position: relative` stage. Default false keeps real GPUix viewport
-   * behaviour.
-   */
+
   contained?: boolean
   children?: ReactNode
 }
@@ -28,12 +20,7 @@ export interface DialogTriggerProps {
 
 export interface DialogContentProps {
   children?: ReactNode
-  /**
-   * Auto-render a close (X) button in the card's top-right corner (absolute,
-   * top 8 / right 8). Default true — matches the reference `DialogContent`
-   * auto close button. Pass false when a custom `DialogClose` placement is
-   * used instead.
-   */
+
   showCloseButton?: boolean
   style?: Partial<StyleDesc>
 }
@@ -63,8 +50,6 @@ export interface DialogCloseProps {
   style?: Partial<StyleDesc>
 }
 
-/* ── Context ──────────────────────────────────────────────────────────── */
-
 interface DialogContext {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -79,8 +64,6 @@ function useDialog(): DialogContext {
   if (!ctx) throw new Error('Dialog components must be used within <Dialog>')
   return ctx
 }
-
-/* ── Components ───────────────────────────────────────────────────────── */
 
 const noop = () => {}
 
@@ -106,8 +89,8 @@ export function DialogContent({ children, showCloseButton = true, style }: Dialo
 
   if (!open) return null
 
-  // contained → the panel is anchored to a positioned ancestor (static renders);
-  // otherwise it floats over the whole viewport (real GPUix).
+
+
   const pos = contained ? 'absolute' : 'fixed'
 
   return (
@@ -125,14 +108,12 @@ export function DialogContent({ children, showCloseButton = true, style }: Dialo
         ...style,
       }}
       onKeyDown={(e: EventPayload) => {
-        // Escape-only dismissal: any-keydown closing would dismiss the dialog
-        // while typing in inner inputs (the old bug).
+
+
         if (e.key === 'Escape') onOpenChange(false)
       }}
     >
       <Scrim position={pos} onDismiss={() => onOpenChange(false)} />
-      {/* Card open transition (GPUix motion animates the fixed property set;
-          opacity is the supported open fade — scale is not in MotionStyle) */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -205,11 +186,6 @@ export function DialogClose({ children, style }: DialogCloseProps) {
   )
 }
 
-/* ── Showcase ─────────────────────────────────────────────────────────── */
-
-/** Full Dialog shot for static renders / playground: closed trigger +
- *  open panel variants (auto close button / custom DialogClose), each
- *  contained in a bounded stage. */
 export function DialogShowcase(): ReactNode {
   const t = useAdwaita()
   return (
@@ -263,7 +239,6 @@ export function DialogShowcase(): ReactNode {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Shot, ShotItem } from './common'
 

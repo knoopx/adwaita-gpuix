@@ -11,21 +11,15 @@ export interface ToggleOption {
 
 interface ToggleGroupBaseProps {
   options: ToggleOption[]
-  /** Container gap between segments (default 2). */
+
   spacing?: number
-  /** `outline` gives inactive segments a 1px border. */
+
   variant?: 'default' | 'outline'
-  /** Segment minHeight: `sm` = 24, `default` = 28, `lg` = 36. */
+
   size?: 'sm' | 'default' | 'lg'
   style?: Partial<StyleDesc>
 }
 
-/**
- * A segmented control. Single-select (`value: string`) by default; set
- * `multiple` for a toggle-set (`value: string[]`, click toggles in/out).
- * The discriminated `multiple` prop keeps the single-mode signature
- * (`onChange: (id: string) => void`) exactly as before.
- */
 export type ToggleGroupProps =
   | (ToggleGroupBaseProps & { multiple?: false; value: string; onChange: (id: string) => void })
   | (ToggleGroupBaseProps & { multiple: true; value: string[]; onChange: (ids: string[]) => void })
@@ -40,7 +34,7 @@ export function ToggleGroup(props: ToggleGroupProps) {
   const outline = variant === 'outline'
   const minHeight = SEG_MIN_HEIGHT[size]
 
-  // Normalise to a string[] for rendering.
+
   const active: string[] = props.multiple === true ? props.value : props.value ? [props.value] : []
 
   const toggle = (id: string) => {
@@ -105,7 +99,6 @@ export function ToggleGroup(props: ToggleGroupProps) {
   )
 }
 
-// ── Showcase shot ─────────────────────────────────────────────────────────
 import type { ComponentShot } from '../../scripts/shot'
 import { Row, Shot, ShotItem } from './common'
 
