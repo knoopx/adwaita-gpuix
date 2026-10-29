@@ -232,7 +232,6 @@ export function FileTreeFile({
       }
       style={{ ...rowStyle(t, isSelected, interactive), ...style }}
     >
-      {}
       <div style={{ width: CHEVRON_SIZE, flexShrink: 0 }} />
       <Icon
         name="fileText"

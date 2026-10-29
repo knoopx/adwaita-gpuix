@@ -85,7 +85,6 @@ export function Switch({
         style,
       )}
     >
-      {}
       <div
         style={{
           width: 20,
