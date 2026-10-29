@@ -2,8 +2,9 @@ import type { ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../../theme/adwaita";
 import { Labeled } from "../common";
+import { Panel } from "../../lib/panel";
 import { Column } from "../Box";
-import { DiffPanel } from "./DiffPanel";
+import { DiffPanel, DiffSummary } from "./DiffPanel";
 import type { TabularSides } from "../../lib/Tabular";
 import { HP_MP_ROWS } from "../.storybook/story-helpers";
 
@@ -99,6 +100,30 @@ export const diffs = defineStory({
           <DiffPanel patch="" tabular={TABULAR} />
         </Frame>
       </Labeled>
+    </Column>
+  ),
+});
+
+const SUMMARIES: [string, number, number][] = [
+  ["mixed diff", 3, 2],
+  ["additions only", 717, 0],
+  ["deletions only", 0, 128],
+  ["empty diff", 0, 0],
+];
+
+export const summary = defineStory({
+  parameters: { height: 220 },
+  render: () => (
+    <Column gap={12} align="stretch" style={{ width: 480 }}>
+      {SUMMARIES.map(([title, added, removed]) => (
+        <Panel
+          key={title}
+          title={title}
+          trailing={<DiffSummary added={added} removed={removed} />}
+        >
+          <></>
+        </Panel>
+      ))}
     </Column>
   ),
 });

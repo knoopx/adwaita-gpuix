@@ -9,6 +9,7 @@ import { useAdwaita } from "../../theme/adwaita";
 import { nativeDiffTheme } from "../../theme/vcs";
 import { T } from "../common";
 import { DataTable } from "../DataTable";
+import { DiffHistogram } from "./FileRow";
 import type { TabularSides } from "../../lib/Tabular";
 
 
@@ -225,6 +226,11 @@ export function DiffSummary({
           {`-${removed}`}
         </T>
       )}
+      <DiffHistogram
+        insertions={added}
+        deletions={removed}
+        colors={colors}
+      />
     </div>
   );
 }
