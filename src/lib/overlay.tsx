@@ -1,67 +1,109 @@
 import type { ReactNode } from "react";
-import { useWindowSize } from "@gpuix/react";
+import { useWindowSize, type StyleDesc } from "@gpuix/react";
 import { Frame } from "../components/Card";
+import { ShortcutHints } from "../components/KeyHint";
+import { type HintGroup } from "../components/KeyBindings";
 import {
   rowHoverBg,
   selectionBg,
   useAdwaita,
 } from "../theme/adwaita";
 
-function scrimBg(): string {
-  return "rgba(0,0,0,0.45)";
-}
+const DIM_BG = "rgba(0,0,0,0.45)";
 
 export function DialogFrame({
   width,
   height,
+  dim = false,
   children,
 }: {
   width: number;
-  height: number;
+  height?: number;
+  dim?: boolean;
   children: ReactNode;
 }) {
   const t = useAdwaita();
-  const { colors, radii } = t;
+  const { colors, radii, spacing } = t;
 
   const { width: winW, height: winH } = useWindowSize();
   return (
-    <anchored position={{ x: 0, y: 0 }}>
-      <div
+    <div
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: winW,
+        height: winH,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        ...(dim ? { backgroundColor: DIM_BG } : {}),
+        pointerEvents: "auto",
+      }}
+    >
+      <Frame
         style={{
-          width: winW,
-          height: winH,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: scrimBg(),
-          pointerEvents: "auto",
+          flexDirection: "column",
+          gap: spacing.gap,
+          width,
+          ...(height !== undefined ? { height } : {}),
+          paddingLeft: spacing.padding,
+          paddingRight: spacing.padding,
+          paddingTop: spacing.paddingTight,
+          paddingBottom: spacing.paddingTight,
+          borderRadius: radii.card,
+          borderWidth: 1,
+          borderColor: colors.border,
+          boxShadow: {
+            offsetX: 0,
+            offsetY: 4,
+            blurRadius: 16,
+            spreadRadius: 0,
+            color: "rgba(0,0,0,0.35)",
+          },
         }}
       >
-        <Frame
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
-            width,
-            height,
-            padding: 16,
-            borderRadius: radii.card,
-            borderWidth: 1,
-            borderColor: colors.border,
-            boxShadow: {
-              offsetX: 0,
-              offsetY: 4,
-              blurRadius: 16,
-              spreadRadius: 0,
-              color: "rgba(0,0,0,0.35)",
-            },
-          }}
-        >
-          {children}
-        </Frame>
-      </div>
-    </anchored>
+        {children}
+      </Frame>
+    </div>
   );
+}
+
+export function DialogHintBar({
+  groups,
+  style,
+}: {
+  groups: HintGroup[];
+  style?: Partial<StyleDesc>;
+}) {
+  const t = useAdwaita();
+  const { colors, spacing } = t;
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: spacing.gap,
+        borderTopWidth: 1,
+        borderColor: colors.border,
+        paddingTop: spacing.gap,
+        ...style,
+      }}
+    >
+      <ShortcutHints groups={groups} />
+    </div>
+  );
+}
+
+export function candidateListHeight(
+  shown: number,
+  rowHeight: number,
+  gap = 2,
+): number {
+  const rows = Math.max(0, shown);
+  if (rows === 0) return 0;
+  return rows * rowHeight + (rows - 1) * gap;
 }
 
 export function OverlayInput({
@@ -132,6 +174,6 @@ export function windowCandidates(
   const activeIdx = Math.min(activeIndex, Math.max(candidates.length - 1, 0));
   let start = Math.max(activeIdx - (maxVisible - 1), 0);
   const end = Math.min(start + maxVisible, candidates.length);
-  start = end - maxVisible;
+  start = Math.max(end - maxVisible, 0);
   return { activeIdx, start, end };
 }
