@@ -5,16 +5,14 @@ import {
   type PublicInstance,
   type StyleDesc,
 } from "@gpuix/react";
-import { useAdwaita, type AdwaitaColors } from "../../theme/adwaita";
+import { useAdwaita } from "../../theme/adwaita";
+import { nativeDiffTheme } from "../../theme/vcs";
 import { T } from "../common";
 import { DataTable } from "../DataTable";
 import type { TabularSides } from "../../lib/Tabular";
 
+
 const MAX_DIFF_LINES = 500;
-
-const CHAR_W = 7.2;
-
-const ROW_H = 22;
 
 type DiffLineKind = "add" | "del" | "ctx" | "hunk";
 
@@ -176,11 +174,8 @@ export interface DiffPanelProps {
 
   diffRef?: Ref<PublicInstance>;
 
-  // Draw own border / corners / background. Off by default: inside a Panel
-  // the Panel already owns the chrome, so framing here nests a pane in a pane.
   framed?: boolean;
 
-  // Draw the file-name plus changed-lines bar (for standalone use).
   header?: boolean;
 }
 
@@ -191,7 +186,7 @@ export interface DiffSummaryData {
   changed: number;
 }
 
-// Stats for a patch, for callers that show them in their own panel header.
+
 export function summarizePatch(patch: string): DiffSummaryData {
   const file = parsePatch(patch);
   return {
@@ -234,109 +229,6 @@ export function DiffSummary({
   );
 }
 
-function rowBg(colors: AdwaitaColors, kind: DiffLineKind): string | undefined {
-  switch (kind) {
-    case "add":
-      return colors.successTint;
-    case "del":
-      return colors.destructiveTint;
-    case "hunk":
-      return colors.headerbar_bg;
-    default:
-      return undefined;
-  }
-}
-
-function DiffLineRow({ line, gutterW }: { line: DiffLine; gutterW: number }) {
-  const t = useAdwaita();
-  const { colors, typography, spacing } = t;
-  const mono: Partial<StyleDesc> = { fontFamily: typography.fontFamilyMono };
-  const bg = rowBg(colors, line.kind);
-
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "stretch",
-        width: "100%",
-        minHeight: ROW_H,
-        ...(bg ? { backgroundColor: bg } : {}),
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "flex-end",
-          width: gutterW,
-          flexShrink: 0,
-          paddingLeft: 2,
-          paddingRight: 2,
-        }}
-      >
-        {line.no !== null ? (
-          <T size="caption" color={colors.dim_fg} style={mono}>
-            {String(line.no)}
-          </T>
-        ) : null}
-      </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 16,
-          flexShrink: 0,
-        }}
-      >
-        {line.kind === "add" ? (
-          <T
-            size="caption"
-            weight={700}
-            color={colors.success}
-            style={mono}
-          >
-            {`+`}
-          </T>
-        ) : line.kind === "del" ? (
-          <T
-            size="caption"
-            weight={700}
-            color={colors.destructive}
-            style={mono}
-          >
-            {`-`}
-          </T>
-        ) : null}
-      </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          flexGrow: 1,
-          minWidth: 0,
-          paddingLeft: 4,
-          paddingRight: spacing.paddingTight,
-        }}
-      >
-        <T
-          size="caption"
-          color={line.kind === "hunk" ? colors.dim_fg : colors.fg}
-          style={{
-            ...mono,
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-            overflow: "hidden",
-          }}
-        >
-          {line.text.length > 0 ? line.text : " "}
-        </T>
-      </div>
-    </div>
-  );
-}
-
 export function DiffPanel({
   patch,
   tabular = null,
@@ -356,9 +248,6 @@ export function DiffPanel({
   const file = useMemo(() => parsePatch(patch), [patch]);
   const mono: Partial<StyleDesc> = { fontFamily: typography.fontFamilyMono };
   const changed = file.added + file.removed;
-
-  const maxNo = file.lines.reduce((m, l) => Math.max(m, l.no ?? 0), 0);
-  const gutterW = Math.max(2, String(maxNo).length) * CHAR_W + 6;
 
   return (
     <div
@@ -413,21 +302,24 @@ export function DiffPanel({
           </T>
         </div>
       )}
-      <virtual-list
+      <div
         ref={diffRef}
-        estimatedItemHeight={ROW_H}
         style={{
           display: "flex",
           flexDirection: "column",
           flexGrow: 1,
           minHeight: 0,
           alignSelf: "stretch",
+          overflow: "scroll",
         }}
       >
-        {file.lines.map((line, i) => (
-          <DiffLineRow key={i} line={line} gutterW={gutterW} />
-        ))}
-      </virtual-list>
+        <diff
+          patch={patch}
+          wordDiff
+          maxLines={MAX_DIFF_LINES}
+          theme={nativeDiffTheme(t)}
+        />
+      </div>
     </div>
   );
 }
