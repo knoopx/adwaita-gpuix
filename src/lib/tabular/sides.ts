@@ -8,14 +8,19 @@ export interface TabularSides {
   hasHeader: boolean;
 }
 
+function isNumericCell(value: string): boolean {
+  const k = value.trim();
+  return k !== "" && Number.isFinite(Number(k));
+}
+
+
+
+
 function hasHeaderRow(rows: string[][]): boolean {
-  return (
-    rows.length > 1 &&
-    rows.every((r) => {
-      const k = (r[0] ?? "").trim();
-      return k !== "" && !Number.isFinite(Number(k));
-    })
-  );
+  if (rows.length < 2) return false;
+  const first = rows[0];
+  if (!first || first.length === 0) return false;
+  return first.every((v) => v.trim() !== "" && !isNumericCell(v));
 }
 
 export function parseTabularSides(

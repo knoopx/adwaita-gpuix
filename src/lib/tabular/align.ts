@@ -28,7 +28,15 @@ function padRow(row: string[], cols: number): string[] {
   return out;
 }
 
-function pickHeaderSrc(oldRows: string[][], nextRows: string[][]): string[] {
+
+
+
+function pickHeaderSrc(
+  oldRows: string[][],
+  nextRows: string[][],
+  hasHeader: boolean,
+): string[] {
+  if (!hasHeader) return [];
   if (nextRows.length > 0) return nextRows[0] as string[];
   if (oldRows.length > 0) return oldRows[0] as string[];
   return [];
@@ -165,7 +173,7 @@ export function alignTables(
 ): AlignedTable {
   const oldData = hasHeader ? oldRows.slice(1) : oldRows;
   const nextData = hasHeader ? nextRows.slice(1) : nextRows;
-  const headerSrc = pickHeaderSrc(oldRows, nextRows);
+  const headerSrc = pickHeaderSrc(oldRows, nextRows, hasHeader);
   const cols = computeCols(headerSrc, oldData, nextData);
   const header = buildHeader(headerSrc, cols);
   const queues = buildRowKeyQueues(oldData);

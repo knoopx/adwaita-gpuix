@@ -80,11 +80,18 @@ export function DataTable({
 
   const tableWidth = gutterWidth + colWidths.reduce((a, b) => a + b, 0);
 
-  const cellStyle = (width: number): StyleDesc => ({
+  
+  
+  const colStyle = (width: number): StyleDesc => ({
     width,
+    flexGrow: 1,
     flexShrink: 0,
     paddingLeft: pad / 2,
     paddingRight: pad / 2,
+  });
+
+  const cellStyle = (): StyleDesc => ({
+    width: "100%",
     whiteSpace: "nowrap",
     textOverflow: "ellipsis",
     overflow: "hidden",
@@ -173,7 +180,8 @@ export function DataTable({
           style={{
             display: "flex",
             flexDirection: "column",
-            width: tableWidth,
+            width: "100%",
+            minWidth: tableWidth,
             flexShrink: 0,
           }}
         >
@@ -207,12 +215,12 @@ export function DataTable({
               </T>
             </div>
             {aligned.header.map((label, c) => (
-              <div key={c} style={cellStyle(colWidths[c] as number)}>
+              <div key={c} style={colStyle(colWidths[c] as number)}>
                 <T
                   size="caption"
                   weight={700}
                   color={colors.dim_fg}
-                  style={cellStyle(colWidths[c] as number)}
+                  style={cellStyle()}
                 >
                   {label}
                 </T>
@@ -275,8 +283,7 @@ export function DataTable({
                         <div
                           key={c}
                           style={{
-                            width: colWidths[c],
-                            flexShrink: 0,
+                            ...colStyle(colWidths[c] as number),
                             backgroundColor: cell.changed
                               ? colors.warningTint
                               : "transparent",
@@ -286,7 +293,7 @@ export function DataTable({
                             size="caption"
                             color={cell.changed ? colors.warning : colors.fg}
                             weight={cell.changed ? 600 : 400}
-                            style={cellStyle(colWidths[c] as number)}
+                            style={cellStyle()}
                           >
                             {cell.changed
                               ? `${cell.old} → ${cell.next}`
@@ -296,10 +303,7 @@ export function DataTable({
                       ) : null,
                     )
                   : r.cells.map((v, c) => (
-                      <div
-                        key={c}
-                        style={{ width: colWidths[c], flexShrink: 0 }}
-                      >
+                      <div style={colStyle(colWidths[c] as number)} key={c}>
                         <T
                           size="caption"
                           color={
@@ -307,7 +311,7 @@ export function DataTable({
                               ? colors.success
                               : colors.destructive
                           }
-                          style={cellStyle(colWidths[c] as number)}
+                          style={cellStyle()}
                         >
                           {v}
                         </T>
