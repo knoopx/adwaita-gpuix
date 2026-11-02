@@ -7,7 +7,8 @@ light/dark colour schemes, nine accent colours, and a full set of idiomatic
 controls.
 
 Built on React 19 + [GPUix](https://github.com/gpuix) (`@gpuix/react` +
-`@gpuix/native`), with `lucide-static` icons.
+`@gpuix/native`), with **Material Symbols** icons (Iconify data, so any Iconify
+set can be registered).
 
 ## Install
 
@@ -53,7 +54,8 @@ minHeight: 0 }}>…rows…</virtual-list>`.
   `ACCENTS`, `SCHEMES`, `Radii`, `Typography`, `Spacing`, `hexToRgba`,
   `shade`, `accentForeground` (types: `ColorScheme`, `AccentKey`,
   `AdwaitaTheme`, `AdwaitaColors`, …)
-- **Text & icons** — `T`, `SectionTitle`, `Icon`, `ICONS` (`IconName`)
+- **Text & icons** — `T`, `SectionTitle`, `Icon`, `ICONS` (`IconName`), `iconSvg`,
+  `registerIconSet` / `setIconSet` (Material Symbols by default, any Iconify set)
 - **Controls** — `Button`, `Switch`, `Entry`, `Spinner`, `ProgressBar`,
   `ToggleGroup`, `Avatar`
 - **Surfaces** — `Card`, `Frame`, `Banner`, `Toast`, `StatusPage`
@@ -82,7 +84,7 @@ function App() {
       >
         <HeaderBar
           title="Adwaita GPUix"
-          left={<Button variant="icon" icon="panel" />}
+          left={<Button variant="icon" icon="viewSidebar" />}
         />
         <div
           style={{
