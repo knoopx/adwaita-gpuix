@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import type { DecoratorFunction } from "storybook";
 import { AdwaitaProvider } from "../src/theme/adwaita";
 
-
 const FRAME_STYLE = {
   display: "flex",
   flexDirection: "column",
