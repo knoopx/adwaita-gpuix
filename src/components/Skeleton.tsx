@@ -1,5 +1,4 @@
-import type { StyleDesc } from "@gpuix/react";
-import { motion } from "@gpuix/react";
+import { type StyleDesc, motion } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
 
 export interface SkeletonProps {
@@ -16,8 +15,6 @@ export function Skeleton({
   style,
 }: SkeletonProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
-
   const isCircle = variant === "circle";
   const size = isCircle ? width : undefined;
 
@@ -28,8 +25,8 @@ export function Skeleton({
       style={{
         width: isCircle ? size : width,
         height: isCircle ? size : height,
-        borderRadius: isCircle ? radii.pill : radii.button,
-        backgroundColor: colors.button_bg,
+        borderRadius: isCircle ? t.radius.full : t.radius.sm,
+        backgroundColor: t.color.surface.button,
         pointerEvents: "none",
         ...style,
       }}

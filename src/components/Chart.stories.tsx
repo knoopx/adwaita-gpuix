@@ -1,13 +1,13 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Column } from "./Box";
 import {
   Chart,
-  ChartLegend,
-  chartPalette,
   type ChartDataPoint,
+  ChartLegend,
   type ChartSeriesPoint,
+  chartPalette,
 } from "./Chart";
 
 const SINGLE_DATA: ChartDataPoint[] = [
@@ -82,23 +82,32 @@ function legendItems(names: string[], palette: string[]) {
   return names.map((name, i) => ({ name, color: palette[i % palette.length] }));
 }
 
-function chartTypeBody(type: "bar" | "line") {
+function ChartTypeBody({ type }: { type: "bar" | "line" }) {
   const t = useAdwaita();
-  const palette = chartPalette(t.colors);
+  const palette = chartPalette(t);
   return (
     <Column gap={16} align="center">
-      <Labeled caption="single series (default accent colour)" style={{ flexGrow: 1 }}>
+      <Labeled
+        caption="single series (default accent colour)"
+        style={{ flexGrow: 1 }}
+      >
         <Chart data={SINGLE_DATA} type={type} height={110} />
       </Labeled>
-      <Labeled caption="single series · custom colour (warning token)" style={{ flexGrow: 1 }}>
+      <Labeled
+        caption="single series · custom colour (warning token)"
+        style={{ flexGrow: 1 }}
+      >
         <Chart
           data={SINGLE_DATA}
           type={type}
           height={110}
-          color={t.colors.warning}
+          color={t.color.functional.warning}
         />
       </Labeled>
-      <Labeled caption="multi-series (token palette) + legend" style={{ flexGrow: 1 }}>
+      <Labeled
+        caption="multi-series (token palette) + legend"
+        style={{ flexGrow: 1 }}
+      >
         <Chart data={MULTI_DATA} type={type} height={110} />
         <ChartLegend items={legendItems(["A", "B", "C"], palette)} />
       </Labeled>
@@ -113,19 +122,22 @@ export default defineMeta({
 });
 
 export const bar = defineStory({
-  render: () => chartTypeBody("bar"),
+  render: () => <ChartTypeBody type="bar" />,
 });
 
 export const line = defineStory({
-  render: () => chartTypeBody("line"),
+  render: () => <ChartTypeBody type="line" />,
 });
 
 export function grid() {
   const t = useAdwaita();
-  const palette = chartPalette(t.colors);
+  const palette = chartPalette(t);
   return (
     <Column gap={16} align="center">
-      <Labeled caption="line · grid lines + markers (border token)" style={{ flexGrow: 1 }}>
+      <Labeled
+        caption="line · grid lines + markers (border token)"
+        style={{ flexGrow: 1 }}
+      >
         <Chart data={SINGLE_DATA} type="line" height={110} grid />
       </Labeled>
       <Labeled caption="multi-series bars · grid lines" style={{ flexGrow: 1 }}>
@@ -152,7 +164,10 @@ export function empty() {
 export function noMarkers() {
   return (
     <Column gap={16} align="center">
-      <Labeled caption="line · data point markers (default)" style={{ flexGrow: 1 }}>
+      <Labeled
+        caption="line · data point markers (default)"
+        style={{ flexGrow: 1 }}
+      >
         <Chart data={SINGLE_DATA} type="line" height={110} />
       </Labeled>
       <Labeled caption="line · markers off" style={{ flexGrow: 1 }}>
@@ -178,7 +193,10 @@ export function longLabels() {
 export function timeSeries() {
   return (
     <Column gap={16} align="center">
-      <Labeled caption="hourly bars · gap-weighted layout (3 h gap)" style={{ flexGrow: 1 }}>
+      <Labeled
+        caption="hourly bars · gap-weighted layout (3 h gap)"
+        style={{ flexGrow: 1 }}
+      >
         <Chart data={TIME_DATA} height={110} />
       </Labeled>
       <Labeled caption="hourly bars · grid lines" style={{ flexGrow: 1 }}>

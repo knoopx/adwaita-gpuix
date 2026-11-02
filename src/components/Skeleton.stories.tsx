@@ -1,7 +1,7 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import { Skeleton } from "./Skeleton";
 
 export default defineMeta({
@@ -49,10 +49,10 @@ function CardPlaceholder() {
         gap: 12,
         width: 288,
         padding: 16,
-        borderRadius: t.radii.card,
+        borderRadius: t.radius.sm,
         borderWidth: 1,
-        borderColor: t.colors.border,
-        backgroundColor: t.colors.view_bg,
+        borderColor: t.color.border.default,
+        backgroundColor: t.color.surface.view,
       }}
     >
       <div

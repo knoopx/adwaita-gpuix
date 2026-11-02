@@ -1,11 +1,8 @@
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, type AdwaitaColors } from "../theme/adwaita";
+import { type StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
+import { type Tone, toneColor } from "../theme/tones";
 
-export type ProgressBarColor =
-  | "accent"
-  | "success"
-  | "destructive"
-  | "warning";
+export type ProgressBarColor = Tone;
 
 export interface ProgressBarProps {
   value: number;
@@ -19,13 +16,6 @@ export interface ProgressBarProps {
   style?: Partial<StyleDesc>;
 }
 
-const FILL_TOKEN: Record<ProgressBarColor, keyof AdwaitaColors> = {
-  accent: "accent",
-  success: "success",
-  destructive: "destructive",
-  warning: "warning",
-};
-
 export function ProgressBar({
   value,
   percent,
@@ -34,10 +24,9 @@ export function ProgressBar({
   style,
 }: ProgressBarProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   const normalized = percent ? value : value / 100;
   const clamped = Math.min(1, Math.max(0, normalized));
-  const pill = radii.pill;
+  const pill = t.radius.full;
   return (
     <div
       style={{
@@ -46,7 +35,7 @@ export function ProgressBar({
         width: "100%",
         height,
         borderRadius: pill,
-        backgroundColor: colors.border,
+        backgroundColor: t.color.border.default,
         overflow: "hidden",
         pointerEvents: "none",
         ...style,
@@ -57,7 +46,7 @@ export function ProgressBar({
           width: `${Math.round(clamped * 100)}%`,
           height,
           borderRadius: pill,
-          backgroundColor: colors[FILL_TOKEN[color]],
+          backgroundColor: toneColor(t, color),
         }}
       />
     </div>

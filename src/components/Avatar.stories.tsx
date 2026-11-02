@@ -1,24 +1,24 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
 import {
   AdwaitaProvider,
-  useAdwaita,
   type AdwaitaTheme,
+  useAdwaita,
 } from "../theme/adwaita";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import { Avatar, AvatarBadge, AvatarGroup, AvatarGroupCount } from "./Avatar";
 import { ICONS } from "./icons";
 
 function photoSrc(t: AdwaitaTheme): string {
-  const inner = ICONS.user
+  const inner = ICONS.person
     .replace(/^<svg[^>]*>/, "")
     .replace("</svg>", "")
-    .replace(/currentColor/g, t.colors.accent);
+    .replace(/currentColor/g, t.color.accent.base);
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">` +
-    `<circle cx="12" cy="12" r="12" fill="${t.colors.accentTint}"/>` +
-    `<g fill="none" stroke="${t.colors.accent}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(5.2 5.2) scale(0.5667)">${inner}</g>` +
+    `<circle cx="12" cy="12" r="12" fill="${t.color.accent.tint}"/>` +
+    `<g fill="none" stroke="${t.color.accent.base}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(5.2 5.2) scale(0.5667)">${inner}</g>` +
     `</svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
@@ -75,7 +75,7 @@ export function photoBadge() {
       <Labeled caption="with badge (success colour)">
         <div style={{ position: "relative", width: 48, height: 48 }}>
           <Avatar name="Grace Hopper" size={48} />
-          <AvatarBadge color={t.colors.success} size={14} />
+          <AvatarBadge color={t.color.functional.success} size={14} />
         </div>
       </Labeled>
     </Row>
@@ -86,7 +86,7 @@ export const icon = defineStory({
   render: () => (
     <Row gap={16} align="start">
       <LabeledAvatar caption="icon (user)">
-        <Avatar name="Ada Lovelace" size={48} icon="user" />
+        <Avatar name="Ada Lovelace" size={48} icon="person" />
       </LabeledAvatar>
       <LabeledAvatar caption="icon (settings)">
         <Avatar name="Build bot" size={48} icon="settings" />
@@ -111,10 +111,10 @@ export function status() {
   );
   return (
     <Row gap={16} align="start">
-      <Labeled caption="online">{dot(t.colors.success)}</Labeled>
-      <Labeled caption="away">{dot(t.colors.warning)}</Labeled>
-      <Labeled caption="busy">{dot(t.colors.destructive)}</Labeled>
-      <Labeled caption="offline">{dot(t.colors.dim_fg)}</Labeled>
+      <Labeled caption="online">{dot(t.color.functional.success)}</Labeled>
+      <Labeled caption="away">{dot(t.color.functional.warning)}</Labeled>
+      <Labeled caption="busy">{dot(t.color.functional.destructive)}</Labeled>
+      <Labeled caption="offline">{dot(t.color.text.dim)}</Labeled>
     </Row>
   );
 }
@@ -134,7 +134,7 @@ export function ringDisabled() {
         <Avatar name="Ada Lovelace" size={48} disabled />
       </LabeledAvatar>
       <LabeledAvatar caption="disabled (icon)">
-        <Avatar name="" size={48} icon="user" disabled />
+        <Avatar name="" size={48} icon="person" disabled />
       </LabeledAvatar>
     </Row>
   );
@@ -143,7 +143,9 @@ export function ringDisabled() {
 const STACK_NAMES = ["Ada Lovelace", "Alan Turing", "Grace Hopper"];
 
 function renderStackAvatars(size: number) {
-  return STACK_NAMES.map((name) => <Avatar key={name} name={name} size={size} />);
+  return STACK_NAMES.map((name) => (
+    <Avatar key={name} name={name} size={size} />
+  ));
 }
 
 export const group = defineStory({

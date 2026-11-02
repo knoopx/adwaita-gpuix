@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, type AdwaitaColors } from "../theme/adwaita";
-import { T } from "./common";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
 
 export interface ChartDataPoint {
   label: string;
@@ -21,45 +21,37 @@ export interface ChartSeriesPoint {
 
 export type ChartData = ChartDataPoint[] | ChartSeriesPoint[];
 
-export interface ChartProps {
-  data: ChartData;
-  type?: "bar" | "line";
-
-  
-  color?: string;
-
-  
-  colors?: string[];
+interface ChartStyleOptions {
   height?: number;
   style?: Partial<StyleDesc>;
   hideZeroLabels?: boolean;
-
-  
+  labels?: boolean;
   grid?: boolean;
-  
   markers?: boolean;
-  
+  fill?: boolean;
+  gap?: number;
   width?: number;
+
+  barWidth?: number;
+
+  fillTop?: number;
+
+  fillBottom?: number;
+}
+
+export interface ChartProps extends ChartStyleOptions {
+  data: ChartData;
+  type?: "bar" | "line";
+  color?: string;
+  colors?: string[];
 }
 
 function isMultiSeriesData(data: ChartData): data is ChartSeriesPoint[] {
   return data.length > 0 && Array.isArray((data[0] as ChartSeriesPoint).values);
 }
 
-
-export function chartPalette(
-  colors: Pick<
-    AdwaitaColors,
-    "accent" | "success" | "warning" | "destructive" | "dim_fg"
-  >,
-): string[] {
-  return [
-    colors.accent,
-    colors.success,
-    colors.warning,
-    colors.destructive,
-    colors.dim_fg,
-  ];
+export function chartPalette(t: AdwaitaTheme): string[] {
+  return t.color.chart.series;
 }
 
 function seriesColor(palette: string[], index: number): string {
@@ -74,9 +66,15 @@ export function Chart({
   height = 120,
   style,
   hideZeroLabels = false,
+  labels = true,
   grid = false,
   markers = true,
+  fill = false,
+  gap,
   width = 480,
+  barWidth,
+  fillTop,
+  fillBottom,
 }: ChartProps) {
   const t = useAdwaita();
 
@@ -84,7 +82,7 @@ export function Chart({
     return <EmptyChart height={height} style={style} />;
   }
 
-  const palette = colors ?? chartPalette(t.colors);
+  const palette = colors ?? chartPalette(t);
   if (isMultiSeriesData(data)) {
     if (type === "line") {
       return (
@@ -93,8 +91,10 @@ export function Chart({
           palette={palette}
           height={height}
           style={style}
+          labels={labels}
           grid={grid}
           markers={markers}
+          fill={fill}
           width={width}
         />
       );
@@ -106,12 +106,13 @@ export function Chart({
         height={height}
         style={style}
         hideZeroLabels={hideZeroLabels}
+        labels={labels}
         grid={grid}
       />
     );
   }
 
-  const chartColor = color ?? t.colors.accent;
+  const chartColor = color ?? t.color.accent.base;
   if (type === "line") {
     return (
       <LineChart
@@ -119,9 +120,13 @@ export function Chart({
         color={chartColor}
         height={height}
         style={style}
+        labels={labels}
         grid={grid}
         markers={markers}
+        fill={fill}
         width={width}
+        fillTop={fillTop}
+        fillBottom={fillBottom}
       />
     );
   }
@@ -131,7 +136,10 @@ export function Chart({
       color={chartColor}
       height={height}
       style={style}
+      gap={gap}
+      barWidth={barWidth}
       hideZeroLabels={hideZeroLabels}
+      labels={labels}
       grid={grid}
     />
   );
@@ -149,7 +157,6 @@ export interface ChartLegendProps {
 
 export function ChartLegend({ items, style }: ChartLegendProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div style={{ display: "flex", flexDirection: "row", gap: 12, ...style }}>
       {items.map((item, i) => (
@@ -170,7 +177,7 @@ export function ChartLegend({ items, style }: ChartLegendProps) {
               backgroundColor: item.color,
             }}
           />
-          <T size="caption" color={colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             {item.name}
           </T>
         </div>
@@ -179,18 +186,19 @@ export function ChartLegend({ items, style }: ChartLegendProps) {
   );
 }
 
-interface ChartRendererProps {
+interface ChartRendererProps extends ChartStyleOptions {
   data: ChartDataPoint[];
   color: string;
   height: number;
-  style?: Partial<StyleDesc>;
-  hideZeroLabels?: boolean;
-  grid?: boolean;
-  markers?: boolean;
-  width?: number;
 }
 
-function EmptyChart({ height, style }: { height: number; style?: Partial<StyleDesc> }) {
+function EmptyChart({
+  height,
+  style,
+}: {
+  height: number;
+  style?: Partial<StyleDesc>;
+}) {
   const t = useAdwaita();
   return (
     <div
@@ -202,7 +210,7 @@ function EmptyChart({ height, style }: { height: number; style?: Partial<StyleDe
         ...style,
       }}
     >
-      <T size="caption" color={t.colors.dim_fg}>
+      <T size="caption" color={t.color.text.dim}>
         No data
       </T>
     </div>
@@ -211,7 +219,6 @@ function EmptyChart({ height, style }: { height: number; style?: Partial<StyleDe
 
 function ChartLabels({ labels }: { labels: ChartData }) {
   const t = useAdwaita();
-  const { colors } = t;
   const pts = labels as ChartDataPoint[];
   const { base, gaps } = timeGapWeights(pts);
   return (
@@ -226,7 +233,7 @@ function ChartLabels({ labels }: { labels: ChartData }) {
               justifyContent: "center",
             }}
           >
-            <T size="caption" color={colors.dim_fg} align="center">
+            <T size="caption" color={t.color.text.dim} align="center">
               {d.label}
             </T>
           </div>
@@ -280,14 +287,43 @@ function BarRow({
   );
 }
 
+function barPlotHeight(height: number): number {
+  return Math.max(height - 16, 8);
+}
 
-function BarGrid({
+function BarPlot({
+  labels,
+  style,
+  height,
   plotHeight,
-  color,
+  gap,
+  grid,
+  children,
 }: {
+  labels?: ChartData;
+  style?: Partial<StyleDesc>;
+  height: number;
   plotHeight: number;
-  color: string;
+  gap: number;
+  grid: boolean;
+  children: ReactNode;
 }) {
+  const t = useAdwaita();
+  return (
+    <ChartFrame labels={labels} style={style}>
+      <div style={{ position: "relative" }}>
+        {grid ? (
+          <BarGrid plotHeight={plotHeight} color={t.color.border.default} />
+        ) : null}
+        <BarRow height={height} gap={gap}>
+          {children}
+        </BarRow>
+      </div>
+    </ChartFrame>
+  );
+}
+
+function BarGrid({ plotHeight, color }: { plotHeight: number; color: string }) {
   return (
     <div
       style={{
@@ -350,11 +386,39 @@ function buildLineSvgSeries(params: {
   dots: string;
   axisColor?: string;
   gridLines?: string;
+  area?: { top: number; bottom: number };
 }): string {
-  const { width, height, padding, color, points, dots, axisColor, gridLines } =
-    params;
+  const {
+    width,
+    height,
+    padding,
+    color,
+    points,
+    dots,
+    axisColor,
+    gridLines,
+    area,
+  } = params;
+  const defs =
+    area !== undefined
+      ? `<defs><linearGradient id="band" x1="0" y1="0" x2="0" y2="${height}" gradientUnits="userSpaceOnUse">`
+      : "";
+  const grad =
+    area !== undefined
+      ? `<stop offset="0" stop-color="${color}" stop-opacity="${area.top}"/>`
+      : "";
+  const gradEnd =
+    area !== undefined
+      ? `<stop offset="1" stop-color="${color}" stop-opacity="${area.bottom}"/></linearGradient></defs>`
+      : "";
+  const band =
+    area !== undefined && points.length > 0
+      ? `<polygon points="0,${height} ${points} ${width},${height}" fill="url(#band)"/>`
+      : "";
   const svgSource = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+    ${defs}${grad}${gradEnd}
     ${gridLines ?? ""}
+    ${band}
     ${axisColor !== undefined ? `<line x1="0" y1="${height - padding}" x2="${width}" y2="${height - padding}" stroke="${axisColor}" stroke-width="1"/>` : ""}
     <polyline points="${points}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
     ${dots}
@@ -376,8 +440,10 @@ function lineGridMarkup(
     .join("");
 }
 
-
-function timeGapWeights(data: ChartDataPoint[]): { base: number; gaps: number[] } {
+function timeGapWeights(data: ChartDataPoint[]): {
+  base: number;
+  gaps: number[];
+} {
   const timeMode =
     data.length > 1 && data.every((d) => typeof d.ts === "number");
   if (!timeMode) {
@@ -399,62 +465,65 @@ function BarChart({
   height,
   style,
   hideZeroLabels = false,
+  labels = true,
   grid = false,
+  gap = 4,
+  barWidth,
 }: ChartRendererProps) {
   const t = useAdwaita();
-  const { colors } = t;
-
-  const plotHeight = Math.max(height - 16, 8);
+  const plotHeight = barPlotHeight(height);
   const maxValue = Math.max(...data.map((d) => d.value), 1);
   const { base, gaps } = timeGapWeights(data);
 
   return (
-    <ChartFrame labels={data} style={style}>
-      <div style={{ position: "relative" }}>
-        {grid ? <BarGrid plotHeight={plotHeight} color={colors.border} /> : null}
-        <BarRow height={height} gap={4}>
-          {data.map((d, i) => {
-            const barHeight =
-              d.value === 0
-                ? 0
-                : Math.max(4, Math.round((d.value / maxValue) * plotHeight));
-            return (
-              <Fragment key={i}>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    flexGrow: base,
-                    flexBasis: 0,
-                    gap: 4,
-                  }}
-                >
-                  {hideZeroLabels && d.value === 0 ? null : (
-                    <T size="caption" color={colors.dim_fg}>
-                      {d.value}
-                    </T>
-                  )}
-                  <div
-                    style={{
-                      width: "100%",
-                      minHeight: d.value === 0 ? 0 : 4,
-                      height: barHeight,
-                      borderRadius: 4,
-                      backgroundColor: color,
-                    }}
-                  />
-                </div>
-                {i < gaps.length && gaps[i] > 0 ? (
-                  <div style={{ flexGrow: gaps[i], flexBasis: 0 }} />
-                ) : null}
-              </Fragment>
-            );
-          })}
-        </BarRow>
-      </div>
-    </ChartFrame>
+    <BarPlot
+      labels={data}
+      style={style}
+      height={height}
+      plotHeight={plotHeight}
+      gap={gap}
+      grid={grid}
+    >
+      {data.map((d, i) => {
+        const barHeight =
+          d.value === 0
+            ? 0
+            : Math.max(4, Math.round((d.value / maxValue) * plotHeight));
+        return (
+          <Fragment key={i}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                flexGrow: base,
+                flexBasis: 0,
+                height: plotHeight,
+                gap: 4,
+              }}
+            >
+              <T size="caption" color={t.color.text.dim}>
+                {labels && !(hideZeroLabels && d.value === 0) ? d.value : " "}
+              </T>
+              <div
+                style={{
+                  width: barWidth ?? "100%",
+                  minHeight: d.value === 0 ? 0 : 4,
+                  height: barHeight,
+                  borderRadius:
+                    barWidth !== undefined ? Math.min(barWidth / 2, 4) : 4,
+                  backgroundColor: color,
+                }}
+              />
+            </div>
+            {i < gaps.length && gaps[i] > 0 ? (
+              <div style={{ flexGrow: gaps[i], flexBasis: 0 }} />
+            ) : null}
+          </Fragment>
+        );
+      })}
+    </BarPlot>
   );
 }
 
@@ -467,7 +536,9 @@ function barHeightAt(
   maxValue: number,
   plotHeight: number,
 ): number {
-  return value === 0 ? 0 : Math.max(4, Math.round((value / maxValue) * plotHeight));
+  return value === 0
+    ? 0
+    : Math.max(4, Math.round((value / maxValue) * plotHeight));
 }
 
 function MultiBarChart({
@@ -476,6 +547,7 @@ function MultiBarChart({
   height,
   style,
   hideZeroLabels = false,
+  labels = true,
   grid = false,
 }: {
   data: ChartSeriesPoint[];
@@ -483,76 +555,79 @@ function MultiBarChart({
   height: number;
   style?: Partial<StyleDesc>;
   hideZeroLabels?: boolean;
+  labels?: boolean;
   grid?: boolean;
 }) {
   const t = useAdwaita();
-  const { colors } = t;
-  const plotHeight = Math.max(height - 16, 8);
+  const plotHeight = barPlotHeight(height);
   const maxValue = maxSeriesValue(data);
 
   return (
-    <ChartFrame style={style}>
-      <div style={{ position: "relative" }}>
-        {grid ? <BarGrid plotHeight={plotHeight} color={colors.border} /> : null}
-        <BarRow height={height} gap={8}>
-          {data.map((d, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                flexGrow: 1,
-                gap: 4,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "flex-end",
-                  gap: 2,
-                  height: plotHeight,
-                }}
-              >
-                {d.values.map((v, j) => {
-                  const barHeight = barHeightAt(v.value, maxValue, plotHeight);
-                  return (
-                    <div
-                      key={j}
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: 2,
-                      }}
-                    >
-                      {hideZeroLabels && v.value === 0 ? null : (
-                        <T size="caption" color={colors.dim_fg}>
-                          {v.value}
-                        </T>
-                      )}
-                      <div
-                        style={{
-                          width: 8,
-                          minHeight: v.value === 0 ? 0 : 4,
-                          height: barHeight,
-                          borderRadius: 2,
-                          backgroundColor: seriesColor(palette, j),
-                        }}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-              <T size="caption" color={colors.dim_fg} align="center">
-                {d.label}
-              </T>
-            </div>
-          ))}
-        </BarRow>
-      </div>
-    </ChartFrame>
+    <BarPlot
+      style={style}
+      height={height}
+      plotHeight={plotHeight}
+      gap={8}
+      grid={grid}
+    >
+      {data.map((d, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            flexGrow: 1,
+            gap: 4,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "flex-end",
+              gap: 2,
+              height: plotHeight,
+            }}
+          >
+            {d.values.map((v, j) => {
+              const barHeight = barHeightAt(v.value, maxValue, plotHeight);
+              return (
+                <div
+                  key={j}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
+                  {labels && !(hideZeroLabels && v.value === 0) ? (
+                    <T size="caption" color={t.color.text.dim}>
+                      {v.value}
+                    </T>
+                  ) : null}
+                  <div
+                    style={{
+                      width: 8,
+                      minHeight: v.value === 0 ? 0 : 4,
+                      height: barHeight,
+                      borderRadius: 2,
+                      backgroundColor: seriesColor(palette, j),
+                    }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          {labels ? (
+            <T size="caption" color={t.color.text.dim} align="center">
+              {d.label}
+            </T>
+          ) : null}
+        </div>
+      ))}
+    </BarPlot>
   );
 }
 
@@ -561,17 +636,26 @@ function LineChart({
   color,
   height,
   style,
+  labels = true,
   grid = false,
   markers = true,
+  fill = false,
   width = 480,
+  fillTop,
+  fillBottom,
 }: ChartRendererProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const maxValue = Math.max(...data.map((d) => d.value), 1);
 
   const padding = 10;
 
-  const pointAt = makeLinePointAt(data.length, maxValue, width, height, padding);
+  const pointAt = makeLinePointAt(
+    data.length,
+    maxValue,
+    width,
+    height,
+    padding,
+  );
 
   const points = data
     .map((d, i) => {
@@ -596,12 +680,20 @@ function LineChart({
     color,
     points,
     dots,
-    axisColor: colors.border,
-    gridLines: grid ? lineGridMarkup(width, height, padding, colors.border) : undefined,
+    axisColor: t.color.border.default,
+    gridLines: grid
+      ? lineGridMarkup(width, height, padding, t.color.border.default)
+      : undefined,
+    area: fill
+      ? {
+          top: fillTop ?? t.color.chart.fillTop,
+          bottom: fillBottom ?? t.color.chart.fillBottom,
+        }
+      : undefined,
   });
 
   return (
-    <ChartFrame labels={data} style={style}>
+    <ChartFrame labels={labels ? data : undefined} style={style}>
       <img
         src={imgSrc}
         objectFit="fill"
@@ -616,28 +708,37 @@ function MultiLineChart({
   palette,
   height,
   style,
+  labels = true,
   grid = false,
   markers = true,
+  fill = false,
   width = 480,
 }: {
   data: ChartSeriesPoint[];
   palette: string[];
   height: number;
   style?: Partial<StyleDesc>;
+  labels?: boolean;
   grid?: boolean;
   markers?: boolean;
+  fill?: boolean;
   width?: number;
 }) {
   const t = useAdwaita();
-  const { colors } = t;
   const seriesCount = Math.max(...data.map((d) => d.values.length), 1);
   const maxValue = maxSeriesValue(data);
   const padding = 10;
 
-  const pointAt = makeLinePointAt(data.length, maxValue, width, height, padding);
+  const pointAt = makeLinePointAt(
+    data.length,
+    maxValue,
+    width,
+    height,
+    padding,
+  );
 
   return (
-    <ChartFrame labels={data} style={style}>
+    <ChartFrame labels={labels ? data : undefined} style={style}>
       <div style={{ position: "relative", height }}>
         {Array.from({ length: seriesCount }, (_, s) => {
           const points: string[] = [];
@@ -660,11 +761,14 @@ function MultiLineChart({
             color: seriesColor(palette, s),
             points: points.join(" "),
             dots: dots.join(""),
-            axisColor: s === 0 ? colors.border : undefined,
+            axisColor: s === 0 ? t.color.border.default : undefined,
             gridLines:
               s === 0 && grid
-                ? lineGridMarkup(width, height, padding, colors.border)
+                ? lineGridMarkup(width, height, padding, t.color.border.default)
                 : undefined,
+            area: fill
+              ? { top: t.color.chart.fillTop, bottom: t.color.chart.fillBottom }
+              : undefined,
           });
           return (
             <img

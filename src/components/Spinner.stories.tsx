@@ -1,7 +1,9 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
-import { Row } from "./Box";
-import { Spinner } from "./Spinner";
+import { useAdwaita } from "../theme/adwaita";
+import { toneColor } from "../theme/tones";
+import { Labeled } from "./text";
+import { Row, Column } from "./Box";
+import { SPINNER_FRAMES, Spinner, spinnerFrameSrc } from "./Spinner";
 
 export default defineMeta({
   title: "Adwaita/Spinner",
@@ -50,6 +52,43 @@ export const colors = defineStory({
       </Labeled>
     </Row>
   ),
+});
+
+export const animated = defineStory({
+  parameters: { settleMs: 250 },
+  render: () => (
+    <Labeled caption="spun 250 ms (3 frames on from basic)">
+      <Spinner size={32} />
+    </Labeled>
+  ),
+});
+
+function FrameGrid() {
+  const t = useAdwaita();
+  const ring = toneColor(t, "accent");
+  const track = t.color.border.default;
+  return (
+    <Column gap={16}>
+      {[0, 1].map((row) => (
+        <Row key={row} gap={12} align="center">
+          {Array.from({ length: SPINNER_FRAMES / 2 }, (_, i) => {
+            const step = row * (SPINNER_FRAMES / 2) + i;
+            return (
+              <img
+                key={step}
+                src={spinnerFrameSrc(48, ring, track, step)}
+                style={{ width: 48, height: 48 }}
+              />
+            );
+          })}
+        </Row>
+      ))}
+    </Column>
+  );
+}
+
+export const frames = defineStory({
+  render: () => <FrameGrid />,
 });
 
 export const states = defineStory({

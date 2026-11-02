@@ -1,6 +1,6 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import { ProgressBar } from "./ProgressBar";
 
 export default defineMeta({

@@ -1,18 +1,18 @@
 import { Children, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { T } from "./common";
+import { T } from "./text";
 import { Icon, type IconName } from "./icons";
 
 export interface AvatarProps {
   name: string;
   size?: number;
   src?: string;
-  
+
   icon?: IconName;
-  
+
   ring?: boolean;
-  
+
   disabled?: boolean;
   style?: Partial<StyleDesc>;
 }
@@ -33,9 +33,10 @@ export function Avatar({
   style,
 }: AvatarProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const hasName = name.trim().length > 0;
-  const ringStyle = ring ? { borderWidth: 1, borderColor: colors.border } : {};
+  const ringStyle = ring
+    ? { borderWidth: 1, borderColor: t.color.border.default }
+    : {};
   const opacity = disabled ? 0.5 : 1;
   if (src) {
     return (
@@ -58,21 +59,21 @@ export function Avatar({
     <Icon
       name={icon}
       size={Math.max(12, Math.round(size * 0.5))}
-      color={hasName ? colors.accent : colors.dim_fg}
+      color={hasName ? t.color.accent.base : t.color.text.dim}
     />
   ) : hasName ? (
     <T
       weight={700}
-      color={colors.accent}
+      color={t.color.accent.base}
       style={{ fontSize: Math.max(10, Math.round(size * 0.4)) }}
     >
       {initials(name)}
     </T>
   ) : (
     <Icon
-      name="user"
+      name="person"
       size={Math.max(12, Math.round(size * 0.5))}
-      color={colors.dim_fg}
+      color={t.color.text.dim}
     />
   );
   return (
@@ -84,7 +85,7 @@ export function Avatar({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: hasName ? colors.accentTint : colors.button_bg,
+        backgroundColor: hasName ? t.color.accent.tint : t.color.surface.button,
         flexShrink: 0,
         ...ringStyle,
         opacity,
@@ -102,7 +103,7 @@ export interface AvatarBadgeProps {
   size?: number;
 
   color?: string;
-  
+
   ringColor?: string;
   style?: Partial<StyleDesc>;
 }
@@ -115,7 +116,6 @@ export function AvatarBadge({
   style,
 }: AvatarBadgeProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div
       style={{
@@ -126,8 +126,8 @@ export function AvatarBadge({
         height: size,
         borderRadius: size / 2,
         borderWidth: 2,
-        borderColor: ringColor ?? colors.view_bg,
-        backgroundColor: color ?? colors.accent,
+        borderColor: ringColor ?? t.color.surface.view,
+        backgroundColor: color ?? t.color.accent.base,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -155,8 +155,7 @@ export function AvatarGroup({
   style,
 }: AvatarGroupProps) {
   const kids = Children.toArray(children);
-  
-  
+
   const ordered = [...kids].reverse();
   return (
     <div
@@ -197,16 +196,15 @@ export function AvatarGroupCount({
   style,
 }: AvatarGroupCountProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div
       style={{
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: colors.button_bg,
+        backgroundColor: t.color.surface.button,
         borderWidth: 1,
-        borderColor: colors.border,
+        borderColor: t.color.border.default,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -216,7 +214,7 @@ export function AvatarGroupCount({
     >
       <T
         size="caption"
-        color={colors.dim_fg}
+        color={t.color.text.dim}
         style={{ fontSize: Math.max(10, Math.round(size * 0.35)) }}
       >
         {`+${count}`}
