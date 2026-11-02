@@ -1,15 +1,26 @@
-import type { ReactNode } from "react";
-import { useWindowSize, type StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc, useWindowSize } from "@gpuix/react";
 import { Frame } from "../components/Card";
 import { ShortcutHints } from "../components/KeyHint";
 import { type HintGroup } from "../components/KeyBindings";
-import {
-  rowHoverBg,
-  selectionBg,
-  useAdwaita,
-} from "../theme/adwaita";
+import { rowHoverBg, selectionBg, useAdwaita } from "../theme/adwaita";
 
 const DIM_BG = "rgba(0,0,0,0.45)";
+
+// The shared fill of a text entry / textarea: bordered surface in the window
+// color, body type, primary text. Overlays in `changes` and `mu` both
+// rest on this.
+export function fieldSurfaceStyle(t: ReturnType<typeof useAdwaita>): StyleDesc {
+  return {
+    borderRadius: t.radius.sm,
+    borderWidth: 1,
+    borderColor: t.color.border.default,
+    backgroundColor: t.color.surface.window,
+    fontSize: t.type.body,
+    fontFamily: t.type.fontFamily,
+    color: t.color.text.primary,
+  };
+}
 
 export function DialogFrame({
   width,
@@ -23,8 +34,6 @@ export function DialogFrame({
   children: ReactNode;
 }) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
-
   const { width: winW, height: winH } = useWindowSize();
   return (
     <div
@@ -45,16 +54,16 @@ export function DialogFrame({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: spacing.gap,
+          gap: t.space.sm,
           width,
           ...(height !== undefined ? { height } : {}),
-          paddingLeft: spacing.padding,
-          paddingRight: spacing.padding,
-          paddingTop: spacing.paddingTight,
-          paddingBottom: spacing.paddingTight,
-          borderRadius: radii.card,
+          paddingLeft: t.space.lg,
+          paddingRight: t.space.lg,
+          paddingTop: t.space.md,
+          paddingBottom: t.space.md,
+          borderRadius: t.radius.sm,
           borderWidth: 1,
-          borderColor: colors.border,
+          borderColor: t.color.border.default,
           boxShadow: {
             offsetX: 0,
             offsetY: 4,
@@ -78,16 +87,13 @@ export function DialogHintBar({
   style?: Partial<StyleDesc>;
 }) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: spacing.gap,
-        borderTopWidth: 1,
-        borderColor: colors.border,
-        paddingTop: spacing.gap,
+        gap: t.space.sm,
+        paddingTop: t.space.sm,
         ...style,
       }}
     >
@@ -120,7 +126,6 @@ export function OverlayInput({
   onKeyDown: (e: { key?: string }) => void;
 }) {
   const t = useAdwaita();
-  const { colors, radii, typography } = t;
   return (
     <input
       autoFocus
@@ -135,13 +140,7 @@ export function OverlayInput({
         minHeight: 34,
         paddingLeft: 12,
         paddingRight: 12,
-        borderRadius: radii.button,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.window_bg,
-        fontSize: typography.body,
-        fontFamily: typography.fontFamily,
-        color: colors.fg,
+        ...fieldSurfaceStyle(t),
       }}
     />
   );
@@ -151,7 +150,6 @@ export function candidateRowStyle(
   t: ReturnType<typeof useAdwaita>,
   active: boolean,
 ): Record<string, unknown> {
-  const { colors, radii } = t;
   return {
     display: "flex",
     alignItems: "center",
@@ -159,7 +157,7 @@ export function candidateRowStyle(
     height: 24,
     paddingLeft: 8,
     paddingRight: 8,
-    borderRadius: radii.row,
+    borderRadius: t.radius.sm,
     backgroundColor: active ? selectionBg(t) : "transparent",
     cursor: "pointer",
     hover: { backgroundColor: active ? selectionBg(t) : rowHoverBg(t) },

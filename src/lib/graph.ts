@@ -1,4 +1,4 @@
-import { ACCENTS, shade, type AccentKey } from "../theme/adwaita";
+import { ACCENTS, type AccentKey, shade } from "../theme/adwaita";
 
 export interface GraphNode {
   id: string;
@@ -192,9 +192,7 @@ function placeParentLanes(
   return { lanesBelow, parentLaneIds };
 }
 
-function buildLanePositions(
-  lanes: (Lane | null)[],
-): Map<number, number> {
+function buildLanePositions(lanes: (Lane | null)[]): Map<number, number> {
   const positions = new Map<number, number>();
   for (let c = 0; c < lanes.length; c++) {
     const lane = lanes[c];
@@ -425,16 +423,12 @@ export const GRAPH_LINE_WIDTH = 2;
 
 export const GRAPH_MAX_GUTTER_WIDTH = 160;
 
-
-
 export const GRAPH_EDGE_PAD = 6;
 
 export function graphXStep(laneCount: number): number {
   if (laneCount <= 0) return GRAPH_X_STEP;
   return Math.min(GRAPH_X_STEP, GRAPH_MAX_GUTTER_WIDTH / laneCount);
 }
-
-
 
 export function graphEdgePad(xs: number): number {
   return Math.max(GRAPH_EDGE_PAD, xs / 4);

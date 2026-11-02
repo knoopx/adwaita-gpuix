@@ -28,9 +28,6 @@ function padRow(row: string[], cols: number): string[] {
   return out;
 }
 
-
-
-
 function pickHeaderSrc(
   oldRows: string[][],
   nextRows: string[][],

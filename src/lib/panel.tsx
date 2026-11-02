@@ -1,20 +1,32 @@
-import type { ReactElement, ReactNode } from "react";
-import { Frame } from "../components/Card";
-import { T } from "../components/common";
+import { type ReactElement, type ReactNode } from "react";
+import { T } from "../components/text";
 import { Icon, type IconName } from "../components/icons";
 import { Spinner } from "../components/Spinner";
+import { Frame } from "../components/Card";
 import {
+  headerStripBg,
   rowHoverBg,
   selectionBg,
   useAdwaita,
 } from "../theme/adwaita";
+
+export const titleTruncate: Record<string, unknown> = {
+  minWidth: 0,
+  flexShrink: 1,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+};
 
 export interface PanelProps {
   title: ReactNode;
   focused?: boolean;
   trailing?: ReactNode;
   headerless?: boolean;
-  
+
+  headerRadiusStart?: number;
+  headerRadiusEnd?: number;
+
   bordered?: boolean;
   children: ReactNode;
   style?: Record<string, unknown>;
@@ -26,11 +38,12 @@ export function Panel({
   trailing,
   headerless = false,
   bordered = true,
+  headerRadiusStart,
+  headerRadiusEnd,
   children,
   style = {},
 }: PanelProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <Frame
       style={{
@@ -39,9 +52,9 @@ export function Panel({
         minWidth: 0,
         minHeight: 0,
         overflow: "hidden",
-        borderRadius: radii.card,
+        borderRadius: t.radius.lg,
         borderWidth: bordered ? 1 : 0,
-        borderColor: focused ? colors.accent : colors.border,
+        borderColor: focused ? t.color.accent.base : t.color.border.default,
         ...(bordered ? {} : { borderRadius: 0 }),
         ...style,
       }}
@@ -57,8 +70,10 @@ export function Panel({
             paddingTop: 8,
             paddingBottom: 8,
             borderBottomWidth: 1,
-            borderColor: colors.border,
-            backgroundColor: colors.headerbar_bg,
+            borderColor: t.color.border.default,
+            backgroundColor: headerStripBg(t),
+            borderTopLeftRadius: headerRadiusStart,
+            borderTopRightRadius: headerRadiusEnd,
             minWidth: 0,
           }}
         >
@@ -67,15 +82,17 @@ export function Panel({
               display: "flex",
               alignItems: "center",
               flexGrow: 1,
+              flexShrink: 1,
               minWidth: 0,
+              overflow: "hidden",
             }}
           >
             {typeof title === "string" ? (
               <T
                 size="title4"
                 weight={600}
-                color={focused ? colors.accent : colors.fg}
-                style={{ minWidth: 0, whiteSpace: "nowrap" }}
+                color={focused ? t.color.accent.base : t.color.text.primary}
+                style={titleTruncate}
               >
                 {title}
               </T>
@@ -104,7 +121,7 @@ export function Panel({
 export function ListRow({
   selected = false,
   current = false,
-  
+
   focused = true,
   onClick,
   children,
@@ -113,7 +130,7 @@ export function ListRow({
 }: {
   selected?: boolean;
   current?: boolean;
-  
+
   focused?: boolean;
   onClick?: () => void;
   children: ReactNode;
@@ -160,7 +177,7 @@ export function Line({
       <T
         size="body"
         weight={bold ? 600 : 400}
-        color={color ?? t.colors.fg}
+        color={color ?? t.color.text.primary}
         style={{ whiteSpace: "nowrap" }}
       >
         {children}
@@ -187,8 +204,7 @@ export function RowShell({ children }: { children: ReactNode }) {
 
 function DefaultPill({ name, dimmed }: { name: string; dimmed?: boolean }) {
   const t = useAdwaita();
-  const { colors, radii } = t;
-  const fg = dimmed ? colors.dim_fg : colors.fg;
+  const fg = dimmed ? t.color.text.dim : t.color.text.primary;
   return (
     <div
       style={{
@@ -197,10 +213,8 @@ function DefaultPill({ name, dimmed }: { name: string; dimmed?: boolean }) {
         height: 22,
         paddingLeft: 8,
         paddingRight: 8,
-        borderRadius: radii.pill,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderRadius: t.radius.full,
+        backgroundColor: t.color.surface.button,
         flexShrink: 1,
         minWidth: 0,
       }}
@@ -243,7 +257,11 @@ export function PillGroup({
     >
       {names.map((n) => (
         <div key={n} style={{ display: "flex", minWidth: 0, flexShrink: 1 }}>
-          {renderPill ? renderPill(n, dimmed) : <DefaultPill name={n} dimmed={dimmed} />}
+          {renderPill ? (
+            renderPill(n, dimmed)
+          ) : (
+            <DefaultPill name={n} dimmed={dimmed} />
+          )}
         </div>
       ))}
     </div>
@@ -275,14 +293,13 @@ export function RowIcon({
 
 export function MonoBadge({ text }: { text: string | null }) {
   const t = useAdwaita();
-  const { colors } = t;
   if (!text) return null;
   return (
     <T
       size="caption"
-      color={colors.dim_fg}
+      color={t.color.text.dim}
       style={{
-        fontFamily: t.typography.fontFamilyMono,
+        fontFamily: t.type.fontFamilyMono,
         whiteSpace: "nowrap",
       }}
     >
@@ -313,14 +330,14 @@ export function FileListTitle({
   description: string | null | undefined;
   focused: boolean;
 }): ReactElement {
-  const { colors } = useAdwaita();
+  const t = useAdwaita();
   if (!description)
     return (
       <T
         size="title4"
         weight={600}
-        color={focused ? colors.accent : colors.fg}
-        style={{ minWidth: 0, whiteSpace: "nowrap" }}
+        color={focused ? t.color.accent.base : t.color.text.primary}
+        style={titleTruncate}
       >
         Files
       </T>
@@ -328,11 +345,7 @@ export function FileListTitle({
   const noDesc = description === "" || description === "(no description)";
   if (noDesc)
     return (
-      <T
-        size="title4"
-        color={colors.dim_fg}
-        style={{ whiteSpace: "nowrap" }}
-      >
+      <T size="title4" color={t.color.text.dim} style={titleTruncate}>
         (no description)
       </T>
     );
@@ -340,8 +353,8 @@ export function FileListTitle({
     <T
       size="title4"
       weight={600}
-      color={focused ? colors.accent : colors.fg}
-      style={{ whiteSpace: "nowrap" }}
+      color={focused ? t.color.accent.base : t.color.text.primary}
+      style={titleTruncate}
     >
       {description}
     </T>

@@ -1,5 +1,9 @@
-import { createContext, useContext, type ReactNode } from "react";
-import { Toaster, useToasts, type ToastOptions } from "../components/chrome/Toaster";
+import { type ReactNode, createContext, useContext } from "react";
+import {
+  type ToastOptions,
+  Toaster,
+  useToasts,
+} from "../components/chrome/Toaster";
 
 export type ToastFn = (message: string, opts?: ToastOptions) => string;
 

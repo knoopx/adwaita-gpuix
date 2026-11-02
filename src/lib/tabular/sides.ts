@@ -1,4 +1,4 @@
-import { detectDelim, parseTable, type TabularDelim } from "./csv";
+import { type TabularDelim, detectDelim, parseTable } from "./csv";
 import { patchSides } from "./patch";
 
 export interface TabularSides {
@@ -12,9 +12,6 @@ function isNumericCell(value: string): boolean {
   const k = value.trim();
   return k !== "" && Number.isFinite(Number(k));
 }
-
-
-
 
 function hasHeaderRow(rows: string[][]): boolean {
   if (rows.length < 2) return false;
