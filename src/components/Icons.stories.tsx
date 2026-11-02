@@ -1,11 +1,17 @@
 import { defineMeta, defineStory } from "storybook";
-import { useAdwaita } from "../theme/adwaita";
-import { T, Labeled } from "./common";
-import { Row, Column } from "./Box";
-import { ICONS, Icon, type IconName } from "./icons";
+import { type AdwaitaTheme, useAdwaita } from "../theme/adwaita";
+import { Labeled, T } from "./text";
+import { Column, Row } from "./Box";
+import {
+  activeIconSet,
+  Icon,
+  iconSetNames,
+  ICONS,
+  type IconName,
+} from "./icons";
 
 function IconGrid({ names }: { names?: IconName[] }) {
-  const { colors } = useAdwaita();
+  const t = useAdwaita();
   const list = names ?? (Object.keys(ICONS) as IconName[]);
   return (
     <div
@@ -27,7 +33,7 @@ function IconGrid({ names }: { names?: IconName[] }) {
             alignItems: "center",
           }}
         >
-          <T size="caption" color={colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             {n}
           </T>
           <Icon name={n} size={16} />
@@ -38,7 +44,7 @@ function IconGrid({ names }: { names?: IconName[] }) {
 }
 
 function IconSizes() {
-  const { colors } = useAdwaita();
+  const t = useAdwaita();
   return (
     <div
       style={{
@@ -53,7 +59,7 @@ function IconSizes() {
           key={s}
           style={{ display: "flex", flexDirection: "column", gap: 4 }}
         >
-          <T size="caption" color={colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             {s}px
           </T>
           <Icon name="settings" size={s} />
@@ -63,18 +69,17 @@ function IconSizes() {
   );
 }
 
-const TONES = [
-  ["fg", "fg"],
-  ["dim", "dim_fg"],
-  ["accent", "accent"],
-  ["destructive", "destructive"],
-  ["success", "success"],
-  ["warning", "warning"],
-] as const;
+const TONES: [string, (t: AdwaitaTheme) => string][] = [
+  ["fg", (t) => t.color.text.primary],
+  ["dim", (t) => t.color.text.dim],
+  ["accent", (t) => t.color.accent.base],
+  ["destructive", (t) => t.color.functional.destructive],
+  ["success", (t) => t.color.functional.success],
+  ["warning", (t) => t.color.functional.warning],
+];
 
 function IconColors() {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div
       style={{
@@ -84,7 +89,7 @@ function IconColors() {
         alignItems: "center",
       }}
     >
-      {TONES.map(([label, key]) => (
+      {TONES.map(([label, tone]) => (
         <div
           key={label}
           style={{
@@ -94,8 +99,8 @@ function IconColors() {
             alignItems: "center",
           }}
         >
-          <Icon name="check" size={20} color={colors[key]} />
-          <T size="caption" color={colors.dim_fg}>
+          <Icon name="check" size={20} color={tone(t)} />
+          <T size="caption" color={t.color.text.dim}>
             {label}
           </T>
         </div>
@@ -106,21 +111,34 @@ function IconColors() {
 
 const SAMPLE: IconName[] = [
   "close",
-  "plus",
-  "chevronDown",
+  "add",
+  "expandMore",
   "info",
   "warning",
-  "success",
-  "settings",
-  "user",
+  "checkCircle",
+  "gridView",
+  "accountTree",
   "search",
+  "settings",
   "home",
-  "bell",
-  "clock",
-  "trash",
-  "sun",
-  "moon",
+  "notifications",
+  "schedule",
+  "delete",
+  "sunny",
+  "darkMode",
   "refresh",
+  "bolt",
+  "science",
+  "language",
+];
+
+const STYLE_NAMES: IconName[] = [
+  "settings",
+  "settings-rounded",
+  "settings-sharp",
+  "star",
+  "star-outline",
+  "star-half",
 ];
 
 export default defineMeta({
@@ -132,8 +150,10 @@ export default defineMeta({
 export const allIcons = defineStory({
   render: () => (
     <Column gap={12}>
-      <Labeled caption={`All ${Object.keys(ICONS).length} icons`}>
-        <IconGrid />
+      <Labeled
+        caption={`${activeIconSet()} · ${Object.keys(ICONS).length} names · sample`}
+      >
+        <IconGrid names={SAMPLE} />
       </Labeled>
       <Labeled caption="sizes">
         <IconSizes />
@@ -152,8 +172,8 @@ export function colors() {
       <Labeled caption="default (theme foreground)">
         <Row gap={16} align="center">
           <Icon name="settings" size={20} />
-          <T size="body" color={t.colors.dim_fg}>
-            colour omitted → t.colors.fg
+          <T size="body" color={t.color.text.dim}>
+            colour omitted → t.color.text.primary
           </T>
         </Row>
       </Labeled>
@@ -161,3 +181,32 @@ export function colors() {
   );
 }
 colors.parameters = { width: 528, height: 200 };
+
+export function styles() {
+  const t = useAdwaita();
+  return (
+    <Column gap={12}>
+      <Labeled caption={`sets: ${iconSetNames().join(", ")}`}>
+        <Row gap={16} align="center">
+          {STYLE_NAMES.map((name) => (
+            <div
+              key={name}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+                alignItems: "center",
+              }}
+            >
+              <T size="caption" color={t.color.text.dim}>
+                {name}
+              </T>
+              <Icon name={name} size={20} />
+            </div>
+          ))}
+        </Row>
+      </Labeled>
+    </Column>
+  );
+}
+styles.parameters = { width: 528, height: 140 };

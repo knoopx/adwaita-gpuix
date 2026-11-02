@@ -1,12 +1,12 @@
-import { FILE_ICONS, FILENAME_ICONS } from "./FileIconNames";
+import { FILENAME_ICONS, FILE_ICONS } from "./FileIconNames";
 import { FILE_STATUS_ICONS } from "./vcs/FileStatusIcons";
-import { FILE_ICON_COLORS, FILENAME_COLORS } from "./FileIconColors";
+import { FILENAME_COLORS, FILE_ICON_COLORS } from "./FileIconColors";
 import { ACCENTS, shade } from "../theme/adwaita";
-import type { IconName } from "./icons";
+import { type IconName } from "./icons";
 
-const DEFAULT_ICON: IconName = "file";
+const DEFAULT_ICON: IconName = "description";
 const DIR_ICON: IconName = "folder";
-const DEFAULT_STATUS_ICON: IconName = "file";
+const DEFAULT_STATUS_ICON: IconName = "description";
 
 const DIR_COLOR = shade(ACCENTS.slate, 0.4);
 

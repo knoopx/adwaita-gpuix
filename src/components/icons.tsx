@@ -1,178 +1,88 @@
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
+import { icons as MATERIAL_SYMBOLS } from "@iconify-json/material-symbols";
+import { type IconifyIcon, type IconifyJSON } from "@iconify/types";
 import { useAdwaita } from "../theme/adwaita";
-import {
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  Bell,
-  Bookmark,
-  Calendar,
-  Check,
-  Circle,
-  CircleAlert,
-  CircleCheck,
-  CircleDashed,
-  CircleDot,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  ChevronsUpDown,
-  Clock,
-  Code,
-  Container,
-  Copy,
-  Eye,
-  File,
-  FileArchive,
-  FileBraces,
-  FileCode,
-  FileCog,
-  FileImage,
-  FileLock,
-  FileTerminal,
-  FileText,
-  Folder,
-  Hammer,
-  Footprints,
-  GitBranch,
-  GitPullRequest,
-  Globe,
-  GripVertical,
-  Heading1,
-  Heading2,
-  Heading3,
-  Home,
-  Inbox,
-  Info,
-  Image,
-  Layers,
-  LayoutGrid,
-  Link,
-  List,
-  Package,
-  Pencil,
-  ListOrdered,
-  Mail,
-  Menu,
-  MapPin,
-  MessageSquare,
-  Minus,
-  Moon,
-  PanelLeft,
-  Pause,
-  Phone,
-  Play,
-  Plus,
-  Quote,
-  RefreshCw,
-  RotateCcw,
-  RotateCw,
-  ScrollText,
-  Search,
-  Settings,
-  Snowflake,
-  Sparkles,
-  Trash2,
-  Sun,
-  SunMoon,
-  Table,
-  TerminalSquare,
-  Timer,
-  TriangleAlert,
-  Type,
-  User,
-  UserRound,
-  X,
-} from "lucide-static";
 
-export const ICONS = {
-  close: X,
-  plus: Plus,
-  minus: Minus,
-  calendar: Calendar,
-  mapPin: MapPin,
-  chevronDown: ChevronDown,
-  chevronLeft: ChevronLeft,
-  chevronRight: ChevronRight,
-  chevronUp: ChevronUp,
-  chevronsUpDown: ChevronsUpDown,
-  info: Info,
-  warning: TriangleAlert,
-  alert: CircleAlert,
-  success: CircleCheck,
-  check: Check,
-  copy: Copy,
-  circle: Circle,
-  circleDashed: CircleDashed,
-  circleDot: CircleDot,
-  settings: Settings,
-  user: User,
-  userRound: UserRound,
-  search: Search,
-  home: Home,
-  grid: LayoutGrid,
-  list: List,
-  listOrdered: ListOrdered,
-  panel: PanelLeft,
-  clock: Clock,
-  timer: Timer,
-  sparkles: Sparkles,
-  sun: Sun,
-  moon: Moon,
-  sunMoon: SunMoon,
-  file: File,
-  fileArchive: FileArchive,
-  fileBraces: FileBraces,
-  fileCode: FileCode,
-  fileCog: FileCog,
-  fileImage: FileImage,
-  fileLock: FileLock,
-  fileTerminal: FileTerminal,
-  fileText: FileText,
-  folder: Folder,
-  snowflake: Snowflake,
-  package: Package,
-  container: Container,
-  hammer: Hammer,
-  scrollText: ScrollText,
-  pencil: Pencil,
-  inbox: Inbox,
-  eye: Eye,
-  layers: Layers,
-  gitBranch: GitBranch,
-  gitPullRequest: GitPullRequest,
-  globe: Globe,
-  pause: Pause,
-  phone: Phone,
-  play: Play,
-  arrowLeft: ArrowLeft,
-  arrowRight: ArrowRight,
-  arrowUp: ArrowUp,
-  mail: Mail,
-  menu: Menu,
-  messageSquare: MessageSquare,
-  bookmark: Bookmark,
-  bell: Bell,
-  footprints: Footprints,
-  refresh: RefreshCw,
-  trash: Trash2,
-  type: Type,
-  heading1: Heading1,
-  heading2: Heading2,
-  heading3: Heading3,
-  quote: Quote,
-  code: Code,
-  image: Image,
-  table: Table,
-  terminal: TerminalSquare,
-  link: Link,
-  gripVertical: GripVertical,
-  rotateCcw: RotateCcw,
-  rotateCw: RotateCw,
-} as const;
+export const DEFAULT_ICON_SET = "material-symbols";
 
-export type IconName = keyof typeof ICONS;
+const SETS = new Map<string, IconifyJSON>();
+const CACHE = new Map<string, string>();
+let active = DEFAULT_ICON_SET;
+
+export function registerIconSet(data: IconifyJSON): string {
+  const prefix = data.prefix ?? DEFAULT_ICON_SET;
+  SETS.set(prefix, data);
+  return prefix;
+}
+
+export function setIconSet(prefix: string): string {
+  if (!SETS.has(prefix)) return "";
+  active = prefix;
+  return active;
+}
+
+export function activeIconSet(): string {
+  return active;
+}
+
+export function iconSetNames(): string[] {
+  return [...SETS.keys()];
+}
+
+export function iconNames(prefix: string = active): string[] {
+  const data = SETS.get(prefix);
+  if (!data) return [];
+  return [...Object.keys(data.icons), ...Object.keys(data.aliases ?? {})];
+}
+
+function kebabOf(name: string): string {
+  return name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`);
+}
+
+function iconEntry(data: IconifyJSON, name: string): IconifyIcon | undefined {
+  const icon = data.icons[name] ?? data.icons[kebabOf(name)];
+  if (icon) return icon;
+  const alias = data.aliases?.[name] ?? data.aliases?.[kebabOf(name)];
+  return alias ? data.icons[alias.parent] : undefined;
+}
+
+function svgOf(data: IconifyJSON, icon: IconifyIcon): string {
+  const width = icon.width ?? data.width ?? 16;
+  const height = icon.height ?? data.height ?? 16;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" fill="currentColor">${icon.body}</svg>`;
+}
+
+export function iconSvg(name: string, prefix: string = active): string {
+  const [setName = prefix, iconName = ""] = name.includes(":")
+    ? name.split(":")
+    : [prefix, name];
+  const key = `${setName}:${iconName}`;
+  const cached = CACHE.get(key);
+  if (cached !== undefined) return cached;
+
+  const data = SETS.get(setName);
+  const icon = data ? iconEntry(data, iconName) : undefined;
+  const svg = data && icon ? svgOf(data, icon) : "";
+  CACHE.set(key, svg);
+  return svg;
+}
+
+export const ICONS: Record<string, string> = new Proxy(
+  {} as Record<string, string>,
+  {
+    get: (_target, prop) =>
+      typeof prop === "string" ? iconSvg(prop) : undefined,
+    has: (_target, prop) => typeof prop === "string" && iconSvg(prop) !== "",
+    ownKeys: () => iconNames(),
+    getOwnPropertyDescriptor: () => ({
+      enumerable: true,
+      configurable: true,
+    }),
+    deleteProperty: () => false,
+  },
+);
+
+export type IconName = keyof typeof ICONS | (string & {});
 
 export interface IconProps {
   name: IconName;
@@ -206,5 +116,9 @@ export function renderIconSvg(
 
 export function Icon({ name, size = 16, color, style }: IconProps) {
   const t = useAdwaita();
-  return renderIconSvg(ICONS[name], color ?? t.colors.fg, size, style);
+
+  const svg = iconSvg(name) || iconSvg("circle");
+  return renderIconSvg(svg, color ?? t.color.text.primary, size, style);
 }
+
+registerIconSet(MATERIAL_SYMBOLS);
