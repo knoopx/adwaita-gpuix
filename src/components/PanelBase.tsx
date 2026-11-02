@@ -1,13 +1,14 @@
-import { createContext, useContext, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode, createContext, useContext } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
 import {
-  OverlayShell,
-  OverlayPanel,
-  sidePanelStyle,
   CloseButton,
-  T,
-} from "./common";
+  OverlayPanel,
+  OverlayShell,
+  sidePanelStyle,
+} from "./overlay";
+import { rowStyle } from "./Box";
+import { T } from "./text";
 
 export type PanelSide = "bottom" | "left" | "right" | "top";
 
@@ -23,6 +24,8 @@ export interface PanelRootProps {
   onOpenChange: (open: boolean) => void;
   side?: PanelSide;
   contained?: boolean;
+
+  inset?: Partial<StyleDesc>;
   children?: ReactNode;
   style?: Partial<StyleDesc>;
 }
@@ -44,26 +47,26 @@ export function renderPanelShell({
   side,
   children,
   style,
-  colors,
   panelExtra,
+  inset,
 }: {
   onOpenChange: (open: boolean) => void;
   contained: boolean;
   side: PanelSide;
   children?: ReactNode;
   style?: Partial<StyleDesc>;
-  colors: { border: string };
   panelExtra?: ReactNode;
+  inset?: Partial<StyleDesc>;
 }) {
   const pos = contained ? "absolute" : "fixed";
-  const panelStyle = sidePanelStyle(side, colors);
+  const panelStyle = sidePanelStyle(side);
   return (
     <OverlayShell
       position={pos}
       onDismiss={() => onOpenChange(false)}
-      style={style}
+      style={{ ...inset, ...style }}
     >
-      <OverlayPanel position={pos} panelStyle={panelStyle}>
+      <OverlayPanel position={pos} panelStyle={{ ...panelStyle, ...inset }}>
         {panelExtra}
         {children}
       </OverlayPanel>
@@ -119,16 +122,13 @@ export function makePanelHeader(usePanel: () => PanelContextValue) {
     const t = useAdwaita();
     return (
       <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
+        style={rowStyle(t, {
           justifyContent: "space-between",
-          gap: t.spacing.gap,
-          padding: t.spacing.padding,
+          gap: t.space.sm,
+          padding: t.space.lg,
           paddingBottom: 0,
           ...style,
-        }}
+        })}
       >
         {children}
       </div>
@@ -145,7 +145,6 @@ export function makePanelFooter(usePanel: () => PanelContextValue) {
     style?: Partial<StyleDesc>;
   }) {
     const t = useAdwaita();
-    const { colors, spacing } = t;
     return (
       <div style={{ display: "flex", flexDirection: "column", ...style }}>
         <div style={{ flexGrow: 1 }} />
@@ -155,10 +154,10 @@ export function makePanelFooter(usePanel: () => PanelContextValue) {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "flex-end",
-            gap: spacing.gap,
-            padding: spacing.padding,
+            gap: t.space.sm,
+            padding: t.space.lg,
             borderTopWidth: 1,
-            borderColor: colors.border,
+            borderColor: t.color.border.default,
           }}
         >
           {children}
@@ -181,8 +180,8 @@ export function PaddedSection({
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: t.spacing.gap,
-        padding: t.spacing.padding,
+        gap: t.space.sm,
+        padding: t.space.lg,
         ...style,
       }}
     >
@@ -214,14 +213,23 @@ export function PanelShowcaseRow({ children }: { children?: ReactNode }) {
   );
 }
 
+function ShowcaseCaption({ caption }: { caption?: string }) {
+  const t = useAdwaita();
+  if (!caption) return null;
+  return (
+    <T size="caption" color={t.color.text.dim}>
+      {caption}
+    </T>
+  );
+}
+
 export function PanelShowcaseSection({
   caption,
   children,
 }: {
-  caption: string;
+  caption?: string;
   children?: ReactNode;
 }) {
-  const t = useAdwaita();
   return (
     <div
       style={{
@@ -231,9 +239,7 @@ export function PanelShowcaseSection({
         alignItems: "center",
       }}
     >
-      <T size="caption" color={t.colors.dim_fg}>
-        {caption}
-      </T>
+      <ShowcaseCaption caption={caption} />
       {children}
     </div>
   );
@@ -243,19 +249,23 @@ export function PanelShowcaseColumn({
   caption,
   children,
 }: {
-  caption: string;
+  caption?: string;
   children?: ReactNode;
 }) {
-  const t = useAdwaita();
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      <T size="caption" color={t.colors.dim_fg}>
-        {caption}
-      </T>
+      <ShowcaseCaption caption={caption} />
       {children}
     </div>
   );
 }
+
+export const PANEL_SIDES: { side: PanelSide; label: string }[] = [
+  { side: "left", label: "side=left" },
+  { side: "right", label: "side=right" },
+  { side: "top", label: "side=top" },
+  { side: "bottom", label: "side=bottom" },
+];
 
 export function PanelSideStages({
   stages,
@@ -293,17 +303,15 @@ export function PanelShowcaseStage({
   style?: Partial<StyleDesc>;
 }) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       style={{
         position: "relative",
         width,
         height,
-        borderRadius: radii.card,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderRadius: t.radius.sm,
+        borderWidth: 0,
+        backgroundColor: t.color.surface.view,
         overflow: "hidden",
         ...style,
       }}

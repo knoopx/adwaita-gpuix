@@ -1,14 +1,8 @@
 import { defineMeta, defineStory } from "storybook";
-import { T } from "./common";
+import { T } from "./text";
 import { useAdwaita } from "../theme/adwaita";
 
-function TallMenu({
-  rows,
-  maxHeight,
-}: {
-  rows: number;
-  maxHeight?: number;
-}) {
+function TallMenu({ rows, maxHeight }: { rows: number; maxHeight?: number }) {
   const t = useAdwaita();
   return (
     <div
@@ -18,13 +12,11 @@ function TallMenu({
         gap: 2,
         padding: 4,
         minWidth: 200,
-        ...(maxHeight !== undefined
-          ? { maxHeight, overflowY: "auto" }
-          : {}),
-        borderRadius: t.radii.card,
+        ...(maxHeight !== undefined ? { maxHeight, overflowY: "auto" } : {}),
+        borderRadius: t.radius.sm,
         borderWidth: 1,
-        borderColor: t.colors.border,
-        backgroundColor: t.colors.view_bg,
+        borderColor: t.color.border.default,
+        backgroundColor: t.color.surface.view,
       }}
     >
       {Array.from({ length: rows }).map((_, i) => (
@@ -44,8 +36,8 @@ function Stage({ children }: { children?: import("react").ReactNode }) {
         position: "relative",
         width: 400,
         height: 500,
-        backgroundColor: t.colors.window_bg,
-        borderRadius: t.radii.card,
+        backgroundColor: t.color.surface.window,
+        borderRadius: t.radius.sm,
       }}
     >
       {children}
@@ -89,12 +81,9 @@ export default defineMeta({
   parameters: { width: 420, height: 520 },
 });
 
-
-
 export const bottomFlip = defineStory({
   render: () => <BottomFlipFitStory />,
 });
-
 
 export const bottomFlipCapped = defineStory({
   render: () => <BottomFlipFitStory maxHeight={140} />,
