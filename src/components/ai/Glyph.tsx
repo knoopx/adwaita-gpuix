@@ -1,14 +1,11 @@
-import type { StyleDesc } from "@gpuix/react";
-import { Globe, FlaskConical, TerminalSquare } from "lucide-static";
-import { renderIconSvg } from "../../components/icons";
+import { type StyleDesc } from "@gpuix/react";
+import { iconSvg, renderIconSvg, type IconName } from "../../components/icons";
 
-export type GlyphName = "terminal" | "flask" | "globe";
+export type GlyphName = IconName;
 
-const GLYPHS: Record<GlyphName, string> = {
-  terminal: TerminalSquare,
-  flask: FlaskConical,
-  globe: Globe,
-};
+export function glyphSvg(name: string): string {
+  return iconSvg(name);
+}
 
 export interface GlyphProps {
   name: GlyphName;
@@ -18,5 +15,5 @@ export interface GlyphProps {
 }
 
 export function Glyph({ name, size = 14, color, style }: GlyphProps) {
-  return renderIconSvg(GLYPHS[name], color, size, style);
+  return renderIconSvg(glyphSvg(name), color, size, style);
 }

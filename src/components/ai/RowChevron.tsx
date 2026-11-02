@@ -1,4 +1,4 @@
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
 import { Icon } from "../../components/icons";
 
@@ -14,7 +14,7 @@ export function RowChevron({ open, color, style }: RowChevronProps) {
     <Icon
       name={open ? "chevronDown" : "chevronRight"}
       size={14}
-      color={color ?? t.colors.dim_fg}
+      color={color ?? t.color.text.dim}
       style={{ flexShrink: 0, ...style }}
     />
   );

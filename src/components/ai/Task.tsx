@@ -1,15 +1,13 @@
 import { type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
-import { Icon } from "../../components/icons";
-import { Spinner } from "../../components/Spinner";
+import { T } from "../text";
 import { ProgressBar } from "../../components/ProgressBar";
-import {
-  CollapsibleContent,
-  useControllableOpen,
-} from "../../components/Collapsible";
+import { useControllableOpen } from "../../components/Collapsible";
 import { CollapsibleTriggerRow } from "./CollapsibleTriggerRow";
+import { DisclosureBody } from "./DisclosureBody";
+import { RowLabel } from "./RowLabel";
+import { StatusGlyph } from "./StatusGlyph";
 
 export interface TaskProps {
   children?: ReactNode;
@@ -39,55 +37,14 @@ export interface TaskContentProps {
 }
 
 export function TaskContent({ open, children, style }: TaskContentProps) {
-  const t = useAdwaita();
-  const { colors } = t;
   return (
-    <CollapsibleContent open={open} style={style}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          paddingTop: 4,
-          paddingLeft: 12,
-          borderLeftWidth: 2,
-          borderColor: colors.border,
-          minWidth: 0,
-        }}
-      >
-        {children}
-      </div>
-    </CollapsibleContent>
+    <DisclosureBody open={open} indent style={style}>
+      {children}
+    </DisclosureBody>
   );
 }
 
 export type TaskStatus = "pending" | "running" | "done";
-
-function TaskIndicator({ status }: { status: TaskStatus }) {
-  const t = useAdwaita();
-  const { colors } = t;
-  if (status === "running") {
-    return <Spinner size={16} label={false} style={{ flexShrink: 0 }} />;
-  }
-  if (status === "done") {
-    return (
-      <Icon
-        name="success"
-        size={14}
-        color={colors.success}
-        style={{ flexShrink: 0 }}
-      />
-    );
-  }
-  return (
-    <Icon
-      name="circle"
-      size={14}
-      color={colors.dim_fg}
-      style={{ flexShrink: 0 }}
-    />
-  );
-}
 
 export interface TaskItemProps {
   title: ReactNode;
@@ -113,7 +70,6 @@ export function TaskItem({
   style,
 }: TaskItemProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const { open: isOpen, setOpen } = useControllableOpen(
     open,
     defaultOpen ?? false,
@@ -130,30 +86,29 @@ export function TaskItem({
       }}
     >
       <CollapsibleTriggerRow
-        icon={<TaskIndicator status={status} />}
-        title={
-          <T
-            size="body"
-            color={status === "running" ? colors.fg : colors.dim_fg}
-            style={{ flexShrink: 1, textOverflow: "ellipsis" }}
-          >
-            {title}
-          </T>
-        }
+        icon={<StatusGlyph status={status === "done" ? "complete" : status} />}
+        title={<RowLabel>{title}</RowLabel>}
         open={isOpen}
         onToggle={() => setOpen(!isOpen)}
       />
       {description !== undefined ? (
         <T
           size="caption"
-          color={colors.dim_fg}
+          color={t.color.text.dim}
           style={{ marginLeft: 22, flexShrink: 1, textOverflow: "ellipsis" }}
         >
           {description}
         </T>
       ) : null}
       {progress !== undefined ? (
-        <div style={{ display: "flex", flexDirection: "row", marginLeft: 22, minWidth: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            marginLeft: 22,
+            minWidth: 0,
+          }}
+        >
           <ProgressBar value={progress} height={4} />
         </div>
       ) : null}

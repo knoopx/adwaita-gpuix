@@ -11,10 +11,17 @@ export {
   ACCENT_SETS,
   TINT_ALPHA,
   SELECTION,
+  DIVIDER,
   APPEARANCE,
+  INPUT_FILL,
+  OSD_FG,
+  CHART_SERIES,
+  CHART_FILL,
+  CHART_SUN,
   RADIUS,
   SPACE,
   TYPE,
+  CONTROL,
   resolveTokens,
   tokensToDtcg,
   tokensToDtcgAll,
@@ -28,19 +35,42 @@ export type {
   ColorScheme,
   AccentKey,
   AdwaitaTheme,
-  AdwaitaColors,
+  SemanticColors,
   AdwaitaProviderProps,
   SemanticTokens,
 } from "./theme/adwaita";
 
+export { toneColor, toneTint, textToneColor } from "./theme/tones";
+export type { Tone, TextTone } from "./theme/tones";
+
+export { T } from "./components/text";
+export type { TextProps, TextSize } from "./components/text";
 export {
-  T,
   MenuIndicator,
   MenuShortcut,
-  AdwaitaInputBase,
-} from "./components/common";
-export type { TextProps, TextSize, AdwaitaInputBaseProps } from "./components/common";
-export { Icon, ICONS } from "./components/icons";
+  MenuRow,
+  MenuLabel,
+  MenuSeparator,
+  MenuGroup,
+  MenuItemRow,
+  destructiveRowProps,
+} from "./components/menu";
+export { AdwaitaInputBase } from "./components/input-base";
+export type { AdwaitaInputBaseProps } from "./components/input-base";
+export { listPanelStyle, menuPanelStyle } from "./components/FloatingPanel";
+export { PANEL_SHADOW } from "./components/overlay";
+export {
+  activeIconSet,
+  DEFAULT_ICON_SET,
+  Icon,
+  ICONS,
+  iconNames,
+  iconSetNames,
+  iconSvg,
+  registerIconSet,
+  renderIconSvg,
+  setIconSet,
+} from "./components/icons";
 export type { IconName, IconProps } from "./components/icons";
 
 export { Button } from "./components/Button";
@@ -75,6 +105,7 @@ export { Card, Frame } from "./components/Card";
 export type { CardProps, FrameProps } from "./components/Card";
 export {
   BoxedList,
+  BoxedRow,
   ActionRow,
   EntryRow,
   SwitchRow,
@@ -85,6 +116,7 @@ export {
 } from "./components/BoxedList";
 export type {
   BoxedListProps,
+  BoxedRowProps,
   ActionRowProps,
   EntryRowProps,
   SwitchRowProps,
@@ -95,7 +127,6 @@ export type {
 } from "./components/BoxedList";
 export {
   AlertDialog,
-  MessageDialog,
   AlertDialogHeader,
   AlertDialogFooter,
   AlertDialogTitle,
@@ -114,7 +145,6 @@ export type {
 } from "./components/AlertDialog";
 export {
   Tabs,
-  TabBar,
   TabsList,
   TabsTrigger,
   TabsContent,
@@ -149,7 +179,10 @@ export type {
   AvatarGroupCountProps,
 } from "./components/Avatar";
 export { ProgressBar } from "./components/ProgressBar";
-export type { ProgressBarProps, ProgressBarColor } from "./components/ProgressBar";
+export type {
+  ProgressBarProps,
+  ProgressBarColor,
+} from "./components/ProgressBar";
 export { ViewSwitcher } from "./components/chrome/ViewSwitcher";
 export type {
   ViewSwitcherProps,
@@ -169,20 +202,18 @@ export type { JsonViewProps } from "./components/JsonView";
 export { ColorPicker } from "./components/ColorPicker";
 export type { ColorPickerProps } from "./components/ColorPicker";
 export { Badge } from "./components/Badge";
-export type {
-  BadgeVariant,
-  BadgeSize,
-  BadgeProps,
-} from "./components/Badge";
+export type { BadgeVariant, BadgeSize, BadgeProps } from "./components/Badge";
 export { Label } from "./components/Label";
 export type { LabelProps, LabelVariant } from "./components/Label";
-export { Separator } from "./components/Separator";
-export type { SeparatorProps } from "./components/Separator";
+export * from "./components/Divider.tsx";
 export { Skeleton } from "./components/Skeleton";
 export type { SkeletonProps } from "./components/Skeleton";
+export { MediaTile } from "./components/MediaTile";
+export type { MediaTileProps } from "./components/MediaTile";
 export { Kbd, KbdGroup, KbdCombo } from "./components/Kbd";
 export type {
   KbdProps,
+  KbdColors,
   KbdGroupProps,
   KbdComboProps,
 } from "./components/Kbd";
@@ -190,7 +221,6 @@ export { DataTable } from "./components/DataTable";
 export {
   VirtualListPanel,
   VirtualListRow,
-  ListPanel,
 } from "./components/chrome/VirtualListPanel";
 export type {
   VirtualListPanelProps,
@@ -285,7 +315,6 @@ export type {
   SmallProps,
   BlockquoteProps,
   InlineCodeProps,
-  TextTone,
 } from "./components/Typography";
 export {
   CardHeader,
@@ -433,6 +462,8 @@ export {
   TableRow,
   TableHead,
   TableCell,
+  TableLeadCell,
+  TableNodeCell,
   TableCaption,
 } from "./components/Table";
 export type {
@@ -444,6 +475,8 @@ export type {
   TableRowProps,
   TableHeadProps,
   TableCellProps,
+  TableLeadCellProps,
+  TableNodeCellProps,
   TableCaptionProps,
   TableCellAlign,
 } from "./components/Table";
@@ -496,19 +529,6 @@ export type {
   CarouselItemProps,
   CarouselDotsProps,
 } from "./components/Carousel";
-export {
-  Resizable,
-  ResizablePanel,
-  ResizableHandle,
-  ResizablePanelGroup,
-} from "./components/chrome/Resizable";
-export type {
-  ResizableProps,
-  ResizablePanelProps,
-  ResizableHandleProps,
-  ResizablePanelGroupProps,
-} from "./components/chrome/Resizable";
-
 export {
   Dialog,
   DialogTrigger,
@@ -819,6 +839,8 @@ export type {
   SidebarFooterProps,
   SidebarMenuItemProps,
 } from "./components/chrome/Sidebar";
+export { LocationEntry } from "./components/chrome/LocationEntry";
+export type { LocationEntryProps } from "./components/chrome/LocationEntry";
 export { ListBox, ListBoxItem } from "./components/ListBox";
 export type { ListBoxProps, ListBoxItemProps } from "./components/ListBox";
 export { Description } from "./components/Description";
@@ -831,27 +853,64 @@ export type {
   ToastOptions,
 } from "./components/chrome/Toaster";
 
-
-
 export { Terminal, Summary } from "./components/ai";
-export { type Currency } from "./components/intents";
-export * from "lucide-static";
+export { launchApp, dispatchWindowKey, type LaunchOptions } from "./lib/app";
 export * from "./lib/toast";
 export * from "./lib/graph";
 export * from "./lib/panel";
 export * from "./lib/overlay";
 
-
-
 export {
   type Shortcut,
+  type ShortcutBase,
+  type HiddenCapable,
   type KeyMods,
+  type CommandBinding,
   matchShortcut,
+  bindingMatches,
+  findCommandBinding,
+  isHidden,
   hints,
+  navShortcuts,
   NAV,
   PAGED_NAV,
 } from "./lib/shortcuts";
+export type { NavShortcutsOptions } from "./lib/shortcuts";
+export {
+  type WindowKeyEvent,
+  type KeyHandler,
+  keyHandler,
+  globalKeyHandler,
+  canonicalKey,
+  keyOf,
+} from "./lib/keybus";
+export {
+  arrowStep,
+  isActivateKey,
+  stepIndex,
+  type FocusStep,
+} from "./lib/roving";
 export * from "./lib/config";
+export {
+  type Watcher,
+  type PollOptions,
+  DEFAULT_DEBOUNCE_MS,
+  DEFAULT_POLL_MS,
+  configWatcher,
+  createPollWatcher,
+  fileSample,
+  jjOpHeadPath,
+  mtimeSample,
+} from "./lib/watch";
+export { useListFollow } from "./lib/listFollow";
+export { StoryFrame, themeFrame, themeOnly } from "./lib/storyFrame";
+export { GraphGutter } from "./components/GraphGutter";
+export {
+  type CliResult,
+  type CliMock,
+  runCli,
+  sanitizeDescription,
+} from "./lib/cli";
 
 export {
   BookmarkPill,
@@ -862,15 +921,40 @@ export {
   type DiffPanelProps,
   type DiffSummaryData,
   makeDiffScroller,
-  FileChangeRow,
+  ToolDiff,
+  type ToolDiffProps,
+  DIFF_METRICS,
+  diffRowCounts,
+  diffHeightOf,
+  type DiffMetrics,
+  type DiffRowCounts,
+  DiffCountColumn,
+  diffCountColumnWidth,
   DiffHistogram,
+  DiffStats,
+  FileChangeRow,
+  FileIconCell,
+  FilePathCell,
+  FileStatusCell,
+  fileStatusColor,
   fileRowStats,
   type FileRowData,
   type FileRowStats,
   FILE_STATUS_ICONS,
   MONO,
+  FILE_HEADER_ROW_HEIGHT,
   nativeDiffTheme,
 } from "./components/vcs";
 
+export {
+  imageFormatOf,
+  imageFormatOfExtension,
+  imageFormatOfSource,
+  isRasterFormat,
+  isRasterMimeType,
+  isRasterFormatName,
+  isRenderableImage,
+  type ImageFormat,
+} from "./lib/media";
+
 export * from "./components/ai";
-export * from "./components/intents";

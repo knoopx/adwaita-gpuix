@@ -1,19 +1,16 @@
 import {
+  type ReactNode,
   createContext,
   useContext,
   useEffect,
   useMemo,
-  type ReactNode,
 } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { T } from "../text";
 import { Spinner } from "../../components/Spinner";
-import {
-  Collapsible,
-  CollapsibleContent,
-  useControllableOpen,
-} from "../../components/Collapsible";
+import { Collapsible, useControllableOpen } from "../../components/Collapsible";
+import { DisclosureBody } from "./DisclosureBody";
 import { RowChevron } from "./RowChevron";
 
 interface ReasoningContextValue {
@@ -51,11 +48,11 @@ export function Reasoning({
   children,
   style,
 }: ReasoningProps) {
-  const { open: isOpen, setOpen, setInternal } = useControllableOpen(
-    open,
-    defaultOpen ?? false,
-    onOpenChange,
-  );
+  const {
+    open: isOpen,
+    setOpen,
+    setInternal,
+  } = useControllableOpen(open, defaultOpen ?? false, onOpenChange);
 
   useEffect(() => {
     if (isStreaming && open === undefined && defaultOpen !== false) {
@@ -91,7 +88,6 @@ export function ReasoningHeader({
   style,
 }: ReasoningHeaderProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   const ctx = useReasoning();
   const isOpen = open ?? ctx.open;
   const toggle = onOpenChange ?? ctx.onOpenChange;
@@ -109,7 +105,7 @@ export function ReasoningHeader({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        gap: spacing.gap,
+        gap: t.space.sm,
         minWidth: 0,
         cursor: "pointer",
         ...style,
@@ -121,9 +117,9 @@ export function ReasoningHeader({
         </div>
       ) : null}
       <T
-        size="body"
+        size="caption"
         weight={400}
-        color={ctx.isStreaming ? colors.fg : colors.dim_fg}
+        color={ctx.isStreaming ? t.color.text.primary : t.color.text.dim}
         style={{
           flexShrink: 1,
           whiteSpace: "nowrap",
@@ -150,33 +146,29 @@ export function ReasoningContent({
   style,
 }: ReasoningContentProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   const ctx = useReasoning();
   const isOpen = open ?? ctx.open;
   const paragraphs = Array.isArray(children) ? children : [children];
   return (
-    <CollapsibleContent open={isOpen} style={style}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: spacing.gap,
-          padding: spacing.paddingTight,
-          borderLeftWidth: 2,
-          borderColor: colors.accent,
-          backgroundColor: colors.accentTint,
-          borderRadius: radii.row,
-          minWidth: 0,
-        }}
-      >
-        {paragraphs.map((paragraph, i) =>
-          paragraph === undefined || paragraph === null ? null : (
-            <T key={i} size="body" color={colors.dim_fg}>
-              {paragraph}
-            </T>
-          ),
-        )}
-      </div>
-    </CollapsibleContent>
+    <DisclosureBody
+      open={isOpen}
+      gap={t.space.sm}
+      inset={{ padding: t.space.md, minWidth: 0 }}
+      bodyStyle={{
+        borderLeftWidth: 2,
+        borderColor: t.color.accent.base,
+        backgroundColor: t.color.accent.tint,
+        borderRadius: t.radius.sm,
+      }}
+      style={style}
+    >
+      {paragraphs.map((paragraph, i) =>
+        paragraph === undefined || paragraph === null ? null : (
+          <T key={i} size="body" color={t.color.text.dim}>
+            {paragraph}
+          </T>
+        ),
+      )}
+    </DisclosureBody>
   );
 }

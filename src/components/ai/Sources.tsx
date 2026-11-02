@@ -1,13 +1,11 @@
 import { type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { T } from "../text";
 import { Icon, type IconName } from "../../components/icons";
-import {
-  Collapsible,
-  useControllableOpen,
-} from "../../components/Collapsible";
+import { Collapsible, useControllableOpen } from "../../components/Collapsible";
 import { CollapsibleTriggerRow } from "./CollapsibleTriggerRow";
+import { DisclosureRow } from "./DisclosureRow";
 import { Glyph } from "./Glyph";
 
 export interface SourcesProps {
@@ -30,7 +28,6 @@ export function Sources({
   style,
 }: SourcesProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const { open: isOpen, setOpen } = useControllableOpen(
     open,
     defaultOpen ?? false,
@@ -40,31 +37,20 @@ export function Sources({
   return (
     <Collapsible open={isOpen} onOpenChange={setOpen} style={style}>
       <CollapsibleTriggerRow
-        icon={<Glyph name="globe" size={14} color={colors.dim_fg} />}
+        icon={<Glyph name="globe" size={14} color={t.color.text.dim} />}
         title={
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-              minWidth: 0,
-              flexShrink: 1,
-            }}
-          >
-            <T
-              size="body"
-              color={colors.fg}
-              style={{ flexShrink: 1, textOverflow: "ellipsis" }}
-            >
-              {heading}
-            </T>
-            {count !== undefined ? (
-              <T size="caption" color={colors.dim_fg}>
-                {count}
-              </T>
-            ) : null}
-          </div>
+          <DisclosureRow
+            label={heading}
+            gap={6}
+            style={{ minWidth: 0, flexShrink: 1 }}
+            trailing={
+              count !== undefined ? (
+                <T size="caption" color={t.color.text.dim}>
+                  {count}
+                </T>
+              ) : null
+            }
+          />
         }
         open={isOpen}
         onToggle={() => setOpen(!isOpen)}
@@ -92,9 +78,15 @@ export interface SourceProps {
   style?: Partial<StyleDesc>;
 }
 
-export function Source({ title, url, icon, onClick, children, style }: SourceProps) {
+export function Source({
+  title,
+  url,
+  icon,
+  onClick,
+  children,
+  style,
+}: SourceProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   if (children) {
     return <div style={{ minWidth: 0, ...style }}>{children}</div>;
   }
@@ -108,9 +100,9 @@ export function Source({ title, url, icon, onClick, children, style }: SourcePro
         gap: 8,
         minWidth: 0,
         padding: 4,
-        borderRadius: radii.row,
+        borderRadius: t.radius.sm,
         cursor: "pointer",
-        hover: { backgroundColor: colors.button_hover },
+        hover: { backgroundColor: t.color.surface.buttonHover },
         ...style,
       }}
     >
@@ -121,27 +113,26 @@ export function Source({ title, url, icon, onClick, children, style }: SourcePro
           justifyContent: "center",
           width: 24,
           height: 24,
-          borderRadius: radii.button,
-          borderWidth: 1,
-          borderColor: colors.border,
-          backgroundColor: colors.button_bg,
+          borderRadius: t.radius.sm,
+          borderWidth: 0,
+          backgroundColor: t.color.surface.button,
           flexShrink: 0,
           pointerEvents: "none",
         }}
       >
-        <Icon name={icon ?? "link"} size={14} color={colors.fg} />
+        <Icon name={icon ?? "link"} size={14} color={t.color.text.primary} />
       </div>
       <T
         size="body"
-        color={colors.fg}
+        color={t.color.text.primary}
         style={{ flexShrink: 1, textOverflow: "ellipsis" }}
       >
         {title}
       </T>
-      <T size="caption" color={colors.dim_fg} style={{ flexShrink: 0 }}>
+      <T size="caption" color={t.color.text.dim} style={{ flexShrink: 0 }}>
         {hostnameOf(url)}
       </T>
-      <Icon name="arrowRight" size={12} color={colors.dim_fg} />
+      <Icon name="arrowForward" size={12} color={t.color.text.dim} />
     </div>
   );
 }

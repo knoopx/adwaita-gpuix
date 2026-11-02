@@ -1,34 +1,48 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  type ReactNode,
-} from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode, createContext, useContext, useMemo } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
-import { Icon } from "../../components/icons";
-import { Spinner } from "../../components/Spinner";
-import {
-  Collapsible,
-  CollapsibleContent,
-  useControllableOpen,
-} from "../../components/Collapsible";
-import { Glyph } from "./Glyph";
+import { T } from "../text";
+import { Icon, type IconName } from "../../components/icons";
+import { type TextTone, textToneColor } from "../../theme/tones";
+import { Collapsible, useControllableOpen } from "../../components/Collapsible";
+import { DisclosureBody } from "./DisclosureBody";
+import { Glyph, type GlyphName } from "./Glyph";
 import { OutputBox } from "./OutputBox";
-import { RowChevron } from "./RowChevron";
+import { StatusGlyph } from "./StatusGlyph";
 
 export type ToolState =
-  | "running"
-  | "output-available"
-  | "output-error"
-  | "output-denied";
+  "running" | "output-available" | "output-error" | "output-denied";
+
+const GUTTER_GLYPH = 16;
+const GUTTER_GAP = 8;
+const GUTTER_GLYPH_HANG = GUTTER_GLYPH + GUTTER_GAP;
 
 const TOOL_STATE_PREFIX: Record<ToolState, string> = {
   running: "Running",
   "output-available": "Ran",
   "output-error": "Failed to run",
   "output-denied": "Denied",
+};
+
+const TOOL_STATUS_TONE: Record<ToolState, TextTone> = {
+  running: "dim",
+  "output-available": "success",
+  "output-error": "destructive",
+  "output-denied": "dim",
+};
+
+const TOOL_GLYPH_TONE: Record<ToolState, TextTone> = {
+  running: "dim",
+  "output-available": "dim",
+  "output-error": "destructive",
+  "output-denied": "dim",
+};
+
+const TOOL_STATUS_ICON: Record<ToolState, IconName> = {
+  running: "check",
+  "output-available": "check",
+  "output-error": "close",
+  "output-denied": "close",
 };
 
 interface ToolContextValue {
@@ -40,6 +54,98 @@ const ToolCtx = createContext<ToolContextValue | null>(null);
 
 function useToolContext(): ToolContextValue | null {
   return useContext(ToolCtx);
+}
+
+interface ToolOpenState {
+  isOpen: boolean;
+  toggle?: (open: boolean) => void;
+}
+
+function useToolOpenState(
+  open?: boolean,
+  onOpenChange?: (open: boolean) => void,
+): ToolOpenState {
+  const ctx = useToolContext();
+  return {
+    isOpen: open ?? ctx?.open ?? false,
+    toggle: onOpenChange ?? ctx?.onOpenChange,
+  };
+}
+
+function toolHeaderText(
+  children: ReactNode,
+  toolName: string | undefined,
+  prefix: string,
+): ReactNode {
+  if (children != null) return children;
+  return toolName ? `${prefix} ${toolName}` : prefix;
+}
+
+function ToolHeaderTitle({
+  title,
+  argsText,
+}: {
+  title: string;
+  argsText: string;
+}) {
+  const t = useAdwaita();
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: t.space.sm,
+        flexGrow: 1,
+        minWidth: 0,
+        pointerEvents: "none",
+      }}
+    >
+      <T
+        size="body"
+        weight={t.type.weight.bold}
+        color={t.color.text.primary}
+        style={{
+          flexShrink: 0,
+          maxWidth: "100%",
+          minWidth: 0,
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+        }}
+      >
+        {title}
+      </T>
+      {argsText !== "" ? (
+        <T
+          size="caption"
+          color={t.color.text.dim}
+          style={{
+            flexGrow: 1,
+            flexShrink: 1,
+            minWidth: 0,
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+            fontFamily: t.type.fontFamilyMono,
+          }}
+        >
+          {argsText}
+        </T>
+      ) : null}
+    </div>
+  );
+}
+
+function ToolStatusIndicator({ state }: { state: ToolState }) {
+  const t = useAdwaita();
+  return (
+    <StatusGlyph
+      status={state === "running" ? "running" : "complete"}
+      icon={TOOL_STATUS_ICON[state]}
+      color={textToneColor(t, TOOL_STATUS_TONE[state])}
+    />
+  );
 }
 
 export interface ToolProps {
@@ -57,8 +163,6 @@ export function Tool({
   children,
   style,
 }: ToolProps) {
-  const t = useAdwaita();
-  const { colors, radii } = t;
   const { open: isOpen, setOpen } = useControllableOpen(
     open,
     defaultOpen ?? false,
@@ -74,11 +178,11 @@ export function Tool({
         open={isOpen}
         onOpenChange={setOpen}
         style={{
-          backgroundColor: colors.view_bg,
-          borderWidth: 1,
-          borderColor: colors.border,
-          borderRadius: radii.card,
-          overflow: "hidden",
+          overflow: "visible",
+          width: "100%",
+          minWidth: 0,
+
+          borderWidth: 0,
           ...style,
         }}
       >
@@ -90,7 +194,14 @@ export function Tool({
 
 export interface ToolHeaderProps {
   state: ToolState;
+
   title?: string;
+
+  args?: string;
+
+  icon?: GlyphName;
+
+  iconTone?: TextTone;
   toolName?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -101,6 +212,9 @@ export interface ToolHeaderProps {
 export function ToolHeader({
   state,
   title,
+  args,
+  icon = "terminal",
+  iconTone,
   toolName,
   open,
   onOpenChange,
@@ -108,19 +222,9 @@ export function ToolHeader({
   style,
 }: ToolHeaderProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
-  const ctx = useToolContext();
-  const isOpen = open ?? ctx?.open ?? false;
-  const toggle = onOpenChange ?? ctx?.onOpenChange;
-  const prefix = TOOL_STATE_PREFIX[state];
-  const text =
-    children ?? title ?? (toolName ? `${prefix} ${toolName}` : prefix);
-  const statusColor =
-    state === "output-available"
-      ? colors.success
-      : state === "output-error"
-        ? colors.destructive
-        : colors.dim_fg;
+  const { isOpen, toggle } = useToolOpenState(open, onOpenChange);
+  const argsText = args?.trim() ?? "";
+  const glyphTone = iconTone ?? TOOL_GLYPH_TONE[state];
   return (
     <div
       onClick={toggle ? () => toggle(!isOpen) : undefined}
@@ -128,46 +232,92 @@ export function ToolHeader({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        gap: spacing.gap,
-        padding: spacing.gap,
+        gap: GUTTER_GAP,
+        paddingTop: t.space.sm,
+        paddingRight: t.space.sm,
+        paddingBottom: t.space.sm,
+        paddingLeft: 0,
         minWidth: 0,
         cursor: "pointer",
         ...style,
       }}
     >
-      <Glyph name="terminal" size={16} color={colors.fg} />
-      <T
-        size="body"
-        color={colors.fg}
-        style={{
-          flexShrink: 1,
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          pointerEvents: "none",
-        }}
-      >
-        {text}
-      </T>
-      <div style={{ flexGrow: 1 }} />
-      {state === "running" ? (
-        <div style={{ flexShrink: 0 }}>
-          <Spinner size={16} label={false} />
-        </div>
+      <Glyph
+        name={icon}
+        size={GUTTER_GLYPH}
+        color={textToneColor(t, glyphTone)}
+        style={{ marginLeft: -GUTTER_GLYPH_HANG }}
+      />
+      {title !== undefined ? (
+        <ToolHeaderTitle title={title} argsText={argsText} />
       ) : (
-        <Icon
-          name={state === "output-available" ? "check" : "close"}
-          size={14}
-          color={statusColor}
-          style={{ flexShrink: 0 }}
-        />
+        <T
+          size="body"
+          color={t.color.text.primary}
+          style={{
+            flexShrink: 1,
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
+          }}
+        >
+          {toolHeaderText(children, toolName, TOOL_STATE_PREFIX[state])}
+        </T>
       )}
-      <RowChevron open={isOpen} />
+      <div style={{ flexGrow: 1 }} />
+      <ToolStatusIndicator state={state} />
     </div>
   );
 }
 
 function formatValue(value: unknown): string {
   return typeof value === "string" ? value : JSON.stringify(value, null, 2);
+}
+
+function ToolInputBlock({ input }: { input?: unknown }) {
+  const t = useAdwaita();
+  if (input === undefined) return null;
+  const inputLines = formatValue(input).split("\n");
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        minWidth: 0,
+      }}
+    >
+      {inputLines.map((line, i) => (
+        <T
+          key={i}
+          size="caption"
+          color={t.color.text.primary}
+          style={{
+            flexShrink: 1,
+            fontFamily: t.type.fontFamilyMono,
+          }}
+        >
+          {line.length > 0 ? line : " "}
+        </T>
+      ))}
+    </div>
+  );
+}
+
+function ToolOutputBlock({
+  output,
+  errorText,
+}: {
+  output?: unknown;
+  errorText?: string;
+}) {
+  if (output === undefined && errorText === undefined) return null;
+  return (
+    <OutputBox
+      text={errorText ?? formatValue(output)}
+      tone={errorText ? "error" : "default"}
+    />
+  );
 }
 
 export interface ToolContentProps {
@@ -188,57 +338,17 @@ export function ToolContent({
   style,
 }: ToolContentProps) {
   const t = useAdwaita();
-  const { colors, typography, spacing } = t;
-  const ctx = useToolContext();
-  const isOpen = open ?? ctx?.open ?? false;
-  const hasOutput = output !== undefined || errorText !== undefined;
-  const inputLines =
-    input !== undefined ? formatValue(input).split("\n") : [];
+  const { isOpen } = useToolOpenState(open);
   return (
-    <CollapsibleContent open={isOpen} style={style}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: spacing.gap,
-          paddingLeft: spacing.paddingTight,
-          borderLeftWidth: 2,
-          borderColor: colors.border,
-          minWidth: 0,
-        }}
-      >
-        {inputLines.length > 0 ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-              minWidth: 0,
-            }}
-          >
-            {inputLines.map((line, i) => (
-              <T
-                key={i}
-                size="caption"
-                color={colors.dim_fg}
-                style={{
-                  flexShrink: 1,
-                  fontFamily: typography.fontFamilyMono,
-                }}
-              >
-                {line.length > 0 ? line : " "}
-              </T>
-            ))}
-          </div>
-        ) : null}
-        {children}
-        {hasOutput ? (
-          <OutputBox
-            text={errorText ?? formatValue(output)}
-            tone={errorText ? "error" : "default"}
-          />
-        ) : null}
-      </div>
-    </CollapsibleContent>
+    <DisclosureBody
+      open={isOpen}
+      gap={t.space.sm}
+      inset={{ paddingLeft: 0, minWidth: 0 }}
+      style={{ paddingLeft: 0, paddingRight: 0, ...style }}
+    >
+      <ToolInputBlock input={input} />
+      {children}
+      <ToolOutputBlock output={output} errorText={errorText} />
+    </DisclosureBody>
   );
 }

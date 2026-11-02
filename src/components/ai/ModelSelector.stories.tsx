@@ -1,14 +1,14 @@
 import { defineMeta, defineStory } from "storybook";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useAdwaita } from "../../theme/adwaita";
-import { Labeled } from "../common";
-import { Row, Column } from "../Box";
+import { Labeled } from "../text";
+import { Column, Row } from "../Box";
 import { InputGroup } from "../../components/InputGroup";
 import {
   ModelSelector,
   ModelSelectorEffort,
-  type ModelSelectorModel,
   type ModelSelectorEffortOption,
+  type ModelSelectorModel,
 } from "./ModelSelector";
 
 const STORYBOOK_MODELS: ModelSelectorModel[] = [
@@ -32,10 +32,10 @@ function Stage({ children }: { children: ReactNode }) {
         position: "relative",
         width: 480,
         height: 310,
-        borderRadius: 12,
+        borderRadius: 8,
         borderWidth: 1,
-        borderColor: t.colors.border,
-        backgroundColor: t.colors.view_bg,
+        borderColor: t.color.border.default,
+        backgroundColor: t.color.surface.view,
         overflow: "hidden",
       }}
     >
@@ -73,8 +73,14 @@ export const closedTriggers = defineStory({
     <Row gap={16} align="center">
       <Labeled caption="button-style triggers (input group context)">
         <InputGroup>
-          <ModelSelector models={STORYBOOK_MODELS} defaultValue="claude-sonnet-4" />
-          <ModelSelectorEffort efforts={STORYBOOK_EFFORTS} defaultValue="medium" />
+          <ModelSelector
+            models={STORYBOOK_MODELS}
+            defaultValue="claude-sonnet-4"
+          />
+          <ModelSelectorEffort
+            efforts={STORYBOOK_EFFORTS}
+            defaultValue="medium"
+          />
         </InputGroup>
       </Labeled>
     </Row>
@@ -94,7 +100,11 @@ export const openProviderGroups = defineStory({
             />
           </div>
           <div style={{ position: "relative", marginLeft: 150 }}>
-            <ModelSelectorEffort efforts={STORYBOOK_EFFORTS} defaultValue="medium" open />
+            <ModelSelectorEffort
+              efforts={STORYBOOK_EFFORTS}
+              defaultValue="medium"
+              open
+            />
           </div>
         </Row>
       </Stage>

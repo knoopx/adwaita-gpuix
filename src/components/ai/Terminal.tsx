@@ -1,20 +1,14 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { createContext, useContext, useMemo, useState } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { T } from "../text";
 import { Icon } from "../../components/icons";
-import { Button } from "../../components/Button";
-import { Spinner } from "../../components/Spinner";
-import {
-  Collapsible,
-  CollapsibleContent,
-} from "../../components/Collapsible";
-import { RowChevron } from "./RowChevron";
+import { Collapsible } from "../../components/Collapsible";
+import { CollapsibleTriggerRow } from "./CollapsibleTriggerRow";
+import { DisclosureBody } from "./DisclosureBody";
+import { DisclosureTrailing } from "./DisclosureTrailing";
+import { RowLabel } from "./RowLabel";
+import { StatusGlyph } from "./StatusGlyph";
 
 interface TerminalContextValue {
   title?: string;
@@ -63,8 +57,6 @@ export function Terminal({
   maxHeight,
   style,
 }: TerminalProps) {
-  const t = useAdwaita();
-  const { colors, radii } = t;
   const [internal, setInternal] = useState(
     defaultOpen ?? (isStreaming ? true : false),
   );
@@ -92,10 +84,6 @@ export function Terminal({
         open={isOpen}
         onOpenChange={handleOpenChange}
         style={{
-          backgroundColor: colors.view_bg,
-          borderWidth: 1,
-          borderColor: colors.border,
-          borderRadius: radii.card,
           overflow: "hidden",
           ...style,
         }}
@@ -113,55 +101,34 @@ export interface TerminalHeaderProps {
 
 export function TerminalHeader({ style }: TerminalHeaderProps) {
   const t = useAdwaita();
-  const { colors, typography, spacing } = t;
   const { title, isStreaming, open, onOpenChange, onCopy } = useTerminal();
   return (
-    <div
-      onClick={() => onOpenChange(!open)}
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        gap: spacing.gap,
-        padding: spacing.gap,
-        minWidth: 0,
-        cursor: "pointer",
-        ...style,
-      }}
-    >
-      <Icon name="terminal" size={16} color={colors.fg} />
-      <T
-        size="body"
-        weight={400}
-        color={colors.fg}
-        style={{
-          flexShrink: 1,
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          fontFamily: typography.fontFamilyMono,
-          pointerEvents: "none",
-        }}
-      >
-        {title ?? "Terminal"}
-      </T>
-      <div style={{ flexGrow: 1 }} />
-      {isStreaming ? (
-        <div style={{ flexShrink: 0 }}>
-          <Spinner size={16} label={false} />
-        </div>
-      ) : null}
-      {onCopy ? (
-        <Button
-          variant="secondary"
-          size="sm"
-          icon="copy"
-          label="Copy"
-          onClick={onCopy}
-          style={{ flexShrink: 0 }}
-        />
-      ) : null}
-      <RowChevron open={open} />
-    </div>
+    <CollapsibleTriggerRow
+      icon={<Icon name="terminal" size={16} color={t.color.text.primary} />}
+      title={
+        <RowLabel
+          weight={400}
+          style={{
+            fontFamily: t.type.fontFamilyMono,
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
+          }}
+        >
+          {title ?? "Terminal"}
+        </RowLabel>
+      }
+      open={open}
+      onToggle={() => onOpenChange(!open)}
+      spacer
+      trailing={
+        <>
+          {isStreaming ? <StatusGlyph status="running" /> : null}
+          <DisclosureTrailing onCopy={onCopy} open={open} />
+        </>
+      }
+      chevron={false}
+      style={{ padding: t.space.sm, ...style }}
+    />
   );
 }
 
@@ -170,12 +137,8 @@ export interface TerminalContentProps {
   style?: Partial<StyleDesc>;
 }
 
-export function TerminalContent({
-  maxHeight,
-  style,
-}: TerminalContentProps) {
+export function TerminalContent({ maxHeight, style }: TerminalContentProps) {
   const t = useAdwaita();
-  const { colors, typography, spacing } = t;
   const { command, output, error, open } = useTerminal();
   const outputLines = output.length > 0 ? output.split("\n") : [];
   const errorLines = error && error.length > 0 ? error.split("\n") : [];
@@ -183,58 +146,47 @@ export function TerminalContent({
     !command && outputLines.length === 0 && errorLines.length === 0;
   const monoLine: Partial<StyleDesc> = {
     flexShrink: 1,
-    fontFamily: typography.fontFamilyMono,
+    fontFamily: t.type.fontFamilyMono,
   };
   return (
-    <CollapsibleContent
+    <DisclosureBody
       open={open}
-      style={{ paddingLeft: 0, paddingRight: 0, paddingBottom: 0, ...style }}
+      flush
+      gap={2}
+      inset={{ padding: t.space.sm, minWidth: 0 }}
+      maxHeight={maxHeight}
+      style={style}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          padding: spacing.gap,
-          borderTopWidth: 1,
-          borderColor: colors.border,
-          minWidth: 0,
-          ...(maxHeight !== undefined
-            ? { maxHeight, overflowY: "scroll" }
-            : {}),
-        }}
-      >
-        {command ? (
-          <T size="caption" color={colors.fg} style={monoLine}>
-            {command}
-          </T>
-        ) : null}
-        {outputLines.map((line, i) => (
-          <T
-            key={`output-${i}`}
-            size="caption"
-            color={colors.dim_fg}
-            style={monoLine}
-          >
-            {line.length > 0 ? line : " "}
-          </T>
-        ))}
-        {errorLines.map((line, i) => (
-          <T
-            key={`error-${i}`}
-            size="caption"
-            color={colors.destructive}
-            style={monoLine}
-          >
-            {line.length > 0 ? line : " "}
-          </T>
-        ))}
-        {isEmpty ? (
-          <T size="caption" color={colors.dim_fg} style={monoLine}>
-            No output
-          </T>
-        ) : null}
-      </div>
-    </CollapsibleContent>
+      {command ? (
+        <T size="caption" color={t.color.text.primary} style={monoLine}>
+          {command}
+        </T>
+      ) : null}
+      {outputLines.map((line, i) => (
+        <T
+          key={`output-${i}`}
+          size="caption"
+          color={t.color.text.dim}
+          style={monoLine}
+        >
+          {line.length > 0 ? line : " "}
+        </T>
+      ))}
+      {errorLines.map((line, i) => (
+        <T
+          key={`error-${i}`}
+          size="caption"
+          color={t.color.functional.destructive}
+          style={monoLine}
+        >
+          {line.length > 0 ? line : " "}
+        </T>
+      ))}
+      {isEmpty ? (
+        <T size="caption" color={t.color.text.dim} style={monoLine}>
+          No output
+        </T>
+      ) : null}
+    </DisclosureBody>
   );
 }

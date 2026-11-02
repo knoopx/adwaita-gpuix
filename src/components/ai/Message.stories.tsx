@@ -1,22 +1,23 @@
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../../theme/adwaita";
-import { T, Labeled } from "../common";
-import { Row, Column } from "../Box";
+import { Labeled, T } from "../text";
+import { Column, Row } from "../Box";
 import { Icon, type IconName } from "../../components/icons";
 import { Spinner } from "../../components/Spinner";
-import { InlineCitation, type CitationSource } from "./InlineCitation";
+import { type CitationSource, InlineCitation } from "./InlineCitation";
 import {
-  MessageGroup,
   Message,
   MessageAvatar,
   MessageContent,
-  MessageHeader,
   MessageFooter,
+  MessageGroup,
+  MessageHeader,
 } from "./Message";
 
 function Glyph({ name }: { name: IconName }) {
   const t = useAdwaita();
-  return <Icon name={name} size={16} color={t.colors.dim_fg} />;
+  return <Icon name={name} size={16} color={t.color.text.dim} />;
 }
 
 const CITATION_SOURCES: CitationSource[] = [
@@ -32,11 +33,15 @@ const CITATION_SOURCES: CitationSource[] = [
 
 function AssistantMessage({
   body,
+  children,
+  trailing,
   time = "10:42",
   header = true,
   footer = true,
 }: {
-  body: string;
+  body?: string;
+  children?: ReactNode;
+  trailing?: ReactNode;
   time?: string;
   header?: boolean;
   footer?: boolean;
@@ -45,7 +50,7 @@ function AssistantMessage({
   return (
     <Message align="start">
       <MessageAvatar>
-        <Glyph name="sparkles" />
+        <Glyph name="autoAwesome" />
       </MessageAvatar>
       <MessageContent>
         {header ? (
@@ -53,18 +58,20 @@ function AssistantMessage({
             <T size="caption" weight={600}>
               Assistant
             </T>
-            <T size="caption" color={t.colors.dim_fg}>
-              {time}
-            </T>
+            {trailing ?? (
+              <T size="caption" color={t.color.text.dim}>
+                {time}
+              </T>
+            )}
           </MessageHeader>
         ) : null}
-        <T size="body">{body}</T>
+        {children ?? <T size="body">{body}</T>}
         {footer ? (
           <MessageFooter>
-            <T size="caption" color={t.colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               Copy
             </T>
-            <T size="caption" color={t.colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               Regenerate
             </T>
           </MessageFooter>
@@ -92,7 +99,7 @@ function UserMessage({
     <Message align="end">
       {avatar ? (
         <MessageAvatar>
-          <Glyph name="user" />
+          <Glyph name="person" />
         </MessageAvatar>
       ) : null}
       <MessageContent>
@@ -101,16 +108,16 @@ function UserMessage({
             <T size="caption" weight={600}>
               You
             </T>
-            <T size="caption" color={t.colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               {time}
             </T>
           </MessageHeader>
         ) : null}
-        <T size="body" color={t.colors.accent_fg}>
+        <T size="body" color={t.color.text.onAccent}>
           {body}
         </T>
         <MessageFooter>
-          <T size="caption" color={t.colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             {footer}
           </T>
         </MessageFooter>
@@ -165,22 +172,14 @@ export const streaming = defineStory({
   parameters: { width: 528, height: 220 },
   render: () => (
     <Labeled caption="Streaming assistant message — spinner in header">
-      <Message align="start">
-        <MessageAvatar>
-          <Glyph name="sparkles" />
-        </MessageAvatar>
-        <MessageContent>
-          <MessageHeader>
-            <T size="caption" weight={600}>
-              Assistant
-            </T>
-            <Spinner size={16} label={false} />
-          </MessageHeader>
-          <T size="body">
-            I'll start by finding where the ring buffer is allocated…
-          </T>
-        </MessageContent>
-      </Message>
+      <AssistantMessage
+        footer={false}
+        trailing={<Spinner size={16} label={false} />}
+      >
+        <T size="body">
+          I'll start by finding where the ring buffer is allocated…
+        </T>
+      </AssistantMessage>
     </Labeled>
   ),
 });
@@ -189,30 +188,22 @@ export function citations() {
   const t = useAdwaita();
   return (
     <Labeled caption="Assistant message with inline citations">
-      <Message align="start">
-        <MessageAvatar>
-          <Glyph name="sparkles" />
-        </MessageAvatar>
-        <MessageContent>
-          <MessageHeader>
-            <T size="caption" weight={600}>
-              Assistant
-            </T>
-            <T size="caption" color={t.colors.dim_fg}>
-              10:44
-            </T>
-          </MessageHeader>
-          <Row gap={4} align="start" style={{ minWidth: 0 }}>
-            <T size="body">
-              Descriptor-set batching cuts per-draw CPU cost
-            </T>
-            <InlineCitation sources={CITATION_SOURCES} index={1} />
-            <T size="body">, and texture fetches dominate mobile GPU bandwidth</T>
-            <InlineCitation sources={CITATION_SOURCES} index={2} />
-            <T size="body">.</T>
-          </Row>
-        </MessageContent>
-      </Message>
+      <AssistantMessage
+        footer={false}
+        trailing={
+          <T size="caption" color={t.color.text.dim}>
+            10:44
+          </T>
+        }
+      >
+        <Row gap={4} align="start" style={{ minWidth: 0 }}>
+          <T size="body">Descriptor-set batching cuts per-draw CPU cost</T>
+          <InlineCitation sources={CITATION_SOURCES} index={1} />
+          <T size="body">, and texture fetches dominate mobile GPU bandwidth</T>
+          <InlineCitation sources={CITATION_SOURCES} index={2} />
+          <T size="body">.</T>
+        </Row>
+      </AssistantMessage>
     </Labeled>
   );
 }

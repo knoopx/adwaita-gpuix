@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { RowChevron } from "./RowChevron";
 
 export interface CollapsibleTriggerRowProps {
@@ -7,7 +7,10 @@ export interface CollapsibleTriggerRowProps {
   title: ReactNode;
   open: boolean;
   onToggle: () => void;
+  trailing?: ReactNode;
   spacer?: boolean;
+  chevron?: boolean;
+  gap?: number;
   style?: Partial<StyleDesc>;
 }
 
@@ -16,7 +19,10 @@ export function CollapsibleTriggerRow({
   title,
   open,
   onToggle,
+  trailing,
   spacer = false,
+  chevron = true,
+  gap = 8,
   style,
 }: CollapsibleTriggerRowProps) {
   return (
@@ -26,7 +32,7 @@ export function CollapsibleTriggerRow({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        gap: 8,
+        gap,
         minWidth: 0,
         cursor: "pointer",
         ...style,
@@ -35,7 +41,8 @@ export function CollapsibleTriggerRow({
       {icon}
       {title}
       {spacer ? <div style={{ flexGrow: 1 }} /> : null}
-      <RowChevron open={open} />
+      {trailing}
+      {chevron ? <RowChevron open={open} /> : null}
     </div>
   );
 }

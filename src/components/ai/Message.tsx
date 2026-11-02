@@ -1,7 +1,6 @@
-import { createContext, useContext, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode, createContext, useContext } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { Icon, type IconName } from "../../components/icons";
 
 export type MessageAlign = "start" | "end";
 
@@ -13,8 +12,7 @@ const MessageCtx = createContext<MessageContextValue | null>(null);
 
 function useMessage(): MessageContextValue {
   const ctx = useContext(MessageCtx);
-  if (!ctx)
-    throw new Error("Message parts must be used within <Message>");
+  if (!ctx) throw new Error("Message parts must be used within <Message>");
   return ctx;
 }
 
@@ -24,13 +22,13 @@ export interface MessageGroupProps {
 }
 
 export function MessageGroup({ children, style }: MessageGroupProps) {
-  const { spacing } = useAdwaita();
+  const t = useAdwaita();
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: spacing.paddingTight,
+        gap: t.space.md,
         width: "100%",
         minWidth: 0,
         ...style,
@@ -48,7 +46,7 @@ export interface MessageProps {
 }
 
 export function Message({ align = "start", children, style }: MessageProps) {
-  const { spacing } = useAdwaita();
+  const t = useAdwaita();
   const end = align === "end";
   return (
     <MessageCtx.Provider value={{ align }}>
@@ -58,7 +56,7 @@ export function Message({ align = "start", children, style }: MessageProps) {
           flexDirection: "row",
           alignItems: "flex-start",
           justifyContent: end ? "flex-end" : "flex-start",
-          gap: spacing.gap,
+          gap: t.space.sm,
           width: "100%",
           minWidth: 0,
           ...style,
@@ -77,7 +75,6 @@ export interface MessageAvatarProps {
 
 export function MessageAvatar({ children, style }: MessageAvatarProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       style={{
@@ -87,10 +84,9 @@ export function MessageAvatar({ children, style }: MessageAvatarProps) {
         justifyContent: "center",
         width: 32,
         height: 32,
-        borderRadius: radii.pill,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.button_bg,
+        borderRadius: t.radius.full,
+        borderWidth: 0,
+        backgroundColor: t.color.surface.button,
         overflow: "hidden",
         flexShrink: 0,
         ...style,
@@ -108,7 +104,6 @@ export interface MessageContentProps {
 
 export function MessageContent({ children, style }: MessageContentProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   const { align } = useMessage();
   const isUser = align === "end";
   return (
@@ -122,9 +117,9 @@ export function MessageContent({ children, style }: MessageContentProps) {
         maxWidth: isUser ? "85%" : "100%",
         ...(isUser
           ? {
-              backgroundColor: colors.accentTint,
-              borderRadius: radii.button,
-              padding: spacing.gap,
+              backgroundColor: t.color.accent.tint,
+              borderRadius: t.radius.sm,
+              padding: t.space.sm,
             }
           : {}),
         ...style,
@@ -183,4 +178,3 @@ export function MessageFooter({ children, style }: MessageFooterProps) {
     </div>
   );
 }
-

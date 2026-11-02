@@ -1,13 +1,17 @@
-import { useState } from "react";
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba, isDarkScheme } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { type ReactNode, useState } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import {
+  type AdwaitaTheme,
+  hexToRgba,
+  isDarkScheme,
+  useAdwaita,
+} from "../../theme/adwaita";
+import { T } from "../text";
 import { Icon } from "../../components/icons";
 import {
   HoverCard,
-  HoverCardTrigger,
   HoverCardContent,
+  HoverCardTrigger,
 } from "../../components/HoverCard";
 
 export interface CitationSource {
@@ -35,26 +39,109 @@ function hostnameOf(url: string): string {
   }
 }
 
+const MARKER_HOVER_ALPHA: Record<"light" | "dark", number> = {
+  light: 0.24,
+  dark: 0.36,
+};
+
+function markerHoverBg(t: AdwaitaTheme): string {
+  return hexToRgba(
+    t.color.accent.base,
+    MARKER_HOVER_ALPHA[isDarkScheme(t.scheme) ? "dark" : "light"],
+  );
+}
+
+function CitationQuote({ source }: { source: CitationSource }) {
+  const t = useAdwaita();
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        borderLeftWidth: 2,
+        borderColor: t.color.accent.base,
+        backgroundColor: t.color.accent.tint,
+        paddingLeft: 8,
+      }}
+    >
+      <T size="caption" color={t.color.text.dim}>
+        {source.quote}
+      </T>
+    </div>
+  );
+}
+
+function CitationSourceMeta({ source }: { source: CitationSource }) {
+  const t = useAdwaita();
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
+        minWidth: 0,
+      }}
+    >
+      <T
+        size="caption"
+        color={t.color.accent.base}
+        style={{ flexShrink: 1, textOverflow: "ellipsis" }}
+      >
+        {hostnameOf(source.url)}
+      </T>
+      <Icon name="link" size={10} color={t.color.text.dim} />
+    </div>
+  );
+}
+
+function CitationDefaultBody({
+  source,
+  quote,
+}: {
+  source: CitationSource | undefined;
+  quote: boolean;
+}) {
+  const t = useAdwaita();
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 4,
+        minWidth: 0,
+      }}
+    >
+      {quote && source?.quote ? <CitationQuote source={source} /> : null}
+      {source ? (
+        <T
+          size="body"
+          weight={600}
+          color={t.color.text.primary}
+          style={{ flexShrink: 1, textOverflow: "ellipsis" }}
+        >
+          {source.title}
+        </T>
+      ) : null}
+      {source ? <CitationSourceMeta source={source} /> : null}
+    </div>
+  );
+}
+
 export function InlineCitationCard({
   sources,
   index = 1,
-  label,
+  label = String(index),
   quote = false,
   open = false,
-  onOpenChange,
+  onOpenChange = () => {},
   children,
   style,
 }: InlineCitationCardProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   const source = sources[index - 1] ?? sources[0];
-  const markerText = label ?? String(index);
-  const hoverBg = hexToRgba(
-    colors.accent,
-    isDarkScheme(t.scheme) ? 0.36 : 0.24,
-  );
   return (
-    <HoverCard open={open} onOpenChange={onOpenChange ?? (() => {})}>
+    <HoverCard open={open} onOpenChange={onOpenChange}>
       <HoverCardTrigger
         style={{
           display: "flex",
@@ -65,79 +152,24 @@ export function InlineCitationCard({
           paddingBottom: 1,
           paddingLeft: 5,
           paddingRight: 5,
-          borderRadius: radii.pill,
-          backgroundColor: colors.accentTint,
+          borderRadius: t.radius.full,
+          backgroundColor: t.color.accent.tint,
           flexShrink: 0,
-          hover: { backgroundColor: hoverBg },
+          hover: { backgroundColor: markerHoverBg(t) },
           ...style,
         }}
       >
         <T
           size="caption"
           weight={600}
-          color={colors.accent}
+          color={t.color.accent.base}
           style={{ pointerEvents: "none" }}
         >
-          {markerText}
+          {label}
         </T>
       </HoverCardTrigger>
       <HoverCardContent style={{ minWidth: 256, gap: 4 }}>
-        {children ?? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 4,
-              minWidth: 0,
-            }}
-          >
-            {quote && source?.quote ? (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  borderLeftWidth: 2,
-                  borderColor: colors.accent,
-                  paddingLeft: 8,
-                }}
-              >
-                <T size="caption" color={colors.dim_fg}>
-                  {source.quote}
-                </T>
-              </div>
-            ) : null}
-            {source ? (
-              <T
-                size="body"
-                weight={600}
-                color={colors.fg}
-                style={{ flexShrink: 1, textOverflow: "ellipsis" }}
-              >
-                {source.title}
-              </T>
-            ) : null}
-            {source ? (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 4,
-                  minWidth: 0,
-                }}
-              >
-                <T
-                  size="caption"
-                  color={colors.accent}
-                  style={{ flexShrink: 1, textOverflow: "ellipsis" }}
-                >
-                  {hostnameOf(source.url)}
-                </T>
-                <Icon name="link" size={10} color={colors.dim_fg} />
-              </div>
-            ) : null}
-          </div>
-        )}
+        {children ?? <CitationDefaultBody source={source} quote={quote} />}
       </HoverCardContent>
     </HoverCard>
   );

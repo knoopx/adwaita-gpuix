@@ -1,16 +1,16 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
-import { FullWidth, FullWidthLabeled } from "../.storybook/story-helpers";
+import { FullWidth, FullWidthLabeled } from "../../../.storybook/story-helpers";
 import {
   Confirmation,
-  ConfirmationTitle,
-  ConfirmationActions,
   ConfirmationAction,
+  ConfirmationActions,
+  ConfirmationTitle,
 } from "./Confirmation";
 
 type ConfirmActionSpec = {
   variant: "suggested" | "secondary" | "destructive";
-  icon?: "check" | "close" | "trash";
+  icon?: "check" | "close" | "delete";
   label: string;
   onClick?: () => void;
 };
@@ -54,7 +54,9 @@ function ConfirmationCard({
           destructive={destructive}
           disabled={disabled}
         >
-          <ConfirmationTitle description={description}>{title}</ConfirmationTitle>
+          <ConfirmationTitle description={description}>
+            {title}
+          </ConfirmationTitle>
           {actions}
         </Confirmation>
       </FullWidthLabeled>
@@ -113,11 +115,16 @@ export const destructive = defineStory({
           actions={[
             {
               variant: "destructive",
-              icon: "trash",
+              icon: "delete",
               label: "Delete",
               onClick: () => {},
             },
-            { variant: "secondary", icon: "close", label: "Cancel", onClick: () => {} },
+            {
+              variant: "secondary",
+              icon: "close",
+              label: "Cancel",
+              onClick: () => {},
+            },
           ]}
         />
       }

@@ -1,6 +1,6 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../common";
+import { T } from "../text";
 import { Column } from "../Box";
 import { Task, TaskItem } from "./Task";
 
@@ -61,15 +61,14 @@ export const progress = defineStory({
 
 function ExpandedTaskDemo() {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <Column gap={0} style={{ width: "100%", minWidth: 0 }}>
       <Task>
         <TaskItem title="Refactor the parser" status="done" defaultOpen>
-          <T size="caption" color={colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             Updated app/parser.ts, app/lexer.ts and app/grammar.ts
           </T>
-          <T size="caption" color={colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             3 files changed, 41 insertions, 38 deletions
           </T>
         </TaskItem>

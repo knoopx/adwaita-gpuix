@@ -1,8 +1,9 @@
-import { createContext, useContext, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { type ReactNode, createContext, useContext } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../../theme/adwaita";
+import { disabledStyle } from "../disabled.ts";
 import { Icon, type IconName } from "../../components/icons";
+import { TextStack } from "./TextStack";
 
 export interface SuggestionItem {
   title: string;
@@ -20,11 +21,7 @@ export interface SuggestionsProps {
   style?: Partial<StyleDesc>;
 }
 
-export function Suggestions({
-  onSelect,
-  children,
-  style,
-}: SuggestionsProps) {
+export function Suggestions({ onSelect, children, style }: SuggestionsProps) {
   return (
     <SuggestionsCtx.Provider value={onSelect ?? null}>
       <div
@@ -44,6 +41,24 @@ export function Suggestions({
   );
 }
 
+type SuggestionHandler = (suggestion: SuggestionItem) => void;
+
+function suggestionInteractivity(
+  t: AdwaitaTheme,
+  handler: SuggestionHandler | null | undefined,
+  disabled: boolean | undefined,
+): Partial<StyleDesc> {
+  return disabledStyle(disabled, {
+    cursor: handler ? "pointer" : "default",
+    hover: handler
+      ? { backgroundColor: t.color.surface.buttonHover }
+      : undefined,
+    active: handler
+      ? { backgroundColor: t.color.surface.buttonActive }
+      : undefined,
+  });
+}
+
 export interface SuggestionProps {
   suggestion: SuggestionItem;
   onSelect?: (suggestion: SuggestionItem) => void;
@@ -58,9 +73,8 @@ export function Suggestion({
   style,
 }: SuggestionProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   const inherited = useContext(SuggestionsCtx);
-  const handler = disabled ? undefined : onSelect ?? inherited;
+  const handler = disabled ? undefined : (onSelect ?? inherited);
   const { icon, title, description } = suggestion;
   return (
     <div
@@ -73,15 +87,11 @@ export function Suggestion({
         padding: 6,
         paddingLeft: 12,
         paddingRight: 12,
-        borderRadius: radii.pill,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.button_bg,
+        borderRadius: t.radius.full,
+        borderWidth: 0,
+        backgroundColor: t.color.surface.button,
         flexShrink: 0,
-        cursor: handler ? "pointer" : "default",
-        opacity: disabled ? 0.5 : 1,
-        hover: handler ? { backgroundColor: colors.button_hover } : undefined,
-        active: handler ? { backgroundColor: colors.button_active } : undefined,
+        ...suggestionInteractivity(t, handler, disabled),
         ...style,
       }}
     >
@@ -89,27 +99,17 @@ export function Suggestion({
         <Icon
           name={icon}
           size={14}
-          color={colors.fg}
+          color={t.color.text.primary}
           style={{ pointerEvents: "none" }}
         />
       ) : null}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          pointerEvents: "none",
-        }}
-      >
-        <T size="caption" color={colors.fg}>
-          {title}
-        </T>
-        {description ? (
-          <T size="caption" color={colors.dim_fg}>
-            {description}
-          </T>
-        ) : null}
-      </div>
+      <TextStack
+        title={title}
+        description={description}
+        titleSize="caption"
+        gap={2}
+        pointerEvents="none"
+      />
     </div>
   );
 }

@@ -43,16 +43,12 @@ export default defineMeta({
 
 export const allPass = defineStory({
   parameters: { width: 528, height: 190 },
-  render: () => (
-    <TestResults suites={ALL_PASS} open onOpenChange={() => {}} />
-  ),
+  render: () => <TestResults suites={ALL_PASS} open onOpenChange={() => {}} />,
 });
 
 export const failures = defineStory({
   parameters: { width: 528, height: 340 },
-  render: () => (
-    <TestResults suites={SUITES} open onOpenChange={() => {}} />
-  ),
+  render: () => <TestResults suites={SUITES} open onOpenChange={() => {}} />,
 });
 
 export const singleTest = defineStory({

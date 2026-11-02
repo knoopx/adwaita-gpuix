@@ -1,17 +1,19 @@
 import { type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { T } from "../text";
 import { Icon } from "../../components/icons";
 import { Badge } from "../../components/Badge";
-import { Frame } from "../../components/Card";
-import { Spinner } from "../../components/Spinner";
 import {
   Collapsible,
   CollapsibleTrigger,
-  CollapsibleContent,
   useControllableOpen,
 } from "../../components/Collapsible";
+import { DisclosureBody } from "./DisclosureBody";
+import { DisclosureRow } from "./DisclosureRow";
+import { DisclosureSection } from "./DisclosureSection";
+import { OutputBox } from "./OutputBox";
+import { StatusGlyph } from "./StatusGlyph";
 
 export type SubagentToolStatus = "pending" | "running" | "complete" | "error";
 
@@ -36,30 +38,6 @@ export interface SubagentProps {
   style?: Partial<StyleDesc>;
 }
 
-function SubagentStatusIndicator({ status }: { status: SubagentStatus }) {
-  const t = useAdwaita();
-  const { colors } = t;
-  if (status === "running")
-    return <Spinner size={16} label={false} style={{ flexShrink: 0 }} />;
-  if (status === "complete")
-    return (
-      <Icon
-        name="success"
-        size={14}
-        color={colors.success}
-        style={{ flexShrink: 0 }}
-      />
-    );
-  return (
-    <Icon
-      name="alert"
-      size={14}
-      color={colors.destructive}
-      style={{ flexShrink: 0 }}
-    />
-  );
-}
-
 export function Subagent({
   name,
   model,
@@ -73,14 +51,13 @@ export function Subagent({
   style,
 }: SubagentProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const { open: isOpen, setOpen } = useControllableOpen(
     open,
     defaultOpen ?? false,
     onOpenChange,
   );
   return (
-    <Frame
+    <div
       style={{
         display: "flex",
         flexDirection: "column",
@@ -91,17 +68,17 @@ export function Subagent({
         <SubagentHeader name={name} model={model} status={status} />
         <SubagentContent open={isOpen}>
           {instructions ? (
-            <T size="caption" color={colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               {instructions}
             </T>
           ) : null}
           {tools && tools.length > 0 ? (
-            <SubagentSection title="Tools">
+            <DisclosureSection title="Tools">
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: t.spacing.gap,
+                  gap: t.space.sm,
                 }}
               >
                 {tools.map((tool) => (
@@ -113,19 +90,25 @@ export function Subagent({
                   />
                 ))}
               </div>
-            </SubagentSection>
+            </DisclosureSection>
           ) : null}
           {output ? (
-            <SubagentSection title="Output">
-              <SubagentOutputBlock
+            <DisclosureSection title="Output">
+              <OutputBox
                 text={output}
-                tone={status === "error" ? "destructive" : "dim"}
+                filled
+                padding={t.space.sm}
+                color={
+                  status === "error"
+                    ? t.color.functional.destructive
+                    : t.color.text.dim
+                }
               />
-            </SubagentSection>
+            </DisclosureSection>
           ) : null}
         </SubagentContent>
       </Collapsible>
-    </Frame>
+    </div>
   );
 }
 
@@ -136,41 +119,37 @@ export interface SubagentHeaderProps {
   style?: Partial<StyleDesc>;
 }
 
-export function SubagentHeader({ name, model, status, style }: SubagentHeaderProps) {
+export function SubagentHeader({
+  name,
+  model,
+  status,
+  style,
+}: SubagentHeaderProps) {
   const t = useAdwaita();
-  const { colors, typography } = t;
   return (
     <CollapsibleTrigger style={style}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: t.spacing.gap,
-          minWidth: 0,
-        }}
-      >
-        <Icon name="userRound" size={14} color={colors.accent} />
-        <T
-          size="body"
-          color={colors.fg}
-          style={{ flexShrink: 1, textOverflow: "ellipsis" }}
-        >
-          {`Ran the ${name} agent`}
-        </T>
-        {status ? <SubagentStatusIndicator status={status} /> : null}
-        {model ? (
-          <Badge
-            variant="secondary"
-            style={{
-              flexShrink: 0,
-              fontFamily: typography.fontFamilyMono,
-            }}
-          >
-            {model}
-          </Badge>
-        ) : null}
-      </div>
+      <DisclosureRow
+        icon={
+          <Icon name="accountCircle" size={14} color={t.color.accent.base} />
+        }
+        label={`Ran the ${name} agent`}
+        trailing={
+          <>
+            {status ? <StatusGlyph status={status} /> : null}
+            {model ? (
+              <Badge
+                variant="secondary"
+                style={{
+                  flexShrink: 0,
+                  fontFamily: t.type.fontFamilyMono,
+                }}
+              >
+                {model}
+              </Badge>
+            ) : null}
+          </>
+        }
+      />
     </CollapsibleTrigger>
   );
 }
@@ -181,42 +160,21 @@ export interface SubagentContentProps {
   style?: Partial<StyleDesc>;
 }
 
-export function SubagentContent({ open, children, style }: SubagentContentProps) {
-  const t = useAdwaita();
-  const { spacing } = t;
-  return (
-    <CollapsibleContent open={open} style={style}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: spacing.paddingTight,
-          paddingTop: 4,
-          paddingLeft: spacing.padding,
-        }}
-      >
-        {children}
-      </div>
-    </CollapsibleContent>
-  );
-}
-
-function SubagentSection({
-  title,
+export function SubagentContent({
+  open,
   children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
+  style,
+}: SubagentContentProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-      <T size="caption" weight={600} color={colors.dim_fg}>
-        {title}
-      </T>
+    <DisclosureBody
+      open={open}
+      gap={t.space.md}
+      inset={{ paddingTop: 4, paddingLeft: t.space.lg }}
+      style={style}
+    >
       {children}
-    </div>
+    </DisclosureBody>
   );
 }
 
@@ -234,15 +192,14 @@ export function SubagentTool({
   style,
 }: SubagentToolProps) {
   const t = useAdwaita();
-  const { colors, typography } = t;
   const dotColor =
     status === "complete"
-      ? colors.success
+      ? t.color.functional.success
       : status === "error"
-        ? colors.destructive
+        ? t.color.functional.destructive
         : status === "running"
-          ? colors.accent
-          : colors.dim_fg;
+          ? t.color.accent.base
+          : t.color.text.dim;
   return (
     <div
       style={{
@@ -257,7 +214,7 @@ export function SubagentTool({
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
-          gap: t.spacing.gap,
+          gap: t.space.sm,
           minWidth: 0,
         }}
       >
@@ -273,9 +230,9 @@ export function SubagentTool({
         <T
           size="caption"
           weight={500}
-          color={colors.fg}
+          color={t.color.text.primary}
           style={{
-            fontFamily: typography.fontFamilyMono,
+            fontFamily: t.type.fontFamilyMono,
             flexShrink: 0,
           }}
         >
@@ -285,7 +242,7 @@ export function SubagentTool({
       {description ? (
         <T
           size="caption"
-          color={colors.dim_fg}
+          color={t.color.text.dim}
           style={{
             paddingLeft: 16,
             flexShrink: 1,
@@ -294,45 +251,6 @@ export function SubagentTool({
           {description}
         </T>
       ) : null}
-    </div>
-  );
-}
-
-function SubagentOutputBlock({
-  text,
-  tone = "dim",
-}: {
-  text: string;
-  tone?: "dim" | "destructive";
-}) {
-  const t = useAdwaita();
-  const { colors, radii, typography, spacing } = t;
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        padding: spacing.gap,
-        borderRadius: radii.button,
-        backgroundColor: colors.button_bg,
-      }}
-    >
-      {text.split("\n").map((line, i) => (
-        <T
-          key={i}
-          size="caption"
-          color={tone === "destructive" ? colors.destructive : colors.dim_fg}
-          style={{
-            fontFamily: typography.fontFamilyMono,
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-            flexShrink: 1,
-          }}
-        >
-          {line}
-        </T>
-      ))}
     </div>
   );
 }

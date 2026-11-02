@@ -1,11 +1,9 @@
-import { useState, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import {
-  useAdwaita,
-  type AdwaitaTheme,
-} from "../../theme/adwaita";
-import { T } from "../../components/common";
-import { Icon } from "../../components/icons";
+import { type ReactNode, useState } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../../theme/adwaita";
+import { T } from "../text";
+import { Icon, type IconName } from "../../components/icons";
+import { isActivateKey } from "../../lib/roving";
 
 const ICON_SIZE = 14;
 const CHEVRON_SIZE = 12;
@@ -38,35 +36,61 @@ function rowStyle(
   selected: boolean,
   interactive: boolean,
 ): Partial<StyleDesc> {
-  const { colors, radii, spacing } = t;
   return {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.gap,
-    padding: spacing.gap,
-    borderRadius: radii.row,
+    gap: t.space.sm,
+    padding: t.space.sm,
+    borderRadius: t.radius.sm,
     cursor: interactive ? "pointer" : "default",
-    backgroundColor: selected ? colors.accentTint : colors.button_bg,
+    backgroundColor: selected ? t.color.accent.tint : t.color.surface.button,
     hover:
       interactive && !selected
-        ? { backgroundColor: colors.button_hover }
+        ? { backgroundColor: t.color.surface.buttonHover }
         : undefined,
   };
 }
 
-function rowLabelStyle(
-  t: AdwaitaTheme,
-  color: string,
-): Partial<StyleDesc> {
+function rowLabelStyle(t: AdwaitaTheme, color: string): Partial<StyleDesc> {
   return {
     color,
-    fontFamily: t.typography.fontFamilyMono,
+    fontFamily: t.type.fontFamilyMono,
     flexShrink: 1,
     minWidth: 0,
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   };
+}
+
+function FileTreeRowContents({
+  icon,
+  name,
+  selected,
+}: {
+  icon: IconName;
+  name: string;
+  selected: boolean;
+}) {
+  const t = useAdwaita();
+  return (
+    <>
+      <Icon
+        name={icon}
+        size={ICON_SIZE}
+        color={selected ? t.color.accent.base : t.color.text.dim}
+      />
+      <T
+        size="caption"
+        style={rowLabelStyle(
+          t,
+          selected ? t.color.text.primary : t.color.text.dim,
+        )}
+      >
+        {name}
+      </T>
+    </>
+  );
 }
 
 export function FileTree({
@@ -79,7 +103,6 @@ export function FileTree({
   style,
 }: FileTreeProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   const [internalExpanded, setInternalExpanded] = useState<Set<string>>(
     () => new Set(defaultExpandedPaths ?? []),
   );
@@ -128,11 +151,7 @@ export function FileTree({
       style={{
         display: "flex",
         flexDirection: "column",
-        padding: spacing.gap,
-        borderRadius: radii.card,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        padding: t.space.sm,
         ...style,
       }}
     >
@@ -160,7 +179,6 @@ export function FileTreeFolder({
   style,
 }: FileTreeFolderProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   const isSelected = selected === true;
   const interactive = onToggle !== undefined;
   return (
@@ -171,7 +189,7 @@ export function FileTreeFolder({
         onKeyDown={
           interactive
             ? (event) => {
-                if (event.key === "Enter" || event.key === " ") onToggle?.();
+                if (isActivateKey(event.key, { space: true })) onToggle?.();
               }
             : undefined
         }
@@ -180,23 +198,13 @@ export function FileTreeFolder({
         <Icon
           name={expanded ? "chevronDown" : "chevronRight"}
           size={CHEVRON_SIZE}
-          color={colors.dim_fg}
+          color={t.color.text.dim}
           style={{ flexShrink: 0 }}
         />
-        <Icon
-          name="folder"
-          size={ICON_SIZE}
-          color={isSelected ? colors.accent : colors.dim_fg}
-        />
-        <T
-          size="caption"
-          style={rowLabelStyle(t, isSelected ? colors.fg : colors.dim_fg)}
-        >
-          {name}
-        </T>
+        <FileTreeRowContents icon="folder" name={name} selected={isSelected} />
       </div>
       {expanded ? (
-        <div style={{ paddingLeft: spacing.paddingTight }}>{children}</div>
+        <div style={{ paddingLeft: t.space.md }}>{children}</div>
       ) : null}
     </div>
   );
@@ -216,7 +224,6 @@ export function FileTreeFile({
   style,
 }: FileTreeFileProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const isSelected = selected === true;
   const interactive = onSelect !== undefined;
   return (
@@ -226,24 +233,14 @@ export function FileTreeFile({
       onKeyDown={
         interactive
           ? (event) => {
-              if (event.key === "Enter" || event.key === " ") onSelect?.();
+              if (isActivateKey(event.key, { space: true })) onSelect?.();
             }
           : undefined
       }
       style={{ ...rowStyle(t, isSelected, interactive), ...style }}
     >
       <div style={{ width: CHEVRON_SIZE, flexShrink: 0 }} />
-      <Icon
-        name="fileText"
-        size={ICON_SIZE}
-        color={isSelected ? colors.accent : colors.dim_fg}
-      />
-      <T
-        size="caption"
-        style={rowLabelStyle(t, isSelected ? colors.fg : colors.dim_fg)}
-      >
-        {name}
-      </T>
+      <FileTreeRowContents icon="article" name={name} selected={isSelected} />
     </div>
   );
 }

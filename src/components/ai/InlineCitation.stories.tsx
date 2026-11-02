@@ -1,13 +1,13 @@
 import { defineMeta, defineStory } from "storybook";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../common";
-import { Row, Column } from "../Box";
-import { Stage } from "../.storybook/story-helpers";
+import { T } from "../text";
+import { Column, Row } from "../Box";
+import { Stage } from "../../../.storybook/story-helpers";
 import {
+  type CitationSource,
   InlineCitation,
   InlineCitationCard,
-  type CitationSource,
 } from "./InlineCitation";
 
 const STORYBOOK_SOURCES: CitationSource[] = [
@@ -46,9 +46,9 @@ function CitationStage({
 }) {
   const t = useAdwaita();
   return (
-    <Stage width={440} height={height} radius={12}>
+    <Stage width={440} height={height} radius={8}>
       <Sentence>
-        <T size="body" color={t.colors.fg}>
+        <T size="body" color={t.color.text.primary}>
           Batch bindings into descriptor sets to avoid per-draw CPU cost
         </T>
         <InlineCitation sources={STORYBOOK_SOURCES} index={1} />
@@ -66,11 +66,12 @@ export function multipleCitations() {
   const t = useAdwaita();
   return (
     <CitationStage height={88}>
-      <T size="body" color={t.colors.fg}>
+      <T size="body" color={t.color.text.primary}>
         , and texture fetches dominate bandwidth on mobile GPUs
       </T>
       <InlineCitation sources={STORYBOOK_SOURCES} index={2} />
-      <T size="body" color={t.colors.fg}>.
+      <T size="body" color={t.color.text.primary}>
+        .
       </T>
     </CitationStage>
   );
@@ -79,16 +80,12 @@ export function multipleCitations() {
 export function label() {
   const t = useAdwaita();
   return (
-    <Stage width={440} height={64} radius={12}>
+    <Stage width={440} height={64} radius={8}>
       <Sentence>
-        <T size="body" color={t.colors.fg}>
+        <T size="body" color={t.color.text.primary}>
           Descriptor-set batching cuts per-draw CPU cost
         </T>
-        <InlineCitation
-          sources={STORYBOOK_SOURCES}
-          index={1}
-          label="Vulkan"
-        />
+        <InlineCitation sources={STORYBOOK_SOURCES} index={1} label="Vulkan" />
       </Sentence>
     </Stage>
   );
@@ -96,7 +93,7 @@ export function label() {
 
 export const openCard = defineStory({
   render: () => (
-    <Stage width={440} height={128} radius={12}>
+    <Stage width={440} height={128} radius={8}>
       <Column padding={12}>
         <InlineCitationCard sources={STORYBOOK_SOURCES} index={1} open />
       </Column>
@@ -106,7 +103,7 @@ export const openCard = defineStory({
 
 export const openCardWithQuote = defineStory({
   render: () => (
-    <Stage width={440} height={168} radius={12}>
+    <Stage width={440} height={168} radius={8}>
       <Column padding={12}>
         <InlineCitationCard sources={STORYBOOK_SOURCES} index={1} open quote />
       </Column>

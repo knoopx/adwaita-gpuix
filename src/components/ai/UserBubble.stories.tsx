@@ -1,5 +1,5 @@
 import { defineMeta, defineStory } from "storybook";
-import { Stage, PaddedColumn } from "../.storybook/story-helpers";
+import { PaddedColumn, Stage } from "../../../.storybook/story-helpers";
 import { UserBubble } from "./UserBubble";
 
 export default defineMeta({
@@ -11,7 +11,7 @@ export default defineMeta({
 export const singleLine = defineStory({
   parameters: { width: 400, height: 100 },
   render: () => (
-    <Stage width={400} height={100} radius={12}>
+    <Stage width={400} height={100} radius={8}>
       <PaddedColumn>
         <UserBubble text="Deploy the adwaita-gpuix library" />
       </PaddedColumn>

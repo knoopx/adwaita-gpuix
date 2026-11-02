@@ -1,21 +1,18 @@
-import { useState } from "react";
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode, useState } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import {
-  T,
-  selectTriggerStyle,
-} from "../../components/common";
+import { T } from "../text";
+import { selectTriggerStyle } from "../Select";
 import { Icon } from "../../components/icons";
 import { useControllableOpen } from "../../components/Collapsible";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "../../components/DropdownMenu";
 
 export interface ModelSelectorModel {
@@ -54,7 +51,6 @@ function useControllableValue<T>(
   return { value: current, setValue };
 }
 
-
 const panelShadow: Partial<StyleDesc> = {
   boxShadow: {
     offsetX: 0,
@@ -83,37 +79,40 @@ function ModelSelectTrigger({
   style?: Partial<StyleDesc>;
 }) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div
       style={selectTriggerStyle(t, {
         minWidth,
         ...(showLabel ? { justifyContent: "flex-start" } : {}),
-        backgroundColor: colors.button_bg,
+        backgroundColor: t.color.surface.button,
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.5 : 1,
         pointerEvents: disabled ? "none" : undefined,
-        hover: disabled ? undefined : { backgroundColor: colors.button_hover },
-        active: disabled ? undefined : { backgroundColor: colors.button_active },
+        hover: disabled
+          ? undefined
+          : { backgroundColor: t.color.surface.buttonHover },
+        active: disabled
+          ? undefined
+          : { backgroundColor: t.color.surface.buttonActive },
         ...style,
       })}
     >
       {showLabel ? (
-        <T size="body" color={colors.dim_fg} style={{ flexShrink: 0 }}>
+        <T size="body" color={t.color.text.dim} style={{ flexShrink: 0 }}>
           {label}
         </T>
       ) : null}
       <T
         size="body"
-        color={colors.fg}
+        color={t.color.text.primary}
         style={{ flexShrink: 1, textOverflow: "ellipsis" }}
       >
         {display ?? fallback}
       </T>
       <Icon
-        name="chevronDown"
+        name="expandMore"
         size={14}
-        color={colors.dim_fg}
+        color={t.color.text.dim}
         style={{ flexShrink: 0 }}
       />
     </div>
@@ -139,7 +138,7 @@ function ModelRadioItems({
           value={item.id}
           style={
             value === item.id
-              ? { backgroundColor: t.colors.accentTint }
+              ? { backgroundColor: t.color.accent.tint }
               : undefined
           }
         />
@@ -193,11 +192,8 @@ export function ModelSelector({
     false,
     onOpenChange,
   );
-  const { value: currentId, setValue: handleValueChange } = useControllableValue(
-    value,
-    defaultValue ?? models[0]?.id,
-    onValueChange,
-  );
+  const { value: currentId, setValue: handleValueChange } =
+    useControllableValue(value, defaultValue ?? models[0]?.id, onValueChange);
   const current = models.find((m) => m.id === currentId) ?? models[0];
   const providers: string[] = [];
   for (const model of models) {
@@ -276,11 +272,8 @@ export function ModelSelectorEffort({
     false,
     onOpenChange,
   );
-  const { value: currentId, setValue: handleValueChange } = useControllableValue(
-    value,
-    defaultValue ?? efforts[0]?.id,
-    onValueChange,
-  );
+  const { value: currentId, setValue: handleValueChange } =
+    useControllableValue(value, defaultValue ?? efforts[0]?.id, onValueChange);
   const current =
     efforts.find((effort) => effort.id === currentId) ?? efforts[0];
   return (

@@ -1,23 +1,24 @@
 import {
   Children,
+  type ReactNode,
   createContext,
   useContext,
   useEffect,
   useMemo,
-  type ReactNode,
 } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { T } from "../text";
 import { Icon, type IconName } from "../../components/icons";
 import { Badge } from "../../components/Badge";
-import { Spinner } from "../../components/Spinner";
 import {
   Collapsible,
   CollapsibleTrigger,
-  CollapsibleContent,
   useControllableOpen,
 } from "../../components/Collapsible";
+import { DisclosureBody } from "./DisclosureBody";
+import { DisclosureRow } from "./DisclosureRow";
+import { StatusGlyph } from "./StatusGlyph";
 
 export type ChainOfThoughtStepStatus = "pending" | "running" | "complete";
 
@@ -34,7 +35,6 @@ function useChainOfThought(): ChainOfThoughtContextValue {
 }
 
 export interface ChainOfThoughtProps {
-  
   active?: boolean;
   open?: boolean;
   defaultOpen?: boolean;
@@ -52,12 +52,11 @@ export function ChainOfThought({
   style,
 }: ChainOfThoughtProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
-  const { open: isOpen, setOpen, setInternal } = useControllableOpen(
-    open,
-    defaultOpen ?? false,
-    onOpenChange,
-  );
+  const {
+    open: isOpen,
+    setOpen,
+    setInternal,
+  } = useControllableOpen(open, defaultOpen ?? false, onOpenChange);
 
   useEffect(() => {
     if (active && open === undefined && defaultOpen !== false) {
@@ -72,17 +71,7 @@ export function ChainOfThought({
 
   return (
     <ChainOfThoughtCtx.Provider value={value}>
-      <Collapsible
-        open={isOpen}
-        onOpenChange={setOpen}
-        style={{
-          borderRadius: radii.card,
-          borderWidth: 1,
-          borderColor: colors.border,
-          backgroundColor: colors.view_bg,
-          ...style,
-        }}
-      >
+      <Collapsible open={isOpen} onOpenChange={setOpen} style={style}>
         {children}
       </Collapsible>
     </ChainOfThoughtCtx.Provider>
@@ -98,12 +87,12 @@ function StepIndicator({
   icon: IconName;
   color: string;
 }) {
-  return active ? (
-    <div style={{ flexShrink: 0 }}>
-      <Spinner size={16} label={false} />
-    </div>
-  ) : (
-    <Icon name={icon} size={14} color={color} style={{ flexShrink: 0 }} />
+  return (
+    <StatusGlyph
+      status={active ? "running" : "complete"}
+      icon={icon}
+      color={color}
+    />
   );
 }
 
@@ -111,7 +100,7 @@ export interface ChainOfThoughtHeaderProps {
   title?: ReactNode;
   steps?: number;
   icon?: IconName;
-  
+
   active?: boolean;
   children?: ReactNode;
   style?: Partial<StyleDesc>;
@@ -120,13 +109,12 @@ export interface ChainOfThoughtHeaderProps {
 export function ChainOfThoughtHeader({
   title,
   steps,
-  icon = "sparkles",
+  icon = "autoAwesome",
   active,
   children,
   style,
 }: ChainOfThoughtHeaderProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const ctx = useChainOfThought();
   const isActive = active ?? ctx.active;
   const text =
@@ -139,24 +127,16 @@ export function ChainOfThoughtHeader({
         : "Researched");
   return (
     <CollapsibleTrigger style={style}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 8,
-          minWidth: 0,
-        }}
-      >
-        <StepIndicator active={isActive} icon={icon} color={colors.dim_fg} />
-        <T
-          size="body"
-          color={isActive ? colors.fg : colors.dim_fg}
-          style={{ flexShrink: 1, textOverflow: "ellipsis" }}
-        >
-          {text}
-        </T>
-      </div>
+      <DisclosureRow
+        icon={
+          <StepIndicator
+            active={isActive}
+            icon={icon}
+            color={t.color.text.dim}
+          />
+        }
+        label={text}
+      />
     </CollapsibleTrigger>
   );
 }
@@ -173,41 +153,35 @@ export function ChainOfThoughtContent({
   style,
 }: ChainOfThoughtContentProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const items = Children.toArray(children);
   return (
-    <CollapsibleContent open={open} style={style}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          paddingTop: 4,
-          minWidth: 0,
-        }}
-      >
-        {items.map((item, index) =>
-          item == null ? null : (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                minWidth: 0,
-                ...(index > 0
-                  ? {
-                      borderTopWidth: 1,
-                      borderColor: colors.border,
-                      paddingTop: 8,
-                    }
-                  : {}),
-              }}
-            >
-              {item}
-            </div>
-          ),
-        )}
-      </div>
-    </CollapsibleContent>
+    <DisclosureBody
+      open={open}
+      inset={{ paddingTop: 4, minWidth: 0 }}
+      style={style}
+    >
+      {items.map((item, index) =>
+        item == null ? null : (
+          <div
+            key={index}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              minWidth: 0,
+              ...(index > 0
+                ? {
+                    borderTopWidth: 1,
+                    borderColor: t.color.border.default,
+                    paddingTop: 8,
+                  }
+                : {}),
+            }}
+          >
+            {item}
+          </div>
+        ),
+      )}
+    </DisclosureBody>
   );
 }
 
@@ -229,7 +203,6 @@ export function ChainOfThoughtStep({
   style,
 }: ChainOfThoughtStepProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   return (
     <div
       style={{
@@ -241,30 +214,20 @@ export function ChainOfThoughtStep({
         ...style,
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: spacing.gap,
-          minWidth: 0,
-        }}
-      >
-        <StepIndicator
-          active={status === "running"}
-          icon={icon}
-          color={status === "complete" ? colors.fg : colors.dim_fg}
-        />
-        <T
-          size="body"
-          color={status === "pending" ? colors.dim_fg : colors.fg}
-          style={{ flexShrink: 1, textOverflow: "ellipsis" }}
-        >
-          {label}
-        </T>
-      </div>
+      <DisclosureRow
+        icon={
+          <StepIndicator
+            active={status === "running"}
+            icon={icon}
+            color={
+              status === "complete" ? t.color.text.primary : t.color.text.dim
+            }
+          />
+        }
+        label={label}
+      />
       {description !== undefined ? (
-        <T size="caption" color={colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           {description}
         </T>
       ) : null}
@@ -325,7 +288,6 @@ export function ChainOfThoughtImage({
   style,
 }: ChainOfThoughtImageProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4, ...style }}>
       <div
@@ -334,17 +296,16 @@ export function ChainOfThoughtImage({
           alignItems: "center",
           justifyContent: "center",
           minHeight: 96,
-          borderRadius: radii.row,
-          borderWidth: 1,
-          borderColor: colors.border,
-          backgroundColor: colors.button_bg,
-          padding: spacing.padding,
+          borderRadius: t.radius.sm,
+          borderWidth: 0,
+          backgroundColor: t.color.surface.button,
+          padding: t.space.lg,
         }}
       >
         {children}
       </div>
       {caption ? (
-        <T size="caption" color={colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           {caption}
         </T>
       ) : null}

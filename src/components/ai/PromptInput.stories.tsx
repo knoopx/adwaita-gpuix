@@ -1,10 +1,10 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "../common";
+import { Labeled } from "../text";
 import { Column } from "../Box";
 import {
   PromptInput,
-  type PromptInputModelOption,
   type PromptInputEffortOption,
+  type PromptInputModelOption,
 } from "./PromptInput";
 
 const STORYBOOK_MODELS: PromptInputModelOption[] = [

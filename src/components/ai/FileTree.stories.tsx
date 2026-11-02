@@ -1,5 +1,5 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "../common";
+import { Labeled } from "../text";
 import { Column } from "../Box";
 import { FileTree, type FileTreeNode } from "./FileTree";
 

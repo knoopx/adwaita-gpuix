@@ -1,6 +1,6 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "../common";
-import { Stage } from "../.storybook/story-helpers";
+import { Labeled } from "../text";
+import { Stage } from "../../../.storybook/story-helpers";
 import { RowChevron } from "./RowChevron";
 
 function LabeledChevron({ open }: { open: boolean }) {
@@ -23,7 +23,7 @@ export default defineMeta({
 export const open = defineStory({
   parameters: { width: 240, height: 100 },
   render: () => (
-    <Stage width={240} height={100} radius={12}>
+    <Stage width={240} height={100} radius={8}>
       <LabeledChevron open />
     </Stage>
   ),
@@ -32,7 +32,7 @@ export const open = defineStory({
 export const closed = defineStory({
   parameters: { width: 240, height: 100 },
   render: () => (
-    <Stage width={240} height={100} radius={12}>
+    <Stage width={240} height={100} radius={8}>
       <LabeledChevron open={false} />
     </Stage>
   ),

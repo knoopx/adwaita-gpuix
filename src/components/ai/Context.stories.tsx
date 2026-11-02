@@ -1,11 +1,11 @@
 import { defineMeta, defineStory } from "storybook";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useAdwaita } from "../../theme/adwaita";
-import { Labeled, T } from "../common";
-import { Row, Column } from "../Box";
+import { Labeled, T } from "../text";
+import { Column, Row } from "../Box";
 import { Icon } from "../../components/icons";
-import { Stage } from "../.storybook/story-helpers";
-import { Context, ContextTrigger, ContextContent } from "./Context";
+import { Stage } from "../../../.storybook/story-helpers";
+import { Context, ContextContent, ContextTrigger } from "./Context";
 
 function ContextStage({
   caption,
@@ -108,7 +108,6 @@ export const highUsage = defineStory({
 
 function CustomTriggerPill() {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       style={{
@@ -119,15 +118,15 @@ function CustomTriggerPill() {
         minHeight: 28,
         paddingLeft: 12,
         paddingRight: 12,
-        borderRadius: radii.pill,
+        borderRadius: t.radius.full,
         borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.button_bg,
+        borderColor: t.color.border.default,
+        backgroundColor: t.color.surface.button,
         cursor: "pointer",
       }}
     >
-      <Icon name="sparkles" size={14} color={colors.dim_fg} />
-      <T size="caption" weight={600} color={colors.dim_fg}>
+      <Icon name="autoAwesome" size={14} color={t.color.text.dim} />
+      <T size="caption" weight={600} color={t.color.text.dim}>
         132k / 200k tokens
       </T>
     </div>

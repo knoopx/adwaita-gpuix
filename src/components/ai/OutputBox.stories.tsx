@@ -1,5 +1,5 @@
 import { defineMeta, defineStory } from "storybook";
-import { Stage, PaddedColumn } from "../.storybook/story-helpers";
+import { PaddedColumn, Stage } from "../../../.storybook/story-helpers";
 import { OutputBox } from "./OutputBox";
 
 function OutputDemo({
@@ -12,7 +12,7 @@ function OutputDemo({
   height?: number;
 }) {
   return (
-    <Stage width={420} height={height} radius={12}>
+    <Stage width={420} height={height} radius={8}>
       <PaddedColumn>
         <OutputBox text={text} tone={tone} />
       </PaddedColumn>

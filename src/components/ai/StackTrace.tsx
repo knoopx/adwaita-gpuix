@@ -1,23 +1,15 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  type ReactNode,
-} from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode, createContext, useContext, useMemo } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { T } from "../text";
 import { Icon } from "../../components/icons";
-import { Button } from "../../components/Button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  useControllableOpen,
-} from "../../components/Collapsible";
-import { RowChevron } from "./RowChevron";
+import { Collapsible, useControllableOpen } from "../../components/Collapsible";
+import { CollapsibleTriggerRow } from "./CollapsibleTriggerRow";
+import { DisclosureBody } from "./DisclosureBody";
+import { DisclosureTrailing } from "./DisclosureTrailing";
+import { RowLabel } from "./RowLabel";
 
 export interface StackTraceFrame {
-
   raw: string;
 
   internal?: boolean;
@@ -47,7 +39,6 @@ function useStackTrace(): StackTraceContextValue {
 }
 
 export interface StackTraceProps {
-
   errorType: string;
   message?: string;
   frames: StackTraceFrame[];
@@ -91,7 +82,15 @@ export function StackTrace({
       onCopy,
       onFilePathClick,
     }),
-    [errorType, message, frames, internalCount, isOpen, onCopy, onFilePathClick],
+    [
+      errorType,
+      message,
+      frames,
+      internalCount,
+      isOpen,
+      onCopy,
+      onFilePathClick,
+    ],
   );
   return (
     <StackTraceCtx.Provider value={value}>
@@ -109,51 +108,30 @@ export interface StackTraceHeaderProps {
 
 export function StackTraceHeader({ style }: StackTraceHeaderProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const { errorType, message, onCopy, open, onOpenChange } = useStackTrace();
   return (
-    <div
-      onClick={() => onOpenChange(!open)}
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 8,
-        minWidth: 0,
-        cursor: "pointer",
-        ...style,
-      }}
-    >
-      <Icon name="warning" size={16} color={colors.destructive} />
-      <T
-        size="body"
-        color={colors.destructive}
-        style={{
-          flexShrink: 1,
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          pointerEvents: "none",
-        }}
-      >
-        {`Failed: ${errorType}${message ? `: ${message}` : ""}`}
-      </T>
-      {onCopy ? (
-        <Button
-          variant="secondary"
-          size="sm"
-          icon="copy"
-          label="Copy"
-          onClick={onCopy}
-          style={{ flexShrink: 0 }}
-        />
-      ) : null}
-      <RowChevron open={open} />
-    </div>
+    <CollapsibleTriggerRow
+      icon={
+        <Icon name="warning" size={16} color={t.color.functional.destructive} />
+      }
+      title={
+        <RowLabel
+          color={t.color.functional.destructive}
+          style={{ whiteSpace: "nowrap", pointerEvents: "none" }}
+        >
+          {`Failed: ${errorType}${message ? `: ${message}` : ""}`}
+        </RowLabel>
+      }
+      open={open}
+      onToggle={() => onOpenChange(!open)}
+      trailing={<DisclosureTrailing onCopy={onCopy} open={open} />}
+      chevron={false}
+      style={style}
+    />
   );
 }
 
 export interface StackTraceContentProps {
-
   maxHeight?: number;
   children?: ReactNode;
   style?: Partial<StyleDesc>;
@@ -165,37 +143,31 @@ export function StackTraceContent({
   style,
 }: StackTraceContentProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing, typography } = t;
   const { errorType, message, frames, internalCount, open, onFilePathClick } =
     useStackTrace();
   return (
-    <CollapsibleContent
+    <DisclosureBody
       open={open}
-      style={{ paddingLeft: 0, paddingRight: 0, paddingBottom: 0, ...style }}
+      flush
+      gap={6}
+      inset={{ padding: t.space.md, minWidth: 0 }}
+      bodyStyle={{
+        borderRadius: t.radius.sm,
+        borderLeftWidth: 3,
+        borderColor: t.color.functional.destructive,
+        backgroundColor: t.color.functional.destructiveTint,
+      }}
+      maxHeight={maxHeight}
+      style={style}
     >
       {children ?? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-            padding: spacing.paddingTight,
-            borderRadius: radii.row,
-            borderLeftWidth: 3,
-            borderColor: colors.destructive,
-            backgroundColor: colors.destructiveTint,
-            minWidth: 0,
-            ...(maxHeight !== undefined
-              ? { maxHeight, overflowY: "scroll" }
-              : {}),
-          }}
-        >
+        <>
           <T
             size="caption"
-            color={colors.destructive}
+            color={t.color.functional.destructive}
             style={{
               flexShrink: 1,
-              fontFamily: typography.fontFamilyMono,
+              fontFamily: t.type.fontFamilyMono,
             }}
           >
             {`${errorType}${message ? `: ${message}` : ""}`}
@@ -220,28 +192,32 @@ export function StackTraceContent({
               <Icon
                 name="layers"
                 size={14}
-                color={colors.dim_fg}
+                color={t.color.text.dim}
                 style={{ flexShrink: 0 }}
               />
-              <T size="caption" color={colors.dim_fg} style={{ flexShrink: 1 }}>
+              <T
+                size="caption"
+                color={t.color.text.dim}
+                style={{ flexShrink: 1 }}
+              >
                 {`${internalCount} framework frames`}
               </T>
               <Icon
                 name="chevronRight"
                 size={12}
-                color={colors.dim_fg}
+                color={t.color.text.dim}
                 style={{ flexShrink: 0 }}
               />
             </div>
           ) : null}
           {frames.length === 0 && internalCount === undefined ? (
-            <T size="caption" color={colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               No stack frames
             </T>
           ) : null}
-        </div>
+        </>
       )}
-    </CollapsibleContent>
+    </DisclosureBody>
   );
 }
 
@@ -253,8 +229,8 @@ function StackTraceFrameRow({
   onFilePathClick?: (filePath: string, line?: number, column?: number) => void;
 }) {
   const t = useAdwaita();
-  const { colors, typography } = t;
-  const clickable = frame.filePath !== undefined && onFilePathClick !== undefined;
+  const clickable =
+    frame.filePath !== undefined && onFilePathClick !== undefined;
   return (
     <div
       onClick={
@@ -278,19 +254,19 @@ function StackTraceFrameRow({
       }}
     >
       <Icon
-        name="fileText"
+        name="article"
         size={14}
-        color={colors.dim_fg}
+        color={t.color.text.dim}
         style={{ flexShrink: 0 }}
       />
       <T
         size="caption"
-        color={frame.internal ? colors.dim_fg : colors.fg}
+        color={frame.internal ? t.color.text.dim : t.color.text.primary}
         style={{
           flexShrink: 1,
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
-          fontFamily: typography.fontFamilyMono,
+          fontFamily: t.type.fontFamilyMono,
           pointerEvents: "none",
         }}
       >
@@ -299,4 +275,3 @@ function StackTraceFrameRow({
     </div>
   );
 }
-

@@ -1,17 +1,10 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { T } from "../text";
 import { Icon, type IconName } from "../../components/icons";
 import { Spinner } from "../../components/Spinner";
 import { PillIconButton } from "./PillIconButton";
-import {
-  Message,
-  MessageAvatar,
-  MessageContent,
-  MessageHeader,
-  MessageFooter,
-} from "./Message";
 
 export type ChatRole = "user" | "assistant";
 
@@ -23,21 +16,16 @@ export interface ChatProps {
 
 export function Chat({ children, height = 320, style }: ChatProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: spacing.gap,
-        padding: spacing.padding,
+        gap: t.space.sm,
+        padding: t.space.lg,
         width: "100%",
         height,
         overflowY: "scroll",
-        borderRadius: radii.card,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
         ...style,
       }}
     >
@@ -53,7 +41,6 @@ export interface ChatHeaderProps {
 
 export function ChatHeader({ title = "New Thread", style }: ChatHeaderProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div
       style={{
@@ -65,7 +52,7 @@ export function ChatHeader({ title = "New Thread", style }: ChatHeaderProps) {
         ...style,
       }}
     >
-      <T size="body" color={colors.fg} style={{ flexShrink: 1 }}>
+      <T size="body" color={t.color.text.primary} style={{ flexShrink: 1 }}>
         {title}
       </T>
       <div style={{ flexGrow: 1 }} />
@@ -92,39 +79,40 @@ export function ChatMessage({
   style,
 }: ChatMessageProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const isUser = role === "user";
-  const glyph: IconName = isUser ? "user" : "sparkles";
+
   return (
-    <Message align={isUser ? "end" : "start"} style={style}>
-      <MessageAvatar>
-        <Icon
-          name={glyph}
-          size={16}
-          color={isUser ? colors.fg : colors.dim_fg}
-        />
-      </MessageAvatar>
-      <MessageContent
-        style={isUser ? { backgroundColor: colors.accentTint } : undefined}
-      >
-        <MessageHeader
-          style={isUser ? { justifyContent: "flex-end" } : undefined}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: t.space.xs,
+        width: "100%",
+        minWidth: 0,
+        paddingLeft: isUser ? t.space.lg : 0,
+        backgroundColor: isUser ? t.color.accent.tint : undefined,
+        borderRadius: isUser ? t.radius.sm : undefined,
+        padding: isUser ? t.space.sm : undefined,
+        ...style,
+      }}
+    >
+      {streaming ? <Spinner size={16} label={false} /> : null}
+      {typeof children === "string" ? (
+        <T
+          size="body"
+          color={isUser ? t.color.text.primary : t.color.text.primary}
         >
-          <T size="caption" weight={600}>
-            {title ?? (isUser ? "You" : "Assistant")}
-          </T>
-          {streaming ? <Spinner size={16} label={false} /> : null}
-        </MessageHeader>
-        {typeof children === "string" ? <T size="body">{children}</T> : children}
-        {timestamp !== undefined ? (
-          <MessageFooter>
-            <T size="caption" color={colors.dim_fg}>
-              {timestamp}
-            </T>
-          </MessageFooter>
-        ) : null}
-      </MessageContent>
-    </Message>
+          {children}
+        </T>
+      ) : (
+        children
+      )}
+      {timestamp !== undefined ? (
+        <T size="caption" color={t.color.text.dim}>
+          {timestamp}
+        </T>
+      ) : null}
+    </div>
   );
 }
 
@@ -137,14 +125,13 @@ export interface ChatEmptyStateProps {
 }
 
 export function ChatEmptyState({
-  icon = "messageSquare",
+  icon = "chatBubble",
   title = "No messages yet",
   description = "Start a conversation to see messages here",
   children,
   style,
 }: ChatEmptyStateProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       style={{
@@ -169,19 +156,19 @@ export function ChatEmptyState({
               justifyContent: "center",
               width: 44,
               height: 44,
-              borderRadius: radii.button,
-              backgroundColor: colors.button_bg,
+              borderRadius: t.radius.sm,
+              backgroundColor: t.color.surface.button,
               flexShrink: 0,
             }}
           >
-            <Icon name={icon} size={24} color={colors.dim_fg} />
+            <Icon name={icon} size={24} color={t.color.text.dim} />
           </div>
           <T size="body" weight={600}>
             {title}
           </T>
           <T
             size="caption"
-            color={colors.dim_fg}
+            color={t.color.text.dim}
             style={{ maxWidth: 280, textAlign: "center" }}
             clamp={2}
           >
@@ -192,4 +179,3 @@ export function ChatEmptyState({
     </div>
   );
 }
-

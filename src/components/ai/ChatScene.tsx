@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { T } from "../text";
 import { PromptInput } from "./PromptInput";
 import { PillIconButton } from "./PillIconButton";
 
@@ -21,7 +21,6 @@ export function ChatScene({
   style,
 }: ChatSceneProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   return (
     <div
       style={{
@@ -30,7 +29,7 @@ export function ChatScene({
         width: "100%",
         height: "100%",
         minWidth: 0,
-        backgroundColor: colors.view_bg,
+        backgroundColor: t.color.surface.view,
         ...style,
       }}
     >
@@ -39,19 +38,17 @@ export function ChatScene({
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
-          gap: spacing.gap,
-          minHeight: spacing.rowHeight,
-          padding: spacing.paddingTight,
-          backgroundColor: colors.headerbar_bg,
-          borderBottomWidth: 1,
-          borderColor: colors.border,
+          gap: t.space.sm,
+          minHeight: t.control.rowHeight,
+          padding: t.space.md,
+          backgroundColor: t.color.surface.headerbar,
           flexShrink: 0,
         }}
       >
         <T
           size="title4"
           weight={600}
-          color={colors.fg}
+          color={t.color.text.primary}
           style={{
             flexGrow: 1,
             minWidth: 0,
@@ -61,16 +58,16 @@ export function ChatScene({
         >
           {title}
         </T>
-        <PillIconButton icon="plus" label="New thread" onClick={onNewThread} />
+        <PillIconButton icon="add" label="New thread" onClick={onNewThread} />
       </div>
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: spacing.gap,
+          gap: t.space.sm,
           flexGrow: 1,
           minHeight: 0,
-          padding: spacing.padding,
+          padding: t.space.lg,
           overflowY: "scroll",
           minWidth: 0,
         }}
@@ -81,10 +78,7 @@ export function ChatScene({
         style={{
           display: "flex",
           flexDirection: "column",
-          padding: spacing.padding,
-          borderTopWidth: 1,
-          borderColor: colors.border,
-          backgroundColor: colors.view_bg,
+          padding: t.space.lg,
           flexShrink: 0,
         }}
       >

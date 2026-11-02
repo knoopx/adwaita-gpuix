@@ -1,6 +1,6 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../../theme/adwaita";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Column } from "../Box";
 import { Queue, QueueItem } from "./Queue";
 import { CollapsibleContent } from "../../components/Collapsible";
@@ -16,7 +16,7 @@ function QueueIndent({ children }: { children: ReactNode }) {
         paddingTop: 4,
         paddingLeft: 12,
         borderLeftWidth: 2,
-        borderColor: t.colors.border,
+        borderColor: t.color.border.default,
         minWidth: 0,
       }}
     >
@@ -26,14 +26,14 @@ function QueueIndent({ children }: { children: ReactNode }) {
 }
 
 function QueueFrame({ children }: { children: ReactNode }) {
-  return (
-    <Column style={{ width: "100%", minWidth: 0 }}>
-      {children}
-    </Column>
-  );
+  return <Column style={{ width: "100%", minWidth: 0 }}>{children}</Column>;
 }
 
-type QueueItemSpec = { title: string; description?: string; completed?: boolean };
+type QueueItemSpec = {
+  title: string;
+  description?: string;
+  completed?: boolean;
+};
 
 const THEME_ITEMS: QueueItemSpec[] = [
   { title: "Add a dark variant to the theme tokens", completed: true },

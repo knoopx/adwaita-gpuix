@@ -1,12 +1,12 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../common";
+import { T } from "../text";
 import { Column } from "../Box";
-import { Chat, ChatHeader, ChatMessage, ChatEmptyState } from "./Chat";
+import { Chat, ChatEmptyState, ChatHeader, ChatMessage } from "./Chat";
 import { PromptInput } from "./PromptInput";
-import { Reasoning, ReasoningHeader, ReasoningContent } from "./Reasoning";
+import { Reasoning, ReasoningContent, ReasoningHeader } from "./Reasoning";
 
 function ChatDescription({
   text,
@@ -17,7 +17,7 @@ function ChatDescription({
 }) {
   const t = useAdwaita();
   return (
-    <T size="caption" color={t.colors.dim_fg} style={style}>
+    <T size="caption" color={t.color.text.dim} style={style}>
       {text}
     </T>
   );
@@ -36,7 +36,7 @@ export const reference = defineStory({
         <ChatHeader title="New Thread" />
         <ChatDescription text="Ask the agent to change your code." />
         <ChatEmptyState
-          icon="circleDashed"
+          icon="radioButtonUnchecked"
           title="What should we build?"
           description="The agent can read your code, run commands and make changes. Press send to start."
           style={{ flexGrow: 1 }}
@@ -75,21 +75,22 @@ export const conversation = defineStory({
         <Reasoning duration={4}>
           <ReasoningHeader />
           <ReasoningContent>
-            {"The theme is driven by an AdwaitaProvider scheme; the toggle needs to switch it between light and dark."}
+            {
+              "The theme is driven by an AdwaitaProvider scheme; the toggle needs to switch it between light and dark."
+            }
           </ReasoningContent>
         </Reasoning>
         <T size="body">
-          I found the theme tokens in src/theme. I'll add a scheme toggle
-          that switches the provider between light and dark, and persist
-          the choice.
+          I found the theme tokens in src/theme. I'll add a scheme toggle that
+          switches the provider between light and dark, and persist the choice.
         </T>
       </ChatMessage>
       <ChatMessage role="user" timestamp="10:43">
         Can you show me the diff before applying it?
       </ChatMessage>
       <ChatMessage role="assistant" timestamp="10:43">
-        Yes — here is the change: the toggle writes the scheme to the
-        provider and the tokens re-resolve. Applying it now.
+        Yes — here is the change: the toggle writes the scheme to the provider
+        and the tokens re-resolve. Applying it now.
       </ChatMessage>
     </ChatDemo>
   ),
@@ -99,7 +100,10 @@ export const streaming = defineStory({
   render: () => (
     <ChatDemo
       prompt={
-        <PromptInput value="Add a dark mode toggle to the settings page." disabled />
+        <PromptInput
+          value="Add a dark mode toggle to the settings page."
+          disabled
+        />
       }
     >
       <ChatMessage role="assistant" streaming>

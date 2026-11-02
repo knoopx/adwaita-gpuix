@@ -1,17 +1,20 @@
 import {
   Children,
+  type ReactNode,
   cloneElement,
   createContext,
   isValidElement,
   useContext,
   useMemo,
-  type ReactNode,
 } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../../theme/adwaita";
+import { T } from "../text";
+import { disabledStyle } from "../disabled.ts";
 import { Icon, type IconName } from "../../components/icons";
 import { Button } from "../../components/Button";
+import { type TextTone, textToneColor } from "../../theme/tones";
+import { TextStack } from "./TextStack";
 
 export interface ConfirmationApproval {
   approved: boolean;
@@ -37,6 +40,68 @@ function useConfirmation(): ConfirmationContextValue {
   return ctx;
 }
 
+type Outcome = "approved" | "rejected";
+
+const OUTCOME: Record<
+  Outcome,
+  { icon: IconName; tone: TextTone; label: string }
+> = {
+  approved: { icon: "checkCircle", tone: "success", label: "Approved" },
+  rejected: { icon: "close", tone: "destructive", label: "Rejected" },
+};
+
+function outcomeOf(approved: boolean): Outcome {
+  return approved ? "approved" : "rejected";
+}
+
+function containerTint(t: AdwaitaTheme, destructive: boolean): string {
+  return destructive ? t.color.functional.destructiveTint : "transparent";
+}
+
+function isApproved(
+  responded: boolean,
+  approval: ConfirmationApproval | undefined,
+): boolean {
+  return responded && approval?.approved === true;
+}
+
+function ConfirmationOutcome({
+  approved,
+  reason,
+}: {
+  approved: boolean;
+  reason?: string;
+}) {
+  const t = useAdwaita();
+  const outcome = OUTCOME[outcomeOf(approved)];
+  const color = textToneColor(t, outcome.tone);
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6,
+      }}
+    >
+      <Icon
+        name={outcome.icon}
+        size={14}
+        color={color}
+        style={{ flexShrink: 0 }}
+      />
+      <T size="caption" color={color}>
+        {outcome.label}
+      </T>
+      {reason ? (
+        <T size="caption" color={t.color.text.dim}>
+          {`— ${reason}`}
+        </T>
+      ) : null}
+    </div>
+  );
+}
+
 export interface ConfirmationProps {
   approval?: ConfirmationApproval;
   state: ConfirmationState;
@@ -56,57 +121,29 @@ export function Confirmation({
   style,
 }: ConfirmationProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   const value = useMemo(
     () => ({ approval, state, disabled }),
     [approval, state, disabled],
   );
   const responded = state === "responded" && approval !== undefined;
-  const approved = responded && approval.approved;
-  const statusColor = approved ? colors.success : colors.destructive;
+  const approved = isApproved(responded, approval);
   return (
     <ConfirmationCtx.Provider value={value}>
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: spacing.gap,
-          padding: spacing.paddingTight,
-          borderRadius: radii.card,
-          borderWidth: 1,
-          borderColor: destructive ? colors.destructive : colors.border,
-          backgroundColor: destructive
-            ? colors.destructiveTint
-            : colors.view_bg,
-          opacity: disabled ? 0.5 : 1,
+          gap: t.space.sm,
+          padding: t.space.md,
+          borderRadius: t.radius.sm,
+          backgroundColor: containerTint(t, destructive),
+          opacity: disabledStyle(disabled).opacity,
           ...style,
         }}
       >
         {children}
         {responded ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-            }}
-          >
-            <Icon
-              name={approved ? "success" : "close"}
-              size={14}
-              color={statusColor}
-              style={{ flexShrink: 0 }}
-            />
-            <T size="caption" color={statusColor}>
-              {approved ? "Approved" : "Rejected"}
-            </T>
-            {approval.reason ? (
-              <T size="caption" color={colors.dim_fg}>
-                {`— ${approval.reason}`}
-              </T>
-            ) : null}
-          </div>
+          <ConfirmationOutcome approved={approved} reason={approval.reason} />
         ) : null}
       </div>
     </ConfirmationCtx.Provider>
@@ -124,19 +161,13 @@ export function ConfirmationTitle({
   description,
   style,
 }: ConfirmationTitleProps) {
-  const t = useAdwaita();
-  const { colors } = t;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, ...style }}>
-      <T size="body" weight={600} color={colors.fg}>
-        {children}
-      </T>
-      {description ? (
-        <T size="caption" color={colors.dim_fg}>
-          {description}
-        </T>
-      ) : null}
-    </div>
+    <TextStack
+      title={children}
+      description={description}
+      titleWeight={600}
+      style={style}
+    />
   );
 }
 
@@ -159,7 +190,7 @@ export function ConfirmationActions({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-end",
-        gap: t.spacing.gap,
+        gap: t.space.sm,
         ...style,
       }}
     >

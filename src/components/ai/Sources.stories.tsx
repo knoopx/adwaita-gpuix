@@ -1,11 +1,11 @@
 import { defineMeta, defineStory } from "storybook";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useAdwaita } from "../../theme/adwaita";
-import { Labeled } from "../common";
+import { Labeled } from "../text";
 import { Column } from "../Box";
 import { type IconName } from "../../components/icons";
 import { CollapsibleContent } from "../Collapsible";
-import { Sources, Source } from "./Sources";
+import { Source, Sources } from "./Sources";
 
 interface StorySource {
   title: string;
@@ -49,7 +49,6 @@ function Panel({
   width?: number;
 }) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div
       style={{
@@ -59,10 +58,10 @@ function Panel({
         width,
         minWidth: 0,
         padding: 12,
-        borderRadius: 12,
+        borderRadius: 8,
         borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderColor: t.color.border.default,
+        backgroundColor: t.color.surface.view,
       }}
     >
       {children}
@@ -101,7 +100,7 @@ export const iconVariants = defineStory({
   render: () => {
     const withIcons: StorySource[] = [
       { ...STORY_SOURCES[0], icon: "link" },
-      { ...STORY_SOURCES[1], icon: "fileText" },
+      { ...STORY_SOURCES[1], icon: "article" },
       { ...STORY_SOURCES[2], icon: "search" },
     ];
     return (

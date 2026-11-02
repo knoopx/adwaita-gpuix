@@ -1,22 +1,22 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../../theme/adwaita";
 import { Icon, type IconName } from "../../components/icons";
-import { Labeled, T } from "../common";
+import { Labeled, T } from "../text";
 import { Column } from "../Box";
 import {
   ChainOfThought,
-  ChainOfThoughtHeader,
   ChainOfThoughtContent,
-  ChainOfThoughtStep,
-  ChainOfThoughtSearchResults,
-  ChainOfThoughtSearchResult,
+  ChainOfThoughtHeader,
   ChainOfThoughtImage,
+  ChainOfThoughtSearchResult,
+  ChainOfThoughtSearchResults,
+  ChainOfThoughtStep,
 } from "./ChainOfThought";
 
 function ImagePlaceholder() {
   const t = useAdwaita();
-  return <Icon name="grid" size={24} color={t.colors.dim_fg} />;
+  return <Icon name="gridView" size={24} color={t.color.text.dim} />;
 }
 
 type ThoughtStepSpec = {
@@ -33,7 +33,11 @@ const ACTIVE_STEPS: ThoughtStepSpec[] = [
     description: "12 results",
     status: "complete",
   },
-  { icon: "fileText", label: "Reading the vendor developer docs", status: "running" },
+  {
+    icon: "article",
+    label: "Reading the vendor developer docs",
+    status: "running",
+  },
   { icon: "circle", label: "Summarizing the findings", status: "pending" },
 ];
 
@@ -45,12 +49,12 @@ const COMPLETED_STEPS: ThoughtStepSpec[] = [
     status: "complete",
   },
   {
-    icon: "fileText",
+    icon: "article",
     label: "Read the vendor developer docs",
     description: "3 sources",
     status: "complete",
   },
-  { icon: "sparkles", label: "Summarized the findings", status: "complete" },
+  { icon: "autoAwesome", label: "Summarized the findings", status: "complete" },
 ];
 
 function CoTFrame({

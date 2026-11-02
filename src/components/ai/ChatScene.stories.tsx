@@ -1,19 +1,18 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../common";
+import { T } from "../text";
 import { Column } from "../Box";
-import { Stage } from "../.storybook/story-helpers";
+import { Stage } from "../../../.storybook/story-helpers";
 import { ChatScene } from "./ChatScene";
 
 function ShellContent() {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <Column gap={8} style={{ minWidth: 0 }}>
-      <T size="body" color={colors.fg}>
+      <T size="body" color={t.color.text.primary}>
         Ran the test suite.
       </T>
-      <T size="body" color={colors.dim_fg}>
+      <T size="body" color={t.color.text.dim}>
         All 12 tests passed in 0.4s.
       </T>
     </Column>

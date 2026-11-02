@@ -1,19 +1,21 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "../common";
+import { Labeled } from "../text";
 import { Column } from "../Box";
-import {
-  Reasoning,
-  ReasoningHeader,
-  ReasoningContent,
-} from "./Reasoning";
+import { Reasoning, ReasoningContent, ReasoningHeader } from "./Reasoning";
 
 const REASONING_PARAGRAPHS = [
   "The deploy log has three phases. Install takes 38s and next build takes 52s, both normal for this repo.",
   "Image optimization takes 3m 50s. It reruns on every deploy because its cache key includes the commit hash, so the cache never hits.",
 ];
 
-function Frame({ caption, children }: { caption: string; children: ReactNode }) {
+function Frame({
+  caption,
+  children,
+}: {
+  caption: string;
+  children: ReactNode;
+}) {
   return (
     <Column gap={16} align="center">
       <Labeled caption={caption}>{children}</Labeled>

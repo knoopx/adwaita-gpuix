@@ -1,4 +1,4 @@
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
 import { Icon, type IconName } from "../../components/icons";
 
@@ -16,7 +16,6 @@ export function PillIconButton({
   style,
 }: PillIconButtonProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       onClick={onClick}
@@ -27,15 +26,15 @@ export function PillIconButton({
         justifyContent: "center",
         width: 28,
         height: 28,
-        borderRadius: radii.pill,
-        backgroundColor: colors.button_bg,
+        borderRadius: t.radius.full,
+        backgroundColor: t.color.surface.button,
         cursor: "pointer",
         flexShrink: 0,
-        hover: { backgroundColor: colors.button_hover },
+        hover: { backgroundColor: t.color.surface.buttonHover },
         ...style,
       }}
     >
-      <Icon name={icon} size={14} color={colors.dim_fg} />
+      <Icon name={icon} size={14} color={t.color.text.dim} />
     </div>
   );
 }

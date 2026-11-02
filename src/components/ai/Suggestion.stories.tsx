@@ -1,7 +1,7 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "../common";
+import { Labeled } from "../text";
 import { Column } from "../Box";
-import { Suggestions, Suggestion } from "./Suggestion";
+import { Suggestion, Suggestions } from "./Suggestion";
 
 export default defineMeta({
   title: "Adwaita/Suggestion",
@@ -56,7 +56,9 @@ export const withIcons = defineStory({
     <Column gap={16} align="center">
       <Labeled caption="icon + label (clickable)">
         <Suggestions onSelect={() => {}}>
-          <Suggestion suggestion={{ icon: "sparkles", title: "Summarize" }} />
+          <Suggestion
+            suggestion={{ icon: "autoAwesome", title: "Summarize" }}
+          />
           <Suggestion suggestion={{ icon: "search", title: "Explain" }} />
           <Suggestion suggestion={{ icon: "code", title: "Refactor" }} />
         </Suggestions>
@@ -90,7 +92,7 @@ export const disabled = defineStory({
         <Suggestions>
           <Suggestion
             disabled
-            suggestion={{ icon: "sparkles", title: "Summarize" }}
+            suggestion={{ icon: "autoAwesome", title: "Summarize" }}
           />
           <Suggestion disabled suggestion={{ title: "Translate" }} />
           <Suggestion suggestion={{ title: "Active" }} />

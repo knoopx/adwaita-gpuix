@@ -2,11 +2,11 @@ import { defineMeta, defineStory } from "storybook";
 import { Column } from "../Box";
 import {
   Plan,
-  PlanHeader,
-  PlanTitle,
-  PlanDescription,
   PlanContent,
+  PlanDescription,
+  PlanHeader,
   PlanStep,
+  PlanTitle,
 } from "./Plan";
 
 type PlanStepSpec = { title: string; status: "done" | "running" | "pending" };

@@ -1,4 +1,4 @@
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { Button } from "../../components/Button";
 
 export interface ReplayButtonProps {

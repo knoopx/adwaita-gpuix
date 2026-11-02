@@ -1,5 +1,5 @@
 import { defineMeta, defineStory } from "storybook";
-import { FullWidth, FullWidthLabeled } from "../.storybook/story-helpers";
+import { FullWidth, FullWidthLabeled } from "../../../.storybook/story-helpers";
 import { Checkpoint } from "./Checkpoint";
 
 export default defineMeta({
@@ -22,7 +22,11 @@ export const withRestore = defineStory({
   render: () => (
     <FullWidth>
       <FullWidthLabeled caption="restore button (outline sm)">
-        <Checkpoint label="Fine-tune model" timestamp="14:32" onRestore={() => {}} />
+        <Checkpoint
+          label="Fine-tune model"
+          timestamp="14:32"
+          onRestore={() => {}}
+        />
       </FullWidthLabeled>
     </FullWidth>
   ),

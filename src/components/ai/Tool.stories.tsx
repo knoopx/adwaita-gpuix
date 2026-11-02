@@ -1,5 +1,5 @@
 import { defineMeta, defineStory } from "storybook";
-import { Tool, ToolHeader, ToolContent } from "./Tool";
+import { Tool, ToolContent, ToolHeader } from "./Tool";
 
 export default defineMeta({
   title: "Adwaita/Tool",
@@ -50,9 +50,7 @@ export const denied = defineStory({
   render: () => (
     <Tool open onOpenChange={() => {}}>
       <ToolHeader state="output-denied" toolName="write_file" />
-      <ToolContent
-        errorText="Permission denied: write_file is not allowed in this workspace"
-      />
+      <ToolContent errorText="Permission denied: write_file is not allowed in this workspace" />
     </Tool>
   ),
 });

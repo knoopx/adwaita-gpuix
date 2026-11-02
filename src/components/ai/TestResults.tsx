@@ -1,18 +1,16 @@
-import { useState } from "react";
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { type ReactNode, useState } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../../theme/adwaita";
+import { T } from "../text";
 import { Icon } from "../../components/icons";
-import {
-  Collapsible,
-  CollapsibleContent,
-  useControllableOpen,
-} from "../../components/Collapsible";
+import { Collapsible, useControllableOpen } from "../../components/Collapsible";
 import { CollapsibleTriggerRow } from "./CollapsibleTriggerRow";
+import { DisclosureBody } from "./DisclosureBody";
 import { Glyph } from "./Glyph";
 import { OutputBox } from "./OutputBox";
 import { RowChevron } from "./RowChevron";
+import { RowLabel } from "./RowLabel";
+import { StatusGlyph } from "./StatusGlyph";
 
 export type TestResultStatus = "passed" | "failed";
 
@@ -50,24 +48,40 @@ function TestListBody({
   children: ReactNode;
 }) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   return (
-    <CollapsibleContent open={open}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: spacing.gap,
-          paddingTop: 4,
-          paddingLeft: spacing.paddingTight,
-          borderLeftWidth: 2,
-          borderColor: hasFailures ? colors.destructive : colors.success,
-          minWidth: 0,
-        }}
-      >
-        {children}
-      </div>
-    </CollapsibleContent>
+    <DisclosureBody
+      open={open}
+      indent
+      bodyStyle={{
+        borderLeftWidth: 2,
+        borderColor: hasFailures
+          ? t.color.functional.destructive
+          : t.color.functional.success,
+        backgroundColor: hasFailures
+          ? t.color.functional.destructiveTint
+          : t.color.functional.successTint,
+      }}
+    >
+      {children}
+    </DisclosureBody>
+  );
+}
+
+function SummaryLine({ children }: { children: ReactNode }) {
+  const t = useAdwaita();
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: t.space.sm / 2,
+        flexShrink: 1,
+        minWidth: 0,
+      }}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -80,7 +94,6 @@ export function TestResults({
   style,
 }: TestResultsProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   const { open: isOpen, setOpen } = useControllableOpen(
     open,
     defaultOpen ?? true,
@@ -99,35 +112,30 @@ export function TestResults({
       <CollapsibleTriggerRow
         icon={
           <Glyph
-            name="flask"
+            name="science"
             size={14}
-            color={hasFailures ? colors.destructive : colors.success}
+            color={
+              hasFailures
+                ? t.color.functional.destructive
+                : t.color.functional.success
+            }
           />
         }
         title={
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: spacing.gap / 2,
-              flexShrink: 1,
-              minWidth: 0,
-            }}
-          >
+          <SummaryLine>
             <T
               size="body"
-              color={colors.success}
+              color={t.color.functional.success}
               style={{ flexShrink: 1, textOverflow: "ellipsis" }}
             >
               {`${passed} passed`}
             </T>
             {hasFailures ? (
-              <T size="body" color={colors.destructive}>
+              <T size="body" color={t.color.functional.destructive}>
                 {`, ${failed} failed`}
               </T>
             ) : null}
-          </div>
+          </SummaryLine>
         }
         open={isOpen}
         onToggle={() => setOpen(!isOpen)}
@@ -159,7 +167,6 @@ export function TestSuite({
   style,
 }: TestSuiteProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   const failedCount = tests.filter((test) => test.status === "failed").length;
   const suiteFailed = failedCount > 0;
   const { open: isOpen, setOpen } = useControllableOpen(
@@ -172,39 +179,32 @@ export function TestSuite({
       <CollapsibleTriggerRow
         icon={
           <Icon
-            name="fileText"
+            name="article"
             size={14}
-            color={suiteFailed ? colors.destructive : colors.dim_fg}
+            color={
+              suiteFailed ? t.color.functional.destructive : t.color.text.dim
+            }
             style={{ flexShrink: 0 }}
           />
         }
         title={
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: spacing.gap / 2,
-              flexShrink: 1,
-              minWidth: 0,
-            }}
-          >
+          <SummaryLine>
             <T
               size="caption"
-              color={colors.fg}
+              color={t.color.text.primary}
               style={{ flexShrink: 1, textOverflow: "ellipsis" }}
             >
               {name}
             </T>
-            <T size="caption" color={colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               {`, ${tests.length} tests`}
             </T>
             {suiteFailed ? (
-              <T size="caption" color={colors.destructive}>
+              <T size="caption" color={t.color.functional.destructive}>
                 {`, ${failedCount} failed`}
               </T>
             ) : null}
-          </div>
+          </SummaryLine>
         }
         open={isOpen}
         onToggle={() => setOpen(!isOpen)}
@@ -216,6 +216,61 @@ export function TestSuite({
       </TestListBody>
     </Collapsible>
   );
+}
+
+function TestResultStatusIcon({ status }: { status: TestResultStatus }) {
+  return (
+    <StatusGlyph
+      status={status === "passed" ? "complete" : "error"}
+      icon={status === "passed" ? "checkCircle" : "close"}
+    />
+  );
+}
+
+function TestResultFile({ file }: { file: string }) {
+  const t = useAdwaita();
+  return (
+    <T
+      size="caption"
+      color={t.color.text.dim}
+      style={{
+        flexShrink: 1,
+        textOverflow: "ellipsis",
+        fontFamily: t.type.fontFamilyMono,
+        pointerEvents: "none",
+      }}
+    >
+      {file}
+    </T>
+  );
+}
+
+function testResultRowStyle(
+  t: AdwaitaTheme,
+  expandable: boolean,
+): Partial<StyleDesc> {
+  return {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: t.space.sm,
+    minWidth: 0,
+    cursor: expandable ? "pointer" : "default",
+  };
+}
+
+function TestResultOutput({
+  status,
+  error,
+  open,
+}: {
+  status: TestResultStatus;
+  error?: string;
+  open: boolean;
+}) {
+  if (status !== "failed") return null;
+  if (!error || !open) return null;
+  return <OutputBox text={error} tone="error" />;
 }
 
 export interface TestResultProps {
@@ -237,67 +292,31 @@ export function TestResult({
   style,
 }: TestResultProps) {
   const t = useAdwaita();
-  const { colors, spacing, typography } = t;
   void duration;
-  const failed = status === "failed";
-  const expandable = failed && error !== undefined;
+  const expandable = status === "failed" && error !== undefined;
   const [isOpen, setIsOpen] = useState(expandable);
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0, ...style }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 4,
+        minWidth: 0,
+        ...style,
+      }}
+    >
       <div
         onClick={expandable ? () => setIsOpen(!isOpen) : undefined}
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: spacing.gap,
-          minWidth: 0,
-          cursor: expandable ? "pointer" : "default",
-        }}
+        style={testResultRowStyle(t, expandable)}
       >
-        {failed ? (
-          <Icon
-            name="close"
-            size={14}
-            color={colors.destructive}
-            style={{ flexShrink: 0 }}
-          />
-        ) : (
-          <Icon
-            name="success"
-            size={14}
-            color={colors.success}
-            style={{ flexShrink: 0 }}
-          />
-        )}
-        <T
-          size="caption"
-          color={colors.fg}
-          style={{
-            flexShrink: 1,
-            textOverflow: "ellipsis",
-            pointerEvents: "none",
-          }}
-        >
+        <TestResultStatusIcon status={status} />
+        <RowLabel size="caption" style={{ pointerEvents: "none" }}>
           {name}
-        </T>
-        {file ? (
-          <T
-            size="caption"
-            color={colors.dim_fg}
-            style={{
-              flexShrink: 1,
-              textOverflow: "ellipsis",
-              fontFamily: typography.fontFamilyMono,
-              pointerEvents: "none",
-            }}
-          >
-            {file}
-          </T>
-        ) : null}
+        </RowLabel>
+        {file ? <TestResultFile file={file} /> : null}
         {expandable ? <RowChevron open={isOpen} /> : null}
       </div>
-      {failed && error && isOpen ? <OutputBox text={error} tone="error" /> : null}
+      <TestResultOutput status={status} error={error} open={isOpen} />
     </div>
   );
 }

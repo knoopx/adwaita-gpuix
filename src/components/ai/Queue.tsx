@@ -1,16 +1,13 @@
 import { type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../../components/common";
+import { T } from "../text";
 import { Icon } from "../../components/icons";
-import {
-  Collapsible,
-  useControllableOpen,
-} from "../../components/Collapsible";
+import { Collapsible, useControllableOpen } from "../../components/Collapsible";
 import { CollapsibleTriggerRow } from "./CollapsibleTriggerRow";
-import { UserBubble } from "./UserBubble";
-import { Summary } from "./Summary";
-import { ReplayButton } from "./ReplayButton";
+import { DisclosureRow } from "./DisclosureRow";
+import { RowLabel } from "./RowLabel";
+import { StatusGlyph } from "./StatusGlyph";
 
 export interface QueueProps {
   count?: number;
@@ -32,7 +29,6 @@ export function Queue({
   style,
 }: QueueProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const { open: isOpen, setOpen } = useControllableOpen(
     open,
     defaultOpen ?? false,
@@ -44,22 +40,13 @@ export function Queue({
       <CollapsibleTriggerRow
         icon={
           <Icon
-            name="listOrdered"
+            name="formatListNumbered"
             size={14}
-            color={colors.dim_fg}
+            color={t.color.text.dim}
             style={{ flexShrink: 0 }}
           />
         }
-        title={
-          <T
-            size="body"
-            weight={400}
-            color={colors.fg}
-            style={{ flexShrink: 1, textOverflow: "ellipsis" }}
-          >
-            {text}
-          </T>
-        }
+        title={<RowLabel weight={400}>{text}</RowLabel>}
         open={isOpen}
         onToggle={() => setOpen(!isOpen)}
         spacer
@@ -78,14 +65,11 @@ export function QueueItemIndicator({
   completed = false,
   style,
 }: QueueItemIndicatorProps) {
-  const t = useAdwaita();
-  const { colors } = t;
   return (
-    <Icon
-      name={completed ? "success" : "circle"}
-      size={14}
-      color={completed ? colors.success : colors.dim_fg}
-      style={{ flexShrink: 0, ...style }}
+    <StatusGlyph
+      status={completed ? "complete" : "pending"}
+      icon={completed ? "success" : "circle"}
+      style={style}
     />
   );
 }
@@ -106,7 +90,6 @@ export function QueueItem({
   style,
 }: QueueItemProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div
       style={{
@@ -120,29 +103,22 @@ export function QueueItem({
       {children !== undefined ? (
         children
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              minWidth: 0,
-            }}
-          >
-            <QueueItemIndicator completed={completed} />
-            <T
-              size="body"
-              color={completed ? colors.dim_fg : colors.fg}
-              style={{ flexShrink: 1, textOverflow: "ellipsis" }}
-            >
-              {title}
-            </T>
-          </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            minWidth: 0,
+          }}
+        >
+          <DisclosureRow
+            icon={<QueueItemIndicator completed={completed} />}
+            label={title}
+          />
           {description !== undefined ? (
             <T
               size="caption"
-              color={colors.dim_fg}
+              color={t.color.text.dim}
               style={{ marginLeft: 22, textOverflow: "ellipsis" }}
             >
               {description}

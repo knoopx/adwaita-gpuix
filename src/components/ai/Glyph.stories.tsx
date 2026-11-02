@@ -1,13 +1,12 @@
 import { defineMeta, defineStory } from "storybook";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../common";
-import { Row, Column } from "../Box";
+import { T } from "../text";
+import { Column, Row } from "../Box";
 import { Glyph, type GlyphName } from "./Glyph";
 
 function Stage({ children }: { children: ReactNode }) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div
       style={{
@@ -16,10 +15,10 @@ function Stage({ children }: { children: ReactNode }) {
         gap: 16,
         width: "100%",
         padding: 16,
-        borderRadius: 12,
+        borderRadius: 8,
         borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderColor: t.color.border.default,
+        backgroundColor: t.color.surface.view,
       }}
     >
       {children}
@@ -30,16 +29,16 @@ function Stage({ children }: { children: ReactNode }) {
 function GlyphRow() {
   const t = useAdwaita();
   const glyphs: { name: GlyphName; color: string }[] = [
-    { name: "terminal", color: t.colors.fg },
-    { name: "flask", color: t.colors.accent },
-    { name: "globe", color: t.colors.success },
+    { name: "terminal", color: t.color.text.primary },
+    { name: "science", color: t.color.accent.base },
+    { name: "language", color: t.color.functional.success },
   ];
   return (
     <Row gap={24}>
       {glyphs.map(({ name, color }) => (
         <Column key={name} gap={6} align="center">
           <Glyph name={name} size={16} color={color} />
-          <T size="caption" color={t.colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             {name}
           </T>
         </Column>
