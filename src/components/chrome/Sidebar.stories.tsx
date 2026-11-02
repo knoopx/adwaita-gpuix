@@ -1,126 +1,123 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled, T } from "../common";
-import { Row, Column } from "../Box";
+import { CONTROL } from "../../theme/adwaita";
+import { T } from "../text";
+import { Button } from "../Button";
+import { Table } from "../Table";
 import {
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarFooter,
+  SidebarHeader,
   SidebarMenuItem,
 } from "./Sidebar";
-import { Stage } from "../.storybook/story-helpers";
+import { HeaderBar } from "./HeaderBar";
+import { LocationEntry } from "./LocationEntry";
+import {
+  FILES_NAV,
+  FilesNarrowWindow,
+  FilesSidebar,
+  ResourcesSidebar,
+  SETTINGS_NAV_APPEARANCE,
+  SettingsSidebar,
+  WINDOWS,
+} from "../../../.storybook/app-helpers";
 
-function SideContent({ collapsed }: { collapsed: boolean }) {
+const meta = defineMeta({
+  title: "Adwaita/Sidebar",
+  component: Sidebar,
+  parameters: { width: 217, height: 620 },
+});
+
+export default meta;
+
+const noop = () => {};
+
+function FilesNavItems({ disabledId }: { disabledId?: string }) {
   return (
     <>
-      <SidebarHeader>
-        <T size="title3" weight={600}>
-          Adwaita
-        </T>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel icon={collapsed ? "list" : undefined}>
-            General
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenuItem icon="home" label="Home" selected />
-            <SidebarMenuItem icon="settings" label="Settings" />
-            <SidebarMenuItem icon="user" label="Profile" />
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel icon={collapsed ? "settings" : undefined}>
-            Preferences
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenuItem icon="sunMoon" label="Appearance" />
-            <SidebarMenuItem icon="list" label="Shortcuts" />
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenuItem icon="user" label="Ada Lovelace" />
-      </SidebarFooter>
+      {FILES_NAV.map((row) => (
+        <SidebarMenuItem
+          key={row.id}
+          icon={row.icon}
+          label={row.label}
+          selected={row.id === "home"}
+          disabled={row.id === disabledId}
+          onClick={noop}
+        />
+      ))}
     </>
   );
 }
 
-export default defineMeta({
-  title: "Adwaita/Sidebar",
-  component: Sidebar,
-  parameters: { width: 528, height: 700 },
+export const filesNav = defineStory({
+  parameters: { width: 217, height: 470 },
+  render: () => <FilesSidebar selected="home" onSelect={noop} />,
 });
 
-export const expandedCollapsed = defineStory({
+export const settingsRows = defineStory({
   render: () => (
-    <Row gap={16} align="center">
-      <Labeled caption="expanded (default, 220px)">
-        <Sidebar>
-          <SideContent collapsed={false} />
-        </Sidebar>
-      </Labeled>
-      <Labeled caption="collapsed (open=false, 56px rail)">
-        <Sidebar open={false}>
-          <SideContent collapsed />
-        </Sidebar>
-      </Labeled>
-    </Row>
+    <SettingsSidebar selected="appearance" groups={SETTINGS_NAV_APPEARANCE} />
   ),
 });
 
-export const mobileSheetOpen = defineStory({
-  render: () => (
-    <Column gap={16} align="center">
-      <Labeled caption="mobile sheet · open (contained)">
-        <Stage width={340} height={240} radius={12}>
-          <Sidebar mobile contained open>
-            <SideContent collapsed={false} />
-          </Sidebar>
-        </Stage>
-      </Labeled>
-    </Column>
-  ),
+export const resourcesCharts = defineStory({
+  parameters: { width: 217, height: 720 },
+  render: () => <ResourcesSidebar selected="apps" />,
 });
 
-export const mobileSheetClosed = defineStory({
+export const railCollapsed = defineStory({
+  parameters: {
+    width: CONTROL.sidebarRailWidth,
+    height: 420,
+    source:
+      "Nautilus-2.png — the GNOME Files Places rows: Home (selected), Recent, Starred, Network, Trash. Settings-1.png / Resources-1.png — the same pane in Settings and Resources. HIG §12.5 + §25.1: the pane collapses to a rail of icons, no labels, no header text.",
+  },
   render: () => (
-    <Column gap={16} align="center">
-      <Labeled caption="mobile sheet · closed">
-        <Stage width={340} height={120} radius={12}>
-          <Sidebar mobile contained open={false}>
-            <SideContent collapsed={false} />
-          </Sidebar>
-        </Stage>
-      </Labeled>
-    </Column>
+    <Sidebar open={false}>
+      <SidebarContent>
+        <SidebarGroup>
+          <FilesNavItems />
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
   ),
 });
 
 export const disabledRow = defineStory({
-  parameters: { width: 280, height: 400 },
+  parameters: {
+    width: 217,
+    height: 470,
+    source:
+      "Nautilus-2.png — the same Places list expanded, with the place labelled exactly `Network`; GNOME Files draws that place insensitive when no servers are reachable.",
+  },
   render: () => (
-    <Labeled caption="disabled row (dimmed, no click)">
-      <Sidebar>
-        <SidebarHeader>
-          <T size="title3" weight={600}>
-            Adwaita
-          </T>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarGroup>
-            <SidebarGroupLabel>General</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenuItem icon="home" label="Home" selected />
-              <SidebarMenuItem icon="settings" label="Settings" disabled />
-              <SidebarMenuItem icon="user" label="Profile" />
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </SidebarContent>
-      </Sidebar>
-    </Labeled>
+    <Sidebar>
+      <SidebarHeader>
+        <Button variant="icon" size="icon" icon="search" onClick={noop} />
+        <T size="title2" weight={600}>
+          Files
+        </T>
+        <Button variant="icon" size="icon" icon="menu" onClick={noop} />
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <FilesNavItems disabledId="network" />
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  ),
+});
+
+export const mobileSheet = defineStory({
+  parameters: {
+    width: WINDOWS.narrow.width,
+    height: WINDOWS.narrow.height,
+    source:
+      "Junction-3.png — the narrow window: flat menu button leading, centred title, close button trailing; Constrict-3.png — the collapsed pane opens below the header bar, over the content only. HIG §25.1.",
+  },
+  render: () => (
+    <FilesNarrowWindow
+      size={{ width: WINDOWS.narrow.width, height: WINDOWS.narrow.height }}
+    />
   ),
 });

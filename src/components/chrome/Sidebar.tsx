@@ -1,8 +1,16 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
-import type { StyleDesc, EventPayload } from "@gpuix/react";
-import { useAdwaita } from "../../theme/adwaita";
-import { T, MenuRow } from "../common";
+import {
+  type ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { type EventPayload, type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../../theme/adwaita";
+import { T } from "../text";
+import { MenuRow } from "../menu";
+import { arrowStep, isActivateKey, stepIndex } from "../../lib/roving";
 import { Icon, type IconName } from "../icons";
 import { Sheet, SheetContent } from "../Sheet";
 
@@ -35,10 +43,6 @@ function useSidebarCtx(): SidebarContextValue {
   return useContext(SidebarCtx) ?? FALLBACK_CTX;
 }
 
-const EXPANDED_WIDTH = 220;
-
-const COLLAPSED_WIDTH = 56;
-
 export interface SidebarProps {
   width?: number;
 
@@ -54,7 +58,7 @@ export interface SidebarProps {
 }
 
 export function Sidebar({
-  width = EXPANDED_WIDTH,
+  width,
   open,
   onOpenChange,
   mobile = false,
@@ -63,8 +67,6 @@ export function Sidebar({
   style,
 }: SidebarProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
-
   const [internalOpen, setInternalOpen] = useState(
     mobile ? (open ?? false) : (open ?? true),
   );
@@ -98,14 +100,17 @@ export function Sidebar({
   const panel = (
     <div
       style={{
-        width: mobile ? "100%" : collapsed ? COLLAPSED_WIDTH : width,
         display: "flex",
         flexDirection: "column",
-        backgroundColor: colors.sidebar_bg,
-        borderRadius: mobile ? 0 : radii.card,
-        borderWidth: mobile ? 0 : 1,
-        borderColor: colors.border,
+        backgroundColor: t.color.surface.sidebar,
+        borderWidth: 0,
         overflow: "hidden",
+        borderRadius: 0,
+        width: mobile
+          ? "100%"
+          : collapsed
+            ? t.control.sidebarRailWidth
+            : (width ?? t.control.sidebarWidth),
         ...style,
       }}
     >
@@ -114,12 +119,18 @@ export function Sidebar({
   );
 
   if (mobile) {
+    const sheetInset = {
+      top: t.control.headerBarHeight,
+      bottom: 0,
+      height: undefined,
+    };
     return (
       <Sheet
         open={effectiveOpen}
         onOpenChange={handleOpenChange}
         side="left"
         contained={contained}
+        inset={sheetInset}
       >
         <SheetContent style={{ padding: 0, gap: 0 }}>
           <SidebarCtx.Provider value={ctxValue}>{panel}</SidebarCtx.Provider>
@@ -137,13 +148,18 @@ export interface SidebarHeaderProps {
 }
 
 export function SidebarHeader({ children, style }: SidebarHeaderProps) {
+  const t = useAdwaita();
   return (
     <div
       style={{
-        padding: 12,
         display: "flex",
-        flexDirection: "column",
-        gap: 8,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: t.control.headerGroupGap,
+        height: t.control.headerBarHeight,
+        paddingLeft: t.control.headerBarPaddingX,
+        paddingRight: t.control.headerBarPaddingX,
         ...style,
       }}
     >
@@ -158,14 +174,18 @@ export interface SidebarContentProps {
 }
 
 export function SidebarContent({ children, style }: SidebarContentProps) {
+  const t = useAdwaita();
   return (
     <div
       style={{
         flexGrow: 1,
-        padding: 8,
+        paddingTop: t.space.sm,
+        paddingBottom: t.space.sm,
+        paddingLeft: t.control.sidebarRowInsetX,
+        paddingRight: t.control.sidebarRowInsetEnd,
         display: "flex",
         flexDirection: "column",
-        gap: 12,
+        gap: t.space.sm,
         ...style,
       }}
     >
@@ -180,8 +200,19 @@ export interface SidebarGroupProps {
 }
 
 export function SidebarGroup({ children, style }: SidebarGroupProps) {
+  const t = useAdwaita();
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, ...style }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: t.space.sm,
+
+        flexGrow: 1,
+        minHeight: 0,
+        ...style,
+      }}
+    >
       {children}
     </div>
   );
@@ -200,7 +231,6 @@ export function SidebarGroupLabel({
   style,
 }: SidebarGroupLabelProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const { collapsed } = useSidebarCtx();
 
   if (collapsed && icon) {
@@ -214,14 +244,14 @@ export function SidebarGroupLabel({
           ...style,
         }}
       >
-        <Icon name={icon} size={16} color={colors.dim_fg} />
+        <Icon name={icon} size={16} color={t.color.text.dim} />
       </div>
     );
   }
 
   return (
     <div style={{ paddingLeft: 8, paddingRight: 8, ...style }}>
-      <T size="caption" color={colors.dim_fg}>
+      <T size="caption" color={t.color.text.dim}>
         {children}
       </T>
     </div>
@@ -251,10 +281,8 @@ export interface SidebarFooterProps {
 
 export function SidebarFooter({ children, style }: SidebarFooterProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div style={{ display: "flex", flexDirection: "column", ...style }}>
-      <div style={{ height: 1, backgroundColor: colors.border }} />
       <div
         style={{
           padding: 12,
@@ -282,6 +310,55 @@ export interface SidebarMenuItemProps {
 
 let nextSidebarItemId = 0;
 
+function menuItemShellStyle(
+  t: AdwaitaTheme,
+  isFocused: boolean,
+  disabled: boolean,
+): Partial<StyleDesc> {
+  return {
+    borderRadius: t.radius.sm,
+    borderWidth: isFocused ? 1 : 0,
+    borderColor: t.color.accent.base,
+    cursor: disabled ? "default" : "pointer",
+  };
+}
+
+function menuItemLabel(collapsed: boolean, label: string | undefined): string {
+  if (collapsed) return "";
+  return label ?? "";
+}
+
+function menuItemIconColor(
+  t: AdwaitaTheme,
+  selected: boolean | undefined,
+): string {
+  return selected ? t.color.text.primary : t.color.text.dim;
+}
+
+function menuItemRowStyle(
+  t: AdwaitaTheme,
+  collapsed: boolean,
+  selected: boolean | undefined,
+): Partial<StyleDesc> {
+  const c = t.control;
+  const padX = collapsed ? c.sidebarRowPaddingY : c.sidebarRowPaddingX;
+  return {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: c.sidebarRowGap,
+    paddingTop: c.sidebarRowPaddingY,
+    paddingBottom: c.sidebarRowPaddingY,
+    minHeight: c.rowHeight,
+    borderRadius: t.radius.sm,
+    justifyContent: collapsed ? "center" : "flex-start",
+    paddingLeft: padX,
+    paddingRight: padX,
+    backgroundColor: selected ? t.color.selection.muted : "transparent",
+    active: { backgroundColor: t.color.surface.buttonActive },
+  };
+}
+
 export function SidebarMenuItem({
   icon,
   label,
@@ -291,7 +368,6 @@ export function SidebarMenuItem({
   style,
 }: SidebarMenuItemProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const ctx = useSidebarCtx();
   const collapsed = ctx.collapsed;
 
@@ -308,51 +384,38 @@ export function SidebarMenuItem({
   const isFocused = ctx.focused === id;
 
   const handleKeyDown = (event: EventPayload) => {
-    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      const ordered = ctx.ordered();
-      if (ordered.length === 0) return;
-      const idx = ordered.indexOf(id);
-      const next =
-        event.key === "ArrowDown"
-          ? Math.min(idx + 1, ordered.length - 1)
-          : Math.max(idx - 1, 0);
-      ctx.onFocusRow(ordered[next]);
-    } else if (event.key === "Enter" || event.key === " ") {
+    const key = event.key;
+    if (isActivateKey(key, { space: true })) {
       onClick?.();
+      return;
     }
+    const step = arrowStep(key);
+    if (step === 0) return;
+    const ordered = ctx.ordered();
+    if (ordered.length === 0) return;
+    ctx.onFocusRow(
+      ordered[stepIndex(ordered.indexOf(id), step, ordered.length)],
+    );
   };
-
-  const rowColor = selected ? colors.accent : colors.dim_fg;
 
   return (
     <div
       tabIndex={disabled ? -1 : 0}
       onClick={disabled ? undefined : onClick}
       onKeyDown={disabled ? undefined : handleKeyDown}
-      style={{
-        borderRadius: 6,
-        borderWidth: isFocused ? 1 : 0,
-        borderColor: colors.accent,
-        cursor: disabled ? "default" : "pointer",
-        ...style,
-      }}
+      style={{ ...menuItemShellStyle(t, isFocused, disabled), ...style }}
     >
       <MenuRow
-        label={collapsed ? "" : (label ?? "")}
+        label={menuItemLabel(collapsed, label)}
         icon={icon}
         disabled={disabled}
-        iconColor={rowColor}
-        labelColor={rowColor}
-        hoverBackgroundColor={colors.button_hover}
-        style={{
-          justifyContent: collapsed ? "center" : "flex-start",
-          padding: collapsed ? 4 : 8,
-          backgroundColor: selected ? colors.accentTint : "transparent",
-          active: { backgroundColor: colors.button_active },
-        }}
+        iconColor={menuItemIconColor(t, selected)}
+        labelColor={t.color.text.primary}
+        textSize="list"
+        iconSize={t.control.navIconSize}
+        hoverBackgroundColor={t.color.surface.buttonHover}
+        style={menuItemRowStyle(t, collapsed, selected)}
       />
     </div>
   );
 }
-
-

@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import { useWindowSize, type StyleDesc } from "@gpuix/react";
+import { type StyleDesc, useWindowSize } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
 import { Toast, type ToastType } from "./Toast";
 
@@ -80,7 +80,7 @@ export function Toaster({
   style,
 }: ToasterProps) {
   const t = useAdwaita();
-  const offset = t.spacing.padding;
+  const offset = t.space.lg;
   const { vertical, horizontal } = POSITION_ANCHORS[position];
   const win = useWindowSize();
   const measured = typeof win?.width === "number" && win.width > 0;
@@ -115,7 +115,7 @@ export function Toaster({
             : horizontal === "left"
               ? "flex-start"
               : "flex-end",
-        gap: t.spacing.gap,
+        gap: t.space.sm,
         pointerEvents: "none",
         ...style,
       }}

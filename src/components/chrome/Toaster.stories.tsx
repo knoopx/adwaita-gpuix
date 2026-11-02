@@ -1,14 +1,11 @@
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../../theme/adwaita";
-import { Labeled, T } from "../common";
-import { Row, Column } from "../Box";
-import {
-  Toaster,
-  type ToasterPosition,
-} from "./Toaster";
+import { Labeled, T } from "../text";
+import { Column, Row } from "../Box";
+import { Toaster, type ToasterPosition } from "./Toaster";
 import { type ToastType } from "./Toast";
-import { Stage } from "../.storybook/story-helpers";
+import { Stage } from "../../../.storybook/story-helpers";
 
 function ToastStage({
   toasts,
@@ -24,7 +21,6 @@ function ToastStage({
   captionPos?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
 }) {
   const t = useAdwaita();
-  const { colors } = t;
   const captionStyle: StyleDesc = {
     position: "absolute",
     ...(captionPos === "top-right"
@@ -38,7 +34,7 @@ function ToastStage({
   return (
     <Stage width={width} height={height}>
       <div style={captionStyle}>
-        <T size="caption" color={colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           App window
         </T>
       </div>
@@ -146,7 +142,7 @@ export const longWrap = defineStory({
           toasts={[
             {
               message:
-                "Failed: Error: unable to push bookmark \"main\" to remote \"origin\": the remote has advanced since the last fetch, so the push was rejected; fetch the remote first and rebase, or push with --force if this is intended",
+                'Failed: Error: unable to push bookmark "main" to remote "origin": the remote has advanced since the last fetch, so the push was rejected; fetch the remote first and rebase, or push with --force if this is intended',
               type: "error",
             },
           ]}
@@ -160,11 +156,7 @@ export const empty = defineStory({
   render: () => (
     <Column gap={16} align="center">
       <Labeled caption="no toasts (region is transparent and inert)">
-        <ToastStage
-          width={360}
-          height={120}
-          toasts={[]}
-        />
+        <ToastStage width={360} height={120} toasts={[]} />
       </Labeled>
     </Column>
   ),

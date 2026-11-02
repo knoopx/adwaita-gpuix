@@ -1,26 +1,23 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../common";
+import { T } from "../text";
+import { TrailingSlot } from "../Box";
 import { groupHints } from "../KeyBindings";
 import { ShortcutHints } from "../KeyHint";
 import { ProgressBar } from "../ProgressBar";
 import { type Shortcut } from "../../lib/shortcuts";
 
 export interface StatusBarProps {
-  
   message?: ReactNode;
-  
+
   progress?: number;
-  
+
   trailing?: ReactNode;
-  
+
   hints?: Shortcut[];
   style?: Partial<StyleDesc>;
 }
-
-const STATUS_BAR_HEIGHT = 32;
-const PROGRESS_WIDTH = 80;
 
 const messageClamp: Partial<StyleDesc> = {
   flexGrow: 1,
@@ -37,7 +34,6 @@ export function StatusBar({
   style,
 }: StatusBarProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   const groups = hints && hints.length > 0 ? groupHints(hints) : [];
   const hasLeading =
     message !== undefined || progress !== undefined || trailing !== undefined;
@@ -47,13 +43,12 @@ export function StatusBar({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        gap: spacing.gap,
-        height: STATUS_BAR_HEIGHT,
-        paddingLeft: spacing.paddingTight,
-        paddingRight: spacing.paddingTight,
-        backgroundColor: colors.headerbar_bg,
-        borderTopWidth: 1,
-        borderColor: colors.border,
+        width: "100%",
+        height: t.control.statusBarHeight,
+        paddingLeft: t.space.md,
+        paddingRight: t.space.md,
+        gap: t.space.sm,
+        backgroundColor: t.color.surface.headerbar,
         minWidth: 0,
         ...style,
       }}
@@ -61,7 +56,7 @@ export function StatusBar({
       {hasLeading ? (
         message ? (
           typeof message === "string" ? (
-            <T size="caption" color={colors.dim_fg} style={messageClamp}>
+            <T size="caption" color={t.color.text.dim} style={messageClamp}>
               {message}
             </T>
           ) : (
@@ -75,22 +70,10 @@ export function StatusBar({
         <ProgressBar
           value={Math.min(1, Math.max(0, progress)) * 100}
           height={4}
-          style={{ width: PROGRESS_WIDTH, flexShrink: 0 }}
+          style={{ width: t.control.progressWidth, flexShrink: 0 }}
         />
       ) : null}
-      {trailing ? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: spacing.gap,
-            flexShrink: 0,
-          }}
-        >
-          {trailing}
-        </div>
-      ) : null}
+      {trailing ? <TrailingSlot>{trailing}</TrailingSlot> : null}
       {groups.length > 0 ? (
         <ShortcutHints
           groups={groups}

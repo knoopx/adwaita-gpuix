@@ -1,58 +1,92 @@
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "../common";
-import { Column } from "../Box";
+import { Labeled } from "../text";
 import { ViewSwitcher, type ViewSwitcherItem } from "./ViewSwitcher";
+import {
+  FILES_VIEWS,
+  MONITOR_VIEWS,
+  Stack,
+  WEATHER_VIEWS,
+} from "../../../.storybook/app-helpers";
 
-const VIEWS: ViewSwitcherItem[] = [
-  { id: "l", label: "List", icon: "list" },
-  { id: "g", label: "Grid", icon: "grid" },
-  { id: "p", label: "Panel", icon: "panel" },
-];
-
-const VIEWS_DISABLED: ViewSwitcherItem[] = [
-  { id: "l", label: "List", icon: "list" },
-  { id: "g", label: "Grid", icon: "grid" },
-  { id: "p", label: "Panel", icon: "panel", disabled: true },
-];
-
-export default defineMeta({
+const meta = defineMeta({
   title: "Adwaita/ViewSwitcher",
   component: ViewSwitcher,
-  parameters: { width: 528, height: 320 },
+  parameters: { width: 560, height: 250 },
 });
 
-export const variants = defineStory({
+export default meta;
+
+const noop = () => {};
+
+function Centred({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        width: "100%",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+const CLOCKS_VIEWS: ViewSwitcherItem[] = [
+  { id: "world", icon: "globe", label: "World" },
+  { id: "alarms", icon: "alarm", label: "Alarms" },
+  { id: "stopwatch", icon: "timer", label: "Stopwatch" },
+  { id: "timer", icon: "hourglass", label: "Timer" },
+];
+
+export const weatherHourly = defineStory({
   render: () => (
-    <Column gap={16} align="center">
-      <Labeled caption="labeled (default, value=grid)">
-        <ViewSwitcher items={VIEWS} value="g" onChange={() => {}} />
+    <Stack>
+      <Labeled caption="Weather (Weather-1): Hourly active">
+        <Centred>
+          <ViewSwitcher items={WEATHER_VIEWS} value="hourly" onChange={noop} />
+        </Centred>
       </Labeled>
-      <Labeled caption="icon-only (showLabels=false)">
-        <ViewSwitcher
-          items={VIEWS}
-          value="l"
-          showLabels={false}
-          onChange={() => {}}
-        />
+      <Labeled caption="Weather (Weather-2): Daily active">
+        <Centred>
+          <ViewSwitcher items={WEATHER_VIEWS} value="daily" onChange={noop} />
+        </Centred>
       </Labeled>
-    </Column>
+    </Stack>
   ),
 });
 
-export const disabled = defineStory({
+export const filesViewIcons = defineStory({
+  parameters: { width: 560, height: 130 },
   render: () => (
-    <Column gap={16} align="center">
-      <Labeled caption="disabled segment (dim, no click)">
-        <ViewSwitcher items={VIEWS_DISABLED} value="g" onChange={() => {}} />
-      </Labeled>
-      <Labeled caption="icon-only, disabled segment">
-        <ViewSwitcher
-          items={VIEWS_DISABLED}
-          value="l"
-          showLabels={false}
-          onChange={() => {}}
-        />
-      </Labeled>
-    </Column>
+    <Labeled caption="Files (Nautilus-2): grid / list, icon-only segments">
+      <Centred>
+        <ViewSwitcher items={FILES_VIEWS} value="list" onChange={noop} />
+      </Centred>
+    </Labeled>
+  ),
+});
+
+export const systemMonitorViews = defineStory({
+  parameters: { width: 560, height: 130 },
+  render: () => (
+    <Labeled caption="System Monitor (SystemMonitor-1): Processes active">
+      <Centred>
+        <ViewSwitcher items={MONITOR_VIEWS} value="processes" onChange={noop} />
+      </Centred>
+    </Labeled>
+  ),
+});
+
+export const clocksViews = defineStory({
+  parameters: { width: 560, height: 130 },
+  render: () => (
+    <Labeled caption="Clocks (Clocks-1): World active">
+      <Centred>
+        <ViewSwitcher items={CLOCKS_VIEWS} value="world" onChange={noop} />
+      </Centred>
+    </Labeled>
   ),
 });

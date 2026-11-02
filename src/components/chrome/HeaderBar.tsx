@@ -1,54 +1,48 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { T } from "../common";
 
 export interface HeaderBarProps {
-  
-  title?: ReactNode;
-  
-  subtitle?: ReactNode;
-  
   left?: ReactNode;
-  
+
+  center?: ReactNode;
+
   right?: ReactNode;
+
+  centerMode?: "title" | "location";
+  centerStyle?: Partial<StyleDesc>;
   style?: Partial<StyleDesc>;
 }
 
+export function HeaderBar({
+  left,
+  center,
+  right,
+  centerMode = "title",
+  centerStyle,
+  style,
+}: HeaderBarProps) {
+  const t = useAdwaita();
 
-const HEADER_BAR_MIN_HEIGHT = 46;
-
-
-function columnStyle(justify: "flex-start" | "center" | "flex-end"): Partial<StyleDesc> {
-  return {
+  const spacer: Partial<StyleDesc> = {
+    display: "flex",
+    flexDirection: "row",
     flexGrow: 1,
     flexShrink: 1,
     flexBasis: 0,
     minWidth: 0,
+  };
+
+  const group = (justify: "flex-start" | "flex-end"): Partial<StyleDesc> => ({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    gap: t.control.headerActionGap,
+    flexGrow: 0,
+    flexShrink: 1,
+    minWidth: 0,
     justifyContent: justify,
-  };
-}
-
-
-const clampStyle: Partial<StyleDesc> = {
-  flexShrink: 1,
-  minWidth: 0,
-  whiteSpace: "nowrap",
-  textOverflow: "ellipsis",
-};
-
-export function HeaderBar({
-  title,
-  subtitle,
-  left,
-  right,
-  style,
-}: HeaderBarProps) {
-  const t = useAdwaita();
-  const { colors, spacing } = t;
+  });
 
   return (
     <div
@@ -56,48 +50,39 @@ export function HeaderBar({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        minHeight: HEADER_BAR_MIN_HEIGHT,
-        paddingLeft: spacing.paddingTight,
-        paddingRight: spacing.paddingTight,
-        backgroundColor: colors.headerbar_bg,
+        width: "100%",
+        minHeight: t.control.headerBarHeight,
+        paddingLeft: t.control.headerBarPaddingX,
+        paddingRight: t.control.headerBarPaddingX,
+        backgroundColor: t.color.surface.headerbar,
         borderBottomWidth: 1,
-        borderColor: colors.border,
+        borderColor: t.color.border.default,
         ...style,
       }}
     >
-      <div style={{ ...columnStyle("flex-start"), gap: spacing.gap }}>{left}</div>
+      <div style={group("flex-start")}>{left}</div>
+      {centerMode === "title" ? <div style={spacer} /> : null}
       <div
         style={{
-          ...columnStyle("center"),
-          flexDirection: "column",
-          gap: 2,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start",
+
+          flexGrow: centerMode === "title" ? 0 : 1,
+          flexShrink: 1,
+          flexBasis: centerMode === "title" ? undefined : 0,
+          minWidth: 0,
+          maxWidth: t.control.headerBarCenterMaxWidth,
+          gap: t.control.headerGroupGap,
+          overflow: "hidden",
+          ...centerStyle,
         }}
       >
-        {typeof title === "string" ? (
-          <T
-            size="title3"
-            weight={700}
-            color={colors.fg}
-            style={{ textAlign: "center", ...clampStyle }}
-          >
-            {title}
-          </T>
-        ) : title ? (
-          title
-        ) : null}
-        {typeof subtitle === "string" ? (
-          <T
-            size="caption"
-            color={colors.dim_fg}
-            style={{ textAlign: "center", ...clampStyle }}
-          >
-            {subtitle}
-          </T>
-        ) : subtitle ? (
-          subtitle
-        ) : null}
+        {center}
       </div>
-      <div style={{ ...columnStyle("flex-end"), gap: spacing.gap }}>{right}</div>
+      {centerMode === "title" ? <div style={spacer} /> : null}
+      <div style={group("flex-end")}>{right}</div>
     </div>
   );
 }

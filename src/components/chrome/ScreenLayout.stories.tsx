@@ -1,12 +1,24 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
-import { Labeled, T } from "../common";
+import { Labeled, T } from "../text";
 import { Column } from "../Box";
-import { MonoBadge, PanelTrailing } from "../../lib/panel";
+import { FileListTitle, MonoBadge, PanelTrailing } from "../../lib/panel";
 import { HeaderBar } from "./HeaderBar";
+import { ViewSwitcher, type ViewSwitcherItem } from "./ViewSwitcher";
+import { Entry } from "../Entry";
 import { ScreenLayout } from "./ScreenLayout";
 
-function LayoutDemo({ withMid }: { withMid: boolean }) {
+function LayoutDemo({
+  withMid = true,
+  midHeaderless = false,
+  bottomHeaderless = false,
+  bottom = <T>@@ -1,3 +1,4 @@</T>,
+}: {
+  withMid?: boolean;
+  midHeaderless?: boolean;
+  bottomHeaderless?: boolean;
+  bottom?: ReactNode;
+}) {
   return (
     <Column gap={0} style={{ height: 180, width: "100%" }}>
       <ScreenLayout
@@ -15,8 +27,10 @@ function LayoutDemo({ withMid }: { withMid: boolean }) {
         left={<T>src/main.ts</T>}
         mid={withMid ? <T>preview content</T> : undefined}
         midTitle="Preview"
+        midHeaderless={midHeaderless}
         bottomTitle="Diff"
-        bottom={<T>@@ -1,3 +1,4 @@</T>}
+        bottomHeaderless={bottomHeaderless}
+        bottom={bottom}
       />
     </Column>
   );
@@ -59,6 +73,11 @@ function ScreenCell({
   );
 }
 
+const SCREEN_VIEWS: ViewSwitcherItem[] = [
+  { id: "files", icon: "article", label: "Files" },
+  { id: "preview", icon: "visibility", label: "Preview" },
+];
+
 export default defineMeta({
   title: "Adwaita/ScreenLayout",
   component: ScreenLayout,
@@ -85,10 +104,14 @@ export const trailingControls = defineStory({
         <ScreenLayout
           leftTitle="Files"
           leftFocused={true}
-          trailing={<PanelTrailing loading={false} badge={<MonoBadge text="12" />} />}
+          trailing={
+            <PanelTrailing loading={false} badge={<MonoBadge text="12" />} />
+          }
           left={<T>src/main.ts</T>}
           bottomTitle="Diff"
-          bottomTrailing={<PanelTrailing loading={false} badge={<MonoBadge text="3" />} />}
+          bottomTrailing={
+            <PanelTrailing loading={false} badge={<MonoBadge text="3" />} />
+          }
           bottom={<T>@@ -1,3 +1,4 @@</T>}
         />
       </Column>
@@ -120,18 +143,15 @@ export const focusStates = defineStory({
 export const headerlessMid = defineStory({
   render: () => (
     <Labeled caption="headerless mid panel">
-      <Column gap={0} style={{ height: 180, width: "100%" }}>
-        <ScreenLayout
-          leftTitle="Files"
-          leftFocused={true}
-          left={<T>src/main.ts</T>}
-          mid={<T>preview content</T>}
-          midTitle="Preview"
-          midHeaderless={true}
-          bottomTitle="Diff"
-          bottom={<T>@@ -1,3 +1,4 @@</T>}
-        />
-      </Column>
+      <LayoutDemo midHeaderless={true} />
+    </Labeled>
+  ),
+});
+
+export const headerlessBottom = defineStory({
+  render: () => (
+    <Labeled caption="headerless bottom panel (the body names itself)">
+      <LayoutDemo bottomHeaderless={true} bottom={<T>src/main.ts +1 -0</T>} />
     </Labeled>
   ),
 });
@@ -159,11 +179,54 @@ export const growRatios = defineStory({
   ),
 });
 
+export const truncation = defineStory({
+  render: () => (
+    <Labeled caption="long pane titles ellipsize instead of spilling the header">
+      <Column gap={0} style={{ height: 180, width: "100%" }}>
+        <ScreenLayout
+          leftTitle="Working copy changes in the repository (9 commits)"
+          leftFocused={false}
+          left={<T>src/main.ts</T>}
+          mid={<T>preview content</T>}
+          midTitle={
+            <FileListTitle
+              description="refactor(app): mount with adwaita-gpuix/app launchApp (theme + ToastProvider wrap + window options) instead of hand-rolling renderer setup"
+              focused={true}
+            />
+          }
+          midTrailing={
+            <PanelTrailing
+              loading={false}
+              badge={<MonoBadge text="ulpzqwrk" />}
+            />
+          }
+          bottomTitle="tests/integration/very/long/path/to/a/deeply/nested/module/harness.tsx"
+          bottomTrailing={
+            <PanelTrailing loading={false} badge={<MonoBadge text="+3 -0" />} />
+          }
+          bottom={<T>@@ -1,3 +1,4 @@</T>}
+        />
+      </Column>
+    </Labeled>
+  ),
+});
+
 export const screenComposition = defineStory({
   render: () => (
     <Labeled caption="app screen: headerbar + layout">
       <Column gap={0} style={{ height: 340, width: "100%" }}>
-        <HeaderBar title="Editor" subtitle="src/main.ts" />
+        <HeaderBar
+          left={
+            <ViewSwitcher
+              items={SCREEN_VIEWS}
+              value="files"
+              onChange={() => {}}
+            />
+          }
+          center={
+            <Entry type="search" placeholder="Search" value="src/main.ts" />
+          }
+        />
         <ScreenLayout
           leftTitle="Files"
           leftFocused={true}

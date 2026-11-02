@@ -1,12 +1,13 @@
-import { Fragment } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba, isDarkScheme } from "../../theme/adwaita";
-import { SegmentedOptionCell } from "../common";
-import type { IconName } from "../icons";
+import { type StyleDesc } from "@gpuix/react";
+import { hexToRgba, isDarkScheme, useAdwaita } from "../../theme/adwaita";
+import { SegmentedOptionCell } from "../ToggleGroup";
+import { type IconName } from "../icons";
+import { isActivateKey } from "../../lib/roving";
 
 export interface ViewSwitcherItem {
   id: string;
   icon: IconName;
+
   label?: string;
   disabled?: boolean;
 }
@@ -15,9 +16,6 @@ export interface ViewSwitcherProps {
   items: ViewSwitcherItem[];
   value: string;
   onChange: (id: string) => void;
-
-  showLabels?: boolean;
-  separators?: boolean;
   style?: Partial<StyleDesc>;
 }
 
@@ -25,98 +23,90 @@ export function ViewSwitcher({
   items,
   value,
   onChange,
-  showLabels = true,
-  separators = true,
   style,
 }: ViewSwitcherProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing: sp } = t;
-  const dark = isDarkScheme(t.scheme);
-  const pressTint = hexToRgba(colors.accent, dark ? 0.35 : 0.25);
-
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "row",
         alignItems: "stretch",
-        padding: 2,
-        borderRadius: radii.pill,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.button_bg,
+        padding: t.control.viewSwitcherPadding,
+        borderRadius: t.radius.full,
+
+        backgroundColor: t.color.surface.button,
         ...style,
       }}
     >
-      {items.map((item, i) => {
+      {items.map((item) => {
         const selected = item.id === value;
         const disabled = item.disabled === true;
         return (
-          <Fragment key={item.id}>
-            {separators && i > 0 ? (
-              <div
-                style={{
-                  width: 1,
-                  backgroundColor: colors.border,
-                  pointerEvents: "none",
-                }}
-              />
-            ) : null}
+          <div
+            key={item.id}
+            onClick={disabled ? undefined : () => onChange(item.id)}
+            tabIndex={disabled ? -1 : 0}
+            role="tab"
+            aria-label={item.label ?? item.id}
+            aria-selected={selected}
+            onKeyDown={(event) => {
+              if (disabled) return;
+              if (isActivateKey(event.key, { space: true })) onChange(item.id);
+            }}
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: t.control.viewSwitcherHeight,
+              width:
+                item.label === undefined
+                  ? t.control.viewSwitcherHeight +
+                    t.control.viewSwitcherPadding * 2
+                  : undefined,
+              paddingLeft:
+                item.label === undefined ? 0 : t.control.viewSwitcherPaddingX,
+              paddingRight:
+                item.label === undefined ? 0 : t.control.viewSwitcherPaddingX,
+              borderRadius: t.radius.full,
+              backgroundColor: selected ? t.color.accent.tint : "transparent",
+              opacity: disabled ? 0.5 : 1,
+              cursor: disabled ? "default" : "pointer",
+              ...(disabled
+                ? {}
+                : selected
+                  ? {
+                      hover: { backgroundColor: t.color.accent.tint },
+                      active: {
+                        backgroundColor: t.color.surface.active,
+                      },
+                    }
+                  : {
+                      hover: { backgroundColor: t.color.surface.buttonHover },
+                      active: { backgroundColor: t.color.surface.buttonActive },
+                    }),
+            }}
+          >
             <div
-              onClick={disabled ? undefined : () => onChange(item.id)}
-              tabIndex={disabled ? -1 : 0}
-              onKeyDown={(event) => {
-                if (disabled) return;
-                if (event.key === "Enter" || event.key === " ")
-                  onChange(item.id);
-              }}
               style={{
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
-                paddingLeft: sp.paddingTight,
-                paddingRight: sp.paddingTight,
-                minHeight: 32,
-                minWidth: showLabels ? 56 : 0,
-                borderRadius: radii.pill,
-                backgroundColor: selected ? colors.accentTint : "transparent",
-                opacity: disabled ? 0.5 : 1,
-                cursor: disabled ? "default" : "pointer",
-                ...(disabled
-                  ? {}
-                  : selected
-                    ? {
-                        hover: { backgroundColor: colors.accentTint },
-                        active: { backgroundColor: pressTint },
-                      }
-                    : {
-                        hover: { backgroundColor: colors.button_hover },
-                        active: { backgroundColor: colors.button_active },
-                      }),
+                gap: t.space.sm,
+                pointerEvents: "none",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: showLabels ? "column" : "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: showLabels ? 2 : 0,
-                  pointerEvents: "none",
-                }}
-              >
-                <SegmentedOptionCell
-                  active={selected}
-                  icon={item.icon}
-                  iconActiveColor={colors.accent}
-                  label={showLabels ? item.label : undefined}
-                  labelActiveColor={colors.accent}
-                  labelSize="caption"
-                />
-              </div>
+              <SegmentedOptionCell
+                active={selected}
+                icon={item.icon}
+                label={item.label}
+                iconActiveColor={t.color.accent.base}
+                labelActiveColor={t.color.accent.base}
+              />
             </div>
-          </Fragment>
+          </div>
         );
       })}
     </div>
