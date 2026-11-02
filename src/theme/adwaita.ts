@@ -1,32 +1,39 @@
 import {
+  type ReactNode,
   createContext,
   createElement,
   useContext,
   useMemo,
-  type ReactNode,
 } from "react";
-
 import {
-  type ColorScheme,
-  type AccentKey,
-  type SemanticTokens,
-  SCHEMES,
-  NIGHTSKY,
-  isDarkScheme,
   ACCENTS,
   ACCENT_SETS,
-  TINT_ALPHA,
-  SELECTION,
   APPEARANCE,
+  type AccentKey,
+  CHART_FILL,
+  CHART_SERIES,
+  CHART_SUN,
+  CONTROL,
+  type ColorScheme,
+  DIVIDER,
+  INPUT_FILL,
+  NIGHTSKY,
+  OSD_FG,
   RADIUS,
+  SCHEMES,
+  SELECTION,
   SPACE,
+  type SemanticColors,
+  type SemanticTokens,
+  TINT_ALPHA,
   TYPE,
+  accentForeground,
+  hexToRgba,
+  isDarkScheme,
   resolveTokens,
+  shade,
   tokensToDtcg,
   tokensToDtcgAll,
-  hexToRgba,
-  shade,
-  accentForeground,
 } from "./tokens";
 
 export {
@@ -37,8 +44,15 @@ export {
   ACCENT_SETS,
   TINT_ALPHA,
   SELECTION,
+  DIVIDER,
   APPEARANCE,
+  INPUT_FILL,
+  OSD_FG,
+  CHART_SERIES,
+  CHART_FILL,
+  CHART_SUN,
   RADIUS,
+  CONTROL,
   SPACE,
   TYPE,
   resolveTokens,
@@ -48,127 +62,34 @@ export {
   shade,
   accentForeground,
 };
-export type { ColorScheme, AccentKey, SemanticTokens };
+export type { ColorScheme, AccentKey, SemanticColors, SemanticTokens };
 
-export interface AdwaitaColors {
-  window_bg: string;
-  view_bg: string;
-  headerbar_bg: string;
-  sidebar_bg: string;
-  fg: string;
-  dim_fg: string;
-  accent: string;
-  destructive: string;
-  success: string;
-  warning: string;
-  border: string;
-  button_bg: string;
-  button_hover: string;
-  button_active: string;
-  osd_bg: string;
-  accent_fg: string;
-  destructive_fg: string;
-  accentTint: string;
-  selectionMuted: string;
-  destructiveTint: string;
-  successTint: string;
-  warningTint: string;
-}
-
-function toFlatColors(t: SemanticTokens): AdwaitaColors {
-  const c = t.color;
-  return {
-    window_bg: c.surface.window,
-    view_bg: c.surface.view,
-    headerbar_bg: c.surface.headerbar,
-    sidebar_bg: c.surface.sidebar,
-    fg: c.text.primary,
-    dim_fg: c.text.dim,
-    accent: c.accent.base,
-    destructive: c.functional.destructive,
-    success: c.functional.success,
-    warning: c.functional.warning,
-    border: c.border.default,
-    button_bg: c.surface.button,
-    button_hover: c.surface.buttonHover,
-    button_active: c.surface.buttonActive,
-    osd_bg: c.surface.osd,
-    accent_fg: c.text.onAccent,
-    destructive_fg: c.functional.destructiveFg,
-    accentTint: c.accent.tint,
-    selectionMuted: c.selection.muted,
-    destructiveTint: c.functional.destructiveTint,
-    successTint: c.functional.successTint,
-    warningTint: c.functional.warningTint,
-  };
-}
-
-export interface AdwaitaTheme {
+export interface AdwaitaTheme extends SemanticTokens {
   scheme: ColorScheme;
-
   accent: AccentKey | null;
-
-  colors: AdwaitaColors;
-
-  radii: {
-    window: number;
-    card: number;
-    row: number;
-    button: number;
-    pill: number;
-  };
-
-  typography: {
-    title1: number;
-    title2: number;
-    title3: number;
-    title4: number;
-    body: number;
-    caption: number;
-    micro: number;
-    fontFamily: string;
-    fontFamilyMono: string;
-  };
-
-  spacing: {
-    gap: number;
-    padding: number;
-    paddingTight: number;
-    rowHeight: number;
-  };
-
-  tokens: SemanticTokens;
 }
 
 export function buildTheme(
   scheme: ColorScheme,
   accent?: AccentKey | null,
 ): AdwaitaTheme {
-  const tokens = resolveTokens(scheme, accent ?? null);
   return {
     scheme,
     accent: accent ?? null,
-    colors: toFlatColors(tokens),
-    radii: tokens.radius,
-    typography: tokens.typography,
-    spacing: {
-      gap: tokens.space.gap,
-      padding: tokens.space.padding,
-      paddingTight: tokens.space.paddingTight,
-      rowHeight: 40,
-    },
-    tokens,
+    ...resolveTokens(scheme, accent ?? null),
   };
 }
 
-
 export function selectionBg(t: AdwaitaTheme, focused = true): string {
-  return focused ? t.colors.accentTint : t.colors.selectionMuted;
+  return focused ? t.color.accent.tint : t.color.selection.muted;
 }
 
-
 export function rowHoverBg(t: AdwaitaTheme): string {
-  return hexToRgba(t.colors.fg, 0.04);
+  return t.color.surface.hover;
+}
+
+export function headerStripBg(t: AdwaitaTheme): string {
+  return t.color.surface.header;
 }
 
 export const AdwaitaContext = createContext<AdwaitaTheme | null>(null);

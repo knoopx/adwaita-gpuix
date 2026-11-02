@@ -1,28 +1,35 @@
 import {
   APPEARANCE,
-  buildNightskyTheme,
   type AdwaitaTheme,
+  buildNightskyTheme,
 } from "../theme/adwaita";
-import type { GpuixTheme } from "@gpuix/react";
+import { type GpuixTheme } from "@gpuix/react";
 
+export const MONO = buildNightskyTheme().type.fontFamilyMono;
 
-export const MONO = buildNightskyTheme().typography.fontFamilyMono;
+export const FILE_HEADER_ROW_HEIGHT = 36;
 
-
-export function nativeDiffTheme(t: AdwaitaTheme): GpuixTheme {
+export function nativeDiffTheme(
+  t: AdwaitaTheme,
+  opts?: { fileHeaderHeight?: number },
+): GpuixTheme {
+  const fileHeaderHeight = opts?.fileHeaderHeight;
   return {
     appearance: APPEARANCE[t.scheme],
-    bg: t.colors.view_bg,
-    border: t.colors.border,
-    text: t.colors.fg,
-    textMuted: t.colors.dim_fg,
-    textDim: t.colors.dim_fg,
-    textFaint: t.colors.dim_fg,
-    accent: t.colors.accent,
-    diffAdd: t.colors.successTint,
-    diffDel: t.colors.destructiveTint,
-    diffHunkBg: t.colors.headerbar_bg,
-    fontSans: t.typography.fontFamily,
-    fontMono: t.typography.fontFamilyMono,
+    bg: t.color.surface.view,
+    border: t.color.border.default,
+    text: t.color.text.primary,
+    textMuted: t.color.text.dim,
+    textDim: t.color.text.dim,
+    textFaint: t.color.text.dim,
+    accent: t.color.accent.base,
+    diffAdd: t.color.functional.successTint,
+    diffDel: t.color.functional.destructiveTint,
+    diffHunkBg: t.color.surface.headerbar,
+    fontSans: t.type.fontFamily,
+    fontMono: t.type.fontFamilyMono,
+    ...(fileHeaderHeight === undefined
+      ? {}
+      : { metrics: { diffFileHeaderHeight: fileHeaderHeight } }),
   };
 }
