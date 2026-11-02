@@ -1,7 +1,8 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita } from "../theme/adwaita";
-import { DisclosureTrigger, DisclosureContent } from "./common";
+import { type ReactNode, createContext, useContext, useState } from "react";
+import { AnimatePresence, type StyleDesc, motion } from "@gpuix/react";
+import { rowHoverBg, useAdwaita } from "../theme/adwaita";
+import { Icon, type IconName } from "./icons";
+import { isActivateKey } from "../lib/roving";
 
 export interface CollapsibleProps {
   open?: boolean;
@@ -61,7 +62,11 @@ export function Collapsible({
   );
   return (
     <CollapsibleCtx.Provider
-      value={{ open: isOpen, onOpenChange: setOpen, disabled: disabled ?? false }}
+      value={{
+        open: isOpen,
+        onOpenChange: setOpen,
+        disabled: disabled ?? false,
+      }}
     >
       <div style={{ display: "flex", flexDirection: "column", ...style }}>
         {children}
@@ -87,7 +92,6 @@ export function CollapsibleTrigger({
 }: CollapsibleTriggerProps) {
   const ctx = useCollapsible();
   const t = useAdwaita();
-  const { spacing } = t;
   const isOpen = open ?? ctx.open;
   const isDisabled = disabled ?? ctx.disabled;
   return (
@@ -95,10 +99,13 @@ export function CollapsibleTrigger({
       iconSize={16}
       iconName={isOpen ? "chevronUp" : "chevronDown"}
       disabled={isDisabled}
-      onToggle={isDisabled ? undefined : onToggle ?? (() => ctx.onOpenChange(!isOpen))}
+      onToggle={
+        isDisabled ? undefined : (onToggle ?? (() => ctx.onOpenChange(!isOpen)))
+      }
       style={{
-        paddingLeft: spacing.paddingTight,
-        paddingRight: spacing.gap,
+        minHeight: t.control.rowHeight,
+        paddingLeft: t.control.groupRowInset,
+        paddingRight: t.control.groupRowInset,
         ...style,
       }}
     >
@@ -119,11 +126,119 @@ export function CollapsibleContent({
   style,
 }: CollapsibleContentProps) {
   const ctx = useCollapsible();
+  const t = useAdwaita();
   return (
-    <DisclosureContent open={open ?? ctx.open} style={style}>
+    <DisclosureContent
+      open={open ?? ctx.open}
+      style={{
+        paddingLeft: t.control.groupRowInset,
+        paddingRight: t.control.groupRowInset,
+        paddingBottom: t.space.md,
+        ...style,
+      }}
+    >
       {children}
     </DisclosureContent>
   );
 }
 
+export function DisclosureTrigger({
+  children,
+  onToggle,
+  iconSize = 14,
+  iconPosition = "end",
+  iconName = "chevronDown",
+  disabled,
+  style,
+}: {
+  children: ReactNode;
+  onToggle?: () => void;
+  iconSize?: number;
+  iconPosition?: "start" | "end";
+  iconName?: IconName;
+  disabled?: boolean;
+  style?: Partial<StyleDesc>;
+}) {
+  const t = useAdwaita();
+  const chevron = (
+    <Icon
+      name={iconName}
+      size={iconSize}
+      color={t.color.text.dim}
+      style={{ flexShrink: 0, pointerEvents: "none" }}
+    />
+  );
+  return (
+    <div
+      onClick={disabled ? undefined : onToggle}
+      tabIndex={disabled ? -1 : 0}
+      onKeyDown={(event) => {
+        if (disabled) return;
+        if (isActivateKey(event.key, { space: true })) onToggle?.();
+      }}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: t.space.sm,
+        minHeight: 36,
+        borderRadius: t.radius.sm,
+        cursor: disabled ? "default" : "pointer",
+        opacity: disabled ? 0.5 : 1,
+        pointerEvents: disabled ? "none" : "auto",
+        hover: disabled ? undefined : { backgroundColor: rowHoverBg(t) },
+        ...style,
+      }}
+    >
+      {iconPosition === "start" ? chevron : null}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          minWidth: 0,
+        }}
+      >
+        {children}
+      </div>
+      {iconPosition === "end" ? chevron : null}
+    </div>
+  );
+}
 
+export function DisclosureContent({
+  open,
+  children,
+  style,
+}: {
+  open: boolean;
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
+}) {
+  const t = useAdwaita();
+  return (
+    <AnimatePresence initial={false}>
+      {open ? (
+        <motion.div
+          key="disclosure-content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+            paddingLeft: 0,
+            paddingRight: t.space.sm,
+            paddingTop: 0,
+            paddingBottom: t.space.sm,
+            ...style,
+          }}
+        >
+          {children}
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+  );
+}

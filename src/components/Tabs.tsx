@@ -1,7 +1,12 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba, isDarkScheme } from "../theme/adwaita";
-import { T } from "./common";
+import { type ReactNode, createContext, useContext, useState } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import {
+  type AdwaitaTheme,
+  hexToRgba,
+  isDarkScheme,
+  useAdwaita,
+} from "../theme/adwaita";
+import { T } from "./text";
 import { Icon, type IconName } from "./icons";
 
 export interface TabItem {
@@ -13,6 +18,7 @@ export interface TabItem {
 }
 
 export interface TabsProps {
+  variant?: "pill" | "strip";
   items?: TabItem[];
 
   value?: string;
@@ -34,6 +40,7 @@ export interface TabsCtxValue {
 
   setValue: (value: string) => void;
   orientation: "horizontal" | "vertical";
+  variant: "pill" | "strip";
   onClose?: (id: string) => void;
 }
 
@@ -43,6 +50,33 @@ export function useTabs(): TabsCtxValue | null {
   return useContext(TabsCtx);
 }
 
+function tabShellStateStyle(
+  t: AdwaitaTheme,
+  disabled: boolean | undefined,
+  selected: boolean,
+): Partial<StyleDesc> {
+  return {
+    cursor: disabled ? "default" : "pointer",
+    opacity: disabled ? 0.5 : 1,
+    backgroundColor: selected ? t.color.surface.button : "transparent",
+  };
+}
+
+function tabShellHoverStyle(
+  t: AdwaitaTheme,
+  disabled: boolean | undefined,
+  selected: boolean,
+): Partial<StyleDesc> {
+  if (disabled) return { hover: undefined };
+  const tint = isDarkScheme(t.scheme) ? 0.06 : 0.04;
+  return {
+    hover: {
+      backgroundColor: selected
+        ? t.color.surface.hover
+        : t.color.surface.raised,
+    },
+  };
+}
 
 function TabShell({
   selected,
@@ -60,7 +94,6 @@ function TabShell({
   children: ReactNode;
 }) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       onClick={disabled ? undefined : onClick}
@@ -70,21 +103,153 @@ function TabShell({
         alignItems: "center",
         justifyContent: "center",
         ...(grow ? { flexGrow: 1 } : {}),
-        borderRadius: radii.pill,
-        cursor: disabled ? "default" : "pointer",
-        opacity: disabled ? 0.5 : 1,
-        backgroundColor: selected ? colors.button_bg : "transparent",
-        hover: disabled
-          ? undefined
-          : {
-              backgroundColor: selected
-                ? colors.button_hover
-                : hexToRgba(colors.fg, isDarkScheme(t.scheme) ? 0.06 : 0.04),
-            },
+        borderRadius: t.radius.full,
+        ...tabShellStateStyle(t, disabled, selected),
+        ...tabShellHoverStyle(t, disabled, selected),
         ...style,
       }}
     >
       {children}
+    </div>
+  );
+}
+
+function tabLabelWeight(selected: boolean): number {
+  return selected ? 600 : 400;
+}
+
+function tabLabelColor(
+  t: AdwaitaTheme,
+  disabled: boolean,
+  selected: boolean,
+): string {
+  if (disabled) return t.color.text.dim;
+  return selected ? t.color.text.primary : t.color.text.dim;
+}
+
+function tabIconColor(
+  t: AdwaitaTheme,
+  disabled: boolean,
+  selected: boolean,
+): string {
+  if (disabled) return t.color.text.dim;
+  return selected ? t.color.accent.base : t.color.text.dim;
+}
+
+function TabCloseButton({
+  style,
+  iconSize,
+  iconColor,
+  onClose,
+}: {
+  style: Partial<StyleDesc>;
+  iconSize: number;
+  iconColor: string;
+  onClose: () => void;
+}) {
+  return (
+    <div onClick={onClose} style={style}>
+      <Icon name="close" size={iconSize} color={iconColor} />
+    </div>
+  );
+}
+
+function pillCloseStyle(t: AdwaitaTheme): Partial<StyleDesc> {
+  return {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 18,
+    height: 18,
+    borderRadius: 8,
+    marginLeft: 2,
+    cursor: "pointer",
+    hover: { backgroundColor: t.color.surface.hover },
+  };
+}
+
+function stripCloseStyle(t: AdwaitaTheme): Partial<StyleDesc> {
+  return {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: t.control.tabStripCloseHitSize,
+    height: t.control.tabStripCloseHitSize,
+    borderRadius: t.control.tabStripCloseHitSize / 2,
+    flexShrink: 0,
+    cursor: "pointer",
+    hover: { backgroundColor: t.color.selection.muted },
+  };
+}
+
+function StripTab({
+  item,
+  selected,
+  first,
+  onSelect,
+  onClose,
+}: {
+  item: TabItem;
+  selected: boolean;
+  first: boolean;
+  onSelect: (id: string) => void;
+  onClose?: (id: string) => void;
+}) {
+  const t = useAdwaita();
+  const closable = item.closable && !!onClose;
+  return (
+    <div
+      onClick={() => onSelect(item.id)}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        flexGrow: 1,
+        flexBasis: 0,
+        minWidth: 0,
+        height: t.control.tabStripHeight,
+        borderLeftWidth: first ? 0 : t.control.dividerThickness,
+        borderColor: t.color.divider.default,
+        cursor: "pointer",
+        hover: selected
+          ? undefined
+          : { backgroundColor: t.color.selection.faint },
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: t.space.sm,
+          flexGrow: 1,
+          minWidth: 0,
+          margin: t.control.tabStripInset,
+          borderRadius: t.radius.sm,
+          paddingLeft: t.control.tabStripPaddingX,
+          paddingRight: t.control.tabStripPaddingX,
+          backgroundColor: selected
+            ? t.color.surface.buttonHover
+            : "transparent",
+        }}
+      >
+        <T
+          size="body"
+          weight={tabLabelWeight(selected)}
+          color={tabLabelColor(t, false, selected)}
+          style={{ whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+        >
+          {item.label}
+        </T>
+        {closable ? (
+          <TabCloseButton
+            style={stripCloseStyle(t)}
+            iconSize={t.control.caretIconSize}
+            iconColor={t.color.text.dim}
+            onClose={() => onClose?.(item.id)}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -101,19 +266,8 @@ function Tab({
   onClose?: (id: string) => void;
 }) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   const disabled = item.disabled ?? false;
   const closable = item.closable && !!onClose && !disabled;
-  const iconColor = disabled
-    ? colors.dim_fg
-    : selected
-      ? colors.accent
-      : colors.dim_fg;
-  const labelColor = disabled
-    ? colors.dim_fg
-    : selected
-      ? colors.fg
-      : colors.dim_fg;
 
   return (
     <TabShell
@@ -121,48 +275,47 @@ function Tab({
       disabled={disabled}
       onClick={() => onSelect(item.id)}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: spacing.gap,
-          minHeight: 38,
-          paddingLeft: spacing.paddingTight,
-          paddingRight: closable ? 6 : spacing.paddingTight,
-        }}
-      >
+      <div style={tabInnerStyle(t, closable)}>
         {item.icon ? (
-          <Icon name={item.icon} size={16} color={iconColor} />
+          <Icon
+            name={item.icon}
+            size={16}
+            color={tabIconColor(t, disabled, selected)}
+          />
         ) : null}
         <T
           size="body"
-          weight={selected ? 600 : 400}
-          color={labelColor}
+          weight={tabLabelWeight(selected)}
+          color={tabLabelColor(t, disabled, selected)}
         >
           {item.label}
         </T>
         {closable ? (
-          <div
-            onClick={() => onClose?.(item.id)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 18,
-              height: 18,
-              borderRadius: 9,
-              marginLeft: 2,
-              cursor: "pointer",
-              hover: { backgroundColor: hexToRgba(colors.fg, 0.12) },
-            }}
-          >
-            <Icon name="close" size={12} color={colors.dim_fg} />
-          </div>
+          <TabCloseButton
+            style={pillCloseStyle(t)}
+            iconSize={12}
+            iconColor={t.color.text.dim}
+            onClose={() => onClose?.(item.id)}
+          />
         ) : null}
       </div>
     </TabShell>
   );
+}
+
+function tabInnerStyle(
+  t: AdwaitaTheme,
+  closable: boolean | undefined,
+): Partial<StyleDesc> {
+  return {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: t.space.sm,
+    minHeight: 38,
+    paddingLeft: t.space.md,
+    paddingRight: closable ? 6 : t.space.md,
+  };
 }
 
 export interface TabsListProps {
@@ -170,10 +323,8 @@ export interface TabsListProps {
   style?: Partial<StyleDesc>;
 }
 
-
 export function TabsList({ children, style }: TabsListProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   const isVertical = useTabs()?.orientation === "vertical";
   return (
     <div
@@ -182,10 +333,8 @@ export function TabsList({ children, style }: TabsListProps) {
         flexDirection: isVertical ? "column" : "row",
         gap: 4,
         padding: 4,
-        borderRadius: radii.pill,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderRadius: t.radius.full,
+        borderWidth: 0,
         ...style,
       }}
     >
@@ -202,7 +351,6 @@ export interface TabsTriggerProps {
 
 export function TabsTrigger({ value, children, style }: TabsTriggerProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   const ctx = useTabs();
   const selected = ctx?.value === value;
 
@@ -219,15 +367,15 @@ export function TabsTrigger({ value, children, style }: TabsTriggerProps) {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
-          gap: spacing.gap,
+          gap: t.space.sm,
           minHeight: 38,
-          padding: spacing.paddingTight,
+          padding: t.space.md,
         }}
       >
         <T
           size="body"
           weight={selected ? 600 : 400}
-          color={selected ? colors.fg : colors.dim_fg}
+          color={selected ? t.color.text.primary : t.color.text.dim}
         >
           {children}
         </T>
@@ -244,7 +392,6 @@ export interface TabsContentProps {
 
 export function TabsContent({ value, children, style }: TabsContentProps) {
   const t = useAdwaita();
-  const { spacing } = t;
   const ctx = useTabs();
   const active = ctx?.value === value;
   return (
@@ -253,7 +400,7 @@ export function TabsContent({ value, children, style }: TabsContentProps) {
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
-        padding: spacing.paddingTight,
+        padding: t.space.md,
         ...style,
       }}
     >
@@ -267,11 +414,13 @@ export function Tabs({
   value,
   defaultValue,
   onSelect,
+  variant = "pill",
   onClose,
   orientation = "horizontal",
   children,
   style,
 }: TabsProps) {
+  const t = useAdwaita();
   const [internal, setInternal] = useState<string>(defaultValue ?? value ?? "");
   const current = value ?? internal;
   const setValue = (v: string) => {
@@ -283,15 +432,44 @@ export function Tabs({
     value: current,
     setValue,
     orientation,
+    variant,
     onClose,
   };
+
+  if (items && variant === "strip") {
+    return (
+      <TabsCtx.Provider value={ctxValue}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            width: "100%",
+            height: t.control.tabStripHeight,
+            backgroundColor: t.color.surface.headerbar,
+            ...style,
+          }}
+        >
+          {items.map((item, i) => (
+            <StripTab
+              key={item.id}
+              item={item}
+              first={i === 0}
+              selected={item.id === current}
+              onSelect={setValue}
+              onClose={onClose}
+            />
+          ))}
+        </div>
+      </TabsCtx.Provider>
+    );
+  }
 
   return (
     <TabsCtx.Provider value={ctxValue}>
       <div
         style={{
           display: "flex",
-          flexDirection: orientation === "vertical" ? "row" : "column",
+          flexDirection: tabsShellDirection(orientation),
           gap: 4,
           ...style,
         }}
@@ -315,4 +493,6 @@ export function Tabs({
   );
 }
 
-export const TabBar = Tabs;
+function tabsShellDirection(orientation: "horizontal" | "vertical") {
+  return orientation === "vertical" ? "row" : "column";
+}

@@ -1,15 +1,19 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
-import { AdwaitaProvider, useAdwaita, type AdwaitaTheme } from "../theme/adwaita";
-import { Labeled, T } from "./common";
+import {
+  AdwaitaProvider,
+  type AdwaitaTheme,
+  useAdwaita,
+} from "../theme/adwaita";
+import { Labeled, T } from "./text";
 import { Column } from "./Box";
 import { Icon, type IconName } from "./icons";
 import {
   Carousel,
-  CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
   CarouselDots,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
 } from "./Carousel";
 
 function CardCarousel({
@@ -45,28 +49,70 @@ export default defineMeta({
 type TintKey = "accent" | "success" | "warning" | "destructive";
 
 function tintFor(t: AdwaitaTheme, key: TintKey) {
-  const c = t.colors;
   switch (key) {
     case "accent":
-      return { bg: c.accentTint, fg: c.accent };
+      return { bg: t.color.accent.tint, fg: t.color.accent.base };
     case "success":
-      return { bg: c.successTint, fg: c.success };
+      return {
+        bg: t.color.functional.successTint,
+        fg: t.color.functional.success,
+      };
     case "warning":
-      return { bg: c.warningTint, fg: c.warning };
+      return {
+        bg: t.color.functional.warningTint,
+        fg: t.color.functional.warning,
+      };
     case "destructive":
-      return { bg: c.destructiveTint, fg: c.destructive };
+      return {
+        bg: t.color.functional.destructiveTint,
+        fg: t.color.functional.destructive,
+      };
   }
 }
 
-const SLIDES: { icon: IconName; label: string; caption: string; tint: TintKey }[] =
-  [
-    { icon: "home", label: "Overview", caption: "Workspace summary", tint: "accent" },
-    { icon: "layers", label: "Layers", caption: "Stacked modules", tint: "success" },
-    { icon: "clock", label: "Timeline", caption: "Recent activity", tint: "warning" },
-    { icon: "settings", label: "Settings", caption: "Preferences", tint: "destructive" },
-    { icon: "user", label: "Profile", caption: "Account details", tint: "accent" },
-    { icon: "inbox", label: "Inbox", caption: "Unread messages", tint: "success" },
-  ];
+const SLIDES: {
+  icon: IconName;
+  label: string;
+  caption: string;
+  tint: TintKey;
+}[] = [
+  {
+    icon: "home",
+    label: "Overview",
+    caption: "Workspace summary",
+    tint: "accent",
+  },
+  {
+    icon: "layers",
+    label: "Layers",
+    caption: "Stacked modules",
+    tint: "success",
+  },
+  {
+    icon: "schedule",
+    label: "Timeline",
+    caption: "Recent activity",
+    tint: "warning",
+  },
+  {
+    icon: "settings",
+    label: "Settings",
+    caption: "Preferences",
+    tint: "destructive",
+  },
+  {
+    icon: "person",
+    label: "Profile",
+    caption: "Account details",
+    tint: "accent",
+  },
+  {
+    icon: "inbox",
+    label: "Inbox",
+    caption: "Unread messages",
+    tint: "success",
+  },
+];
 
 function Slide({
   icon,
@@ -80,7 +126,7 @@ function Slide({
   tint: TintKey;
 }) {
   const t = useAdwaita();
-  const c = t.colors;
+  const c = t;
   const tone = tintFor(t, tint);
   return (
     <>
@@ -90,16 +136,16 @@ function Slide({
           alignItems: "center",
           justifyContent: "center",
           height: 88,
-          borderRadius: t.radii.button,
+          borderRadius: t.radius.sm,
           backgroundColor: tone.bg,
         }}
       >
         <Icon name={icon} size={28} color={tone.fg} />
       </div>
-      <T size="title4" weight={600} color={c.fg}>
+      <T size="title4" weight={600} color={t.color.text.primary}>
         {label}
       </T>
-      <T size="caption" color={c.dim_fg}>
+      <T size="caption" color={t.color.text.dim}>
         {caption}
       </T>
     </>

@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled, T } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled, T } from "./text";
+import { Column, Row } from "./Box";
 import {
   Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-  CardAction,
   Frame,
 } from "./Card";
 import { Button } from "./Button";
@@ -69,7 +69,6 @@ export const variants = defineStory({
 
 export function mediaHeader() {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <Labeled caption="Card (media area, token placeholder)">
       <Card>
@@ -79,11 +78,11 @@ export function mediaHeader() {
             alignItems: "center",
             justifyContent: "center",
             height: 96,
-            borderRadius: radii.row,
-            backgroundColor: colors.accentTint,
+            borderRadius: t.radius.sm,
+            backgroundColor: t.color.accent.tint,
           }}
         >
-          <Icon name="image" size={32} color={colors.dim_fg} />
+          <Icon name="image" size={32} color={t.color.text.dim} />
         </div>
         <CardHeader>
           <CardTitle>Media card</CardTitle>
@@ -129,7 +128,6 @@ export const profileHeader = defineStory({
 
 export function interactive() {
   const t = useAdwaita();
-  const { colors } = t;
   const [selected, setSelected] = useState(0);
   return (
     <Labeled caption="Card (interactive, hover + selected border)">
@@ -143,9 +141,10 @@ export function interactive() {
             <Card
               style={{
                 cursor: "pointer",
-                borderColor: selected === i ? colors.accent : colors.border,
+                borderColor:
+                  selected === i ? t.color.accent.base : t.color.border.default,
                 borderWidth: selected === i ? 2 : 1,
-                hover: { backgroundColor: colors.button_hover },
+                hover: { backgroundColor: t.color.surface.buttonHover },
               }}
             >
               <CardHeader>
@@ -165,14 +164,13 @@ interactive.parameters = { width: 528, height: 240 };
 
 const GRID_ITEMS: { icon: IconName; title: string; desc: string }[] = [
   { icon: "layers", title: "Storage", desc: "128 GB used of 512 GB" },
-  { icon: "clock", title: "Uptime", desc: "34 days" },
-  { icon: "user", title: "Members", desc: "8 active" },
+  { icon: "schedule", title: "Uptime", desc: "34 days" },
+  { icon: "person", title: "Members", desc: "8 active" },
   { icon: "settings", title: "Preferences", desc: "3 pending" },
 ];
 
 export function grid() {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <Labeled caption="Card grid (2x2)">
       <Column gap={12}>
@@ -181,7 +179,7 @@ export function grid() {
             {GRID_ITEMS.slice(start, start + 2).map((item) => (
               <Card key={item.title} style={{ flexGrow: 1, minWidth: 0 }}>
                 <Row gap={8} align="center">
-                  <Icon name={item.icon} size={16} color={colors.dim_fg} />
+                  <Icon name={item.icon} size={16} color={t.color.text.dim} />
                   <CardTitle>{item.title}</CardTitle>
                 </Row>
                 <CardDescription>{item.desc}</CardDescription>
@@ -232,10 +230,10 @@ export const longContent = defineStory({
         <CardContent>
           <T>
             This card carries a long body of text. Cards grow with their
-            content: the title and description stay fixed at the top, the
-            body wraps line by line inside the frame, and the footer actions
-            remain anchored at the bottom. Nothing is clipped and no
-            scrolling is needed inside the card itself.
+            content: the title and description stay fixed at the top, the body
+            wraps line by line inside the frame, and the footer actions remain
+            anchored at the bottom. Nothing is clipped and no scrolling is
+            needed inside the card itself.
           </T>
         </CardContent>
         <CardFooter>

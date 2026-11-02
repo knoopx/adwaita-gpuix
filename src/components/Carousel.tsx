@@ -1,14 +1,14 @@
 import {
   Children,
+  type ReactNode,
   createContext,
+  isValidElement,
   useCallback,
   useContext,
-  isValidElement,
   useMemo,
   useState,
-  type ReactNode,
 } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
 import { Icon } from "./icons";
 
@@ -32,10 +32,8 @@ function useCarousel(): CarouselContextValue {
 export interface CarouselProps {
   children: ReactNode;
 
-  
   visible?: number;
 
-  
   defaultOffset?: number;
   style?: Partial<StyleDesc>;
 }
@@ -47,7 +45,6 @@ export function Carousel({
   style,
 }: CarouselProps) {
   const t = useAdwaita();
-  const { spacing } = t;
   const [offset, setOffsetRaw] = useState(defaultOffset);
 
   const all = Children.toArray(children);
@@ -99,7 +96,7 @@ export function Carousel({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: spacing.gap,
+          gap: t.space.sm,
           ...style,
         }}
       >
@@ -108,14 +105,14 @@ export function Carousel({
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            gap: spacing.paddingTight,
+            gap: t.space.md,
           }}
         >
           <div
             style={{
               display: "flex",
               flexDirection: "row",
-              gap: spacing.paddingTight,
+              gap: t.space.md,
               flexGrow: 1,
               minWidth: 0,
               overflow: "hidden",
@@ -150,7 +147,6 @@ function CarouselNavButton({
   style,
 }: CarouselNavProps & { direction: "prev" | "next" }) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   const { offset, setOffset, visible, canPrev, canNext } = useCarousel();
   const enabled = direction === "prev" ? canPrev : canNext;
   return (
@@ -170,14 +166,14 @@ function CarouselNavButton({
         width: 32,
         height: 32,
         flexShrink: 0,
-        borderRadius: radii.pill,
-        backgroundColor: colors.button_bg,
+        borderRadius: t.radius.full,
+        backgroundColor: t.color.surface.button,
         cursor: enabled ? "pointer" : "default",
         opacity: enabled ? 1 : 0.4,
         ...(enabled
           ? {
-              hover: { backgroundColor: colors.button_hover },
-              active: { backgroundColor: colors.button_active },
+              hover: { backgroundColor: t.color.surface.buttonHover },
+              active: { backgroundColor: t.color.surface.buttonActive },
             }
           : {}),
         ...style,
@@ -186,7 +182,7 @@ function CarouselNavButton({
       <Icon
         name={direction === "prev" ? "chevronLeft" : "chevronRight"}
         size={16}
-        color={colors.fg}
+        color={t.color.text.primary}
       />
     </div>
   );
@@ -204,10 +200,8 @@ export interface CarouselDotsProps {
   style?: Partial<StyleDesc>;
 }
 
-
 export function CarouselDots({ style }: CarouselDotsProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const { offset, setOffset, count, visible } = useCarousel();
   if (count === 0) return null;
   const pages = Math.max(1, count - visible + 1);
@@ -231,11 +225,13 @@ export function CarouselDots({ style }: CarouselDotsProps) {
               width: active ? 16 : 8,
               height: 8,
               borderRadius: 4,
-              backgroundColor: active ? colors.accent : colors.border,
+              backgroundColor: active
+                ? t.color.accent.base
+                : t.color.border.default,
               cursor: active ? "default" : "pointer",
               ...(active
                 ? {}
-                : { hover: { backgroundColor: colors.accentTint } }),
+                : { hover: { backgroundColor: t.color.accent.tint } }),
             }}
           />
         );
@@ -256,20 +252,18 @@ export function CarouselItem({
   style,
 }: CarouselItemProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: spacing.gap,
+        gap: t.space.sm,
         width,
         flexShrink: 0,
-        padding: spacing.paddingTight,
-        borderRadius: radii.card,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        padding: t.space.md,
+        borderRadius: t.radius.sm,
+        borderWidth: 0,
+        backgroundColor: t.color.surface.card,
         ...style,
       }}
     >

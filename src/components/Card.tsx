@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { T } from "./common";
+import { T } from "./text";
 
 export interface FrameProps {
   children?: ReactNode;
@@ -10,14 +10,12 @@ export interface FrameProps {
 
 export function Frame({ children, style }: FrameProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       style={{
-        borderRadius: radii.card,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderRadius: t.radius.sm,
+        borderWidth: 0,
+        backgroundColor: t.color.surface.view,
         ...style,
       }}
     >
@@ -29,29 +27,31 @@ export function Frame({ children, style }: FrameProps) {
 export interface CardProps {
   title?: string;
   children?: ReactNode;
+  onClick?: () => void;
   style?: Partial<StyleDesc>;
 }
 
-export function Card({ title, children, style }: CardProps) {
+export function Card({ title, children, onClick, style }: CardProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   return (
-    <Frame
+    <div
+      onClick={onClick}
       style={{
         display: "flex",
         flexDirection: "column",
-        padding: spacing.padding,
-        gap: spacing.gap,
+        padding: t.space.lg,
+        gap: t.space.sm,
+        borderRadius: t.radius.lg,
         ...style,
       }}
     >
       {title ? (
-        <T size="title4" weight={700} color={colors.fg}>
+        <T size="title4" weight={700} color={t.color.text.primary}>
           {title}
         </T>
       ) : null}
       {children}
-    </Frame>
+    </div>
   );
 }
 
@@ -83,7 +83,7 @@ export interface CardTitleProps {
 export function CardTitle({ children, style }: CardTitleProps) {
   const t = useAdwaita();
   return (
-    <T size="title4" weight={700} color={t.colors.fg} style={style}>
+    <T size="title4" weight={700} color={t.color.text.primary} style={style}>
       {children}
     </T>
   );
@@ -97,7 +97,7 @@ export interface CardDescriptionProps {
 export function CardDescription({ children, style }: CardDescriptionProps) {
   const t = useAdwaita();
   return (
-    <T size="body" color={t.colors.dim_fg} style={style}>
+    <T size="body" color={t.color.text.dim} style={style}>
       {children}
     </T>
   );
@@ -162,4 +162,3 @@ export function CardAction({ children, style }: CardActionProps) {
     </div>
   );
 }
-

@@ -1,335 +1,298 @@
-import type { ReactNode } from "react";
-import { defineMeta, defineStory } from "storybook";
-import type { StyleDesc } from "@gpuix/react";
+import { defineMeta } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled, T } from "./common";
-import { Row, Column } from "./Box";
-import { Icon, type IconName } from "./icons";
+import { T } from "./text";
+import { Icon } from "./icons";
+import { Switch } from "./Switch";
+import { Entry } from "./Entry";
 import {
   Collapsible,
-  CollapsibleTrigger,
   CollapsibleContent,
+  CollapsibleTrigger,
 } from "./Collapsible";
-
-function Frame({
-  bordered,
-  children,
-  style,
-}: {
-  bordered?: boolean;
-  children: ReactNode;
-  style?: Partial<StyleDesc>;
-}) {
-  const t = useAdwaita();
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: t.spacing.gap,
-        borderRadius: t.radii.card,
-        padding: t.spacing.gap,
-        ...(bordered
-          ? { borderWidth: 1, borderColor: t.colors.border }
-          : {}),
-        ...style,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function Section({
-  caption,
-  children,
-}: {
-  caption: string;
-  children: ReactNode;
-}) {
-  const t = useAdwaita();
-  return (
-    <Column gap={t.spacing.gap} style={{ width: "100%" }}>
-      <T size="caption" color={t.colors.dim_fg}>
-        {caption}
-      </T>
-      {children}
-    </Column>
-  );
-}
-
-function TitleDescription({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
-  const t = useAdwaita();
-  return (
-    <>
-      <T size="body" weight={700}>
-        {title}
-      </T>
-      <T size="caption" color={t.colors.dim_fg}>
-        {description}
-      </T>
-    </>
-  );
-}
-
-function IconLabel({ icon, label }: { icon: IconName; label: string }) {
-  const t = useAdwaita();
-  return (
-    <Row gap={t.spacing.gap} align="center">
-      <Icon
-        name={icon}
-        size={16}
-        color={t.colors.dim_fg}
-        style={{ pointerEvents: "none" }}
-      />
-      <T size="body" weight={700}>
-        {label}
-      </T>
-    </Row>
-  );
-}
-
-type CollSpec = { label: string; content: string; icon?: IconName };
-
-function StackedCollapsibles({
-  items,
-  bordered,
-}: {
-  items: CollSpec[];
-  bordered?: boolean;
-}) {
-  const t = useAdwaita();
-  return (
-    <>
-      {items.map((item, i) => (
-        <Collapsible
-          key={item.label}
-          open={i === 0}
-          onOpenChange={() => {}}
-          style={
-            bordered
-              ? {
-                  borderWidth: 1,
-                  borderColor: t.colors.border,
-                  borderRadius: t.radii.card,
-                  padding: t.spacing.gap,
-                }
-              : undefined
-          }
-        >
-          <CollapsibleTrigger>
-            {item.icon ? (
-              <IconLabel icon={item.icon} label={item.label} />
-            ) : (
-              <T>{item.label}</T>
-            )}
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <T>{item.content}</T>
-          </CollapsibleContent>
-        </Collapsible>
-      ))}
-    </>
-  );
-}
+import { ListBox, ListBoxItem } from "./ListBox";
+import {
+  ContentHeader,
+  type NavGroups,
+  PaneBody,
+  SidebarPane,
+  WindowBody,
+  WindowShell,
+} from "../../.storybook/window-shell";
 
 export default defineMeta({
   title: "Adwaita/Collapsible",
   component: Collapsible,
-  parameters: { width: 528, height: 320 },
+  parameters: { width: 700, height: 520 },
 });
 
-export const states = defineStory({
-  render: () => (
-    <Row gap={16} align="start" style={{ width: "100%" }}>
-      <Labeled caption="open (chevron points up)" style={{ flexGrow: 1 }}>
-        <Frame>
-          <Collapsible open onOpenChange={() => {}}>
-            <CollapsibleTrigger>
-              <T>Open section</T>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <T>Content is visible — chevron flipped to point up.</T>
-            </CollapsibleContent>
-          </Collapsible>
-        </Frame>
-      </Labeled>
-      <Labeled caption="closed (content hidden)" style={{ flexGrow: 1 }}>
-        <Frame>
-          <Collapsible open={false} onOpenChange={() => {}}>
-            <CollapsibleTrigger>
-              <T>Closed section</T>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <T>Hidden content — not rendered.</T>
-            </CollapsibleContent>
-          </Collapsible>
-        </Frame>
-      </Labeled>
-    </Row>
-  ),
-});
+const noop = () => {};
 
-export const titleDescription = defineStory({
-  parameters: { height: 220 },
-  render: () => (
-    <Section caption="title + description header, open">
-      <Frame>
-        <Collapsible open onOpenChange={() => {}}>
-          <CollapsibleTrigger>
-            <TitleDescription
-              title="Notification settings"
-              description="Choose when and how you are alerted"
-            />
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <T>
-              Enable email alerts for updates, push notifications for
-              mentions, and a weekly digest of activity.
-            </T>
-          </CollapsibleContent>
-        </Collapsible>
-      </Frame>
-    </Section>
-  ),
-});
-
-const ICON_ITEMS: { icon: IconName; label: string; content: string }[] = [
-  {
-    icon: "bell",
-    label: "Notifications",
-    content:
-      "Manage how you receive notifications: email, push, or both.",
-  },
-  {
-    icon: "user",
-    label: "Account",
-    content:
-      "Update your profile, change your password, and manage linked services.",
-  },
-  {
-    icon: "settings",
-    label: "Preferences",
-    content:
-      "Adjust appearance, language, and accessibility options.",
-  },
-];
-
-export const withIcon = defineStory({
-  parameters: { height: 280 },
-  render: () => (
-    <Section caption="icon + label headers, first open">
-      <Frame>
-        <StackedCollapsibles items={ICON_ITEMS} />
-      </Frame>
-    </Section>
-  ),
-});
-
-const STACKED_ITEMS: { label: string; content: string }[] = [
-  {
-    label: "Getting started",
-    content:
-      "Create your account, invite your team, and configure your first project.",
-  },
-  {
-    label: "Billing and subscriptions",
-    content:
-      "View invoices, update your payment method, and manage your plan.",
-  },
-  {
-    label: "Privacy and security",
-    content:
-      "Review data retention, sessions, and two-factor authentication.",
-  },
-];
-
-export const stacked = defineStory({
-  parameters: { height: 260 },
-  render: () => (
-    <Section caption="independent collapsibles stacked (first open)">
-      <Frame>
-        <StackedCollapsibles items={STACKED_ITEMS} />
-      </Frame>
-    </Section>
-  ),
-});
-
-export function bordered() {
+function TreeRow({
+  label,
+  icon,
+  indent = 0,
+  selected = false,
+}: {
+  label: string;
+  icon?: Parameters<typeof Icon>[0]["name"];
+  indent?: number;
+  selected?: boolean;
+}) {
   const t = useAdwaita();
   return (
-    <Section caption="with border, first open">
-      <Column gap={t.spacing.gap}>
-        <StackedCollapsibles
-          bordered
-          items={[
-            {
-              label: "Payment methods",
-              content:
-                "Manage the cards and bank accounts used for your subscription.",
-            },
-            {
-              label: "Team members",
-              content: "Invite and manage the people on your team.",
-            },
-          ]}
-        />
-      </Column>
-    </Section>
+    <div
+      onClick={noop}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: t.space.sm,
+        minHeight: t.control.rowHeight,
+        paddingLeft: t.space.sm + indent * t.space.lg,
+        paddingRight: t.space.sm,
+        borderRadius: t.radius.sm,
+        backgroundColor: selected ? t.color.selection.accent : "transparent",
+        cursor: "pointer",
+      }}
+    >
+      {icon ? (
+        <Icon name={icon} size={16} color={t.color.text.primary} />
+      ) : null}
+      <T size="body" color={t.color.text.primary}>
+        {label}
+      </T>
+    </div>
   );
 }
 
-export const disabled = defineStory({
-  render: () => (
-    <Section caption="disabled (dimmed, not interactive)">
-      <Frame>
-        <Collapsible disabled>
-          <CollapsibleTrigger>
-            <T>Premium features</T>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <T>
-              This section is disabled — the trigger is dimmed and does not
-              respond to input.
-            </T>
-          </CollapsibleContent>
-        </Collapsible>
-      </Frame>
-    </Section>
-  ),
-});
+function Disclosure({
+  summary,
+  children,
+  open,
+  indent = 0,
+  caption = false,
+}: {
+  summary: string;
+  children?: React.ReactNode;
+  open: boolean;
+  indent?: number;
+  caption?: boolean;
+}) {
+  const t = useAdwaita();
+  return (
+    <Collapsible open={open} onOpenChange={noop}>
+      <CollapsibleTrigger
+        style={{
+          paddingLeft: t.space.sm + indent * t.space.lg,
+          gap: t.space.xs,
+        }}
+      >
+        <T
+          size={caption ? "caption" : "body"}
+          weight={600}
+          color={t.color.text.primary}
+        >
+          {summary}
+        </T>
+      </CollapsibleTrigger>
+      <CollapsibleContent
+        style={{
+          paddingLeft: t.space.sm + (indent + 1) * t.space.lg,
+          gap: t.space.xs,
+        }}
+      >
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
 
-export const longContent = defineStory({
-  parameters: { height: 260 },
-  render: () => (
-    <Section caption="long trigger and content text, open">
-      <Frame>
-        <Collapsible open onOpenChange={() => {}}>
-          <CollapsibleTrigger>
-            <T>
-              What happens to my data, backups, and team seats when I
-              downgrade from the Enterprise plan to the Starter plan at the
-              end of the billing cycle?
-            </T>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <T>
-              Your data stays intact. Backups older than 90 days are
-              archived, and team seats above the Starter limit are
-              deactivated until the next upgrade — you can re-activate them
-              at any time. Invoices and audit logs remain available in the
-              billing section of your account, and you will receive a
-              confirmation email once the downgrade takes effect.
-            </T>
-          </CollapsibleContent>
-        </Collapsible>
-      </Frame>
-    </Section>
-  ),
-});
+const FEED_NAV: NavGroups = [
+  [
+    { id: "all", label: "All Articles", icon: "globe" },
+    { id: "today", label: "Today", icon: "calendarMonth" },
+  ],
+];
+
+export function feedTree() {
+  const t = useAdwaita();
+  const tree = (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: t.space.xs,
+        paddingLeft: t.space.sm,
+        paddingRight: t.space.sm,
+      }}
+    >
+      <Disclosure summary="Subscriptions" open indent={0} caption>
+        <Disclosure summary="Cat1" open indent={1} caption>
+          <TreeRow label="Planet GNOME" icon="globe" indent={2} selected />
+          <TreeRow label="This Week in GNOME" icon="globe" indent={2} />
+        </Disclosure>
+        <Disclosure summary="Cat2" open={false} indent={1} caption />
+      </Disclosure>
+      <TreeRow label="Lwn" icon="globe" />
+      <TreeRow label="Xkcd" icon="globe" />
+    </div>
+  );
+  return (
+    <WindowShell size={{ width: 700, height: 520 }}>
+      <WindowBody>
+        <SidebarPane
+          title="NewsFlash"
+          groups={FEED_NAV}
+          selected="all"
+          content={tree}
+        />
+        <PaneBody>
+          <ContentHeader
+            title="Planet GNOME"
+            trailingIcons={[
+              "star",
+              "user",
+              "bookmark",
+              "star",
+              "link",
+              "menu",
+              "close",
+            ]}
+          />
+        </PaneBody>
+      </WindowBody>
+    </WindowShell>
+  );
+}
+feedTree.parameters = { width: 700, height: 520 };
+
+export function keyDetails() {
+  const t = useAdwaita();
+  return (
+    <WindowShell size={{ width: 700, height: 460 }}>
+      <PaneBody>
+        <ContentHeader
+          title="Icon Theme"
+          trailingIcons={["search", "menu", "close"]}
+        />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            paddingLeft: t.space.xl,
+            paddingRight: t.space.xl,
+            paddingTop: t.space.md,
+          }}
+        >
+          <Collapsible open onOpenChange={noop}>
+            <CollapsibleTrigger>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: t.space.sm,
+                  minHeight: t.control.rowHeight,
+                  cursor: "pointer",
+                }}
+              >
+                <Icon name="expandMore" size={16} color={t.color.text.dim} />
+                <T size="body" weight={600} color={t.color.text.primary}>
+                  icon-theme
+                </T>
+                <T size="caption" color={t.color.text.dim}>
+                  The fallback icon theme name
+                </T>
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: t.space.md,
+                  paddingTop: t.space.md,
+                }}
+              >
+                <ListBox value="custom" onValueChange={noop}>
+                  <ListBoxItem
+                    value="title"
+                    subtitle="The fallback icon theme name"
+                  >
+                    Title
+                  </ListBoxItem>
+                  <ListBoxItem value="type">Type: s</ListBoxItem>
+                  <ListBoxItem value="value">Value: Adwaita</ListBoxItem>
+                  <ListBoxItem
+                    value="custom"
+                    trailing={<Switch checked={false} onChange={noop} />}
+                  >
+                    Use default value
+                  </ListBoxItem>
+                </ListBox>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: t.space.md,
+                  }}
+                >
+                  <T size="body" color={t.color.text.dim}>
+                    Custom value
+                  </T>
+                  <Entry
+                    value="Adwaita"
+                    onChange={noop}
+                    style={{ flexGrow: 1 }}
+                  />
+                </div>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+      </PaneBody>
+    </WindowShell>
+  );
+}
+keyDetails.parameters = { width: 700, height: 460 };
+
+const DISCS: { name: string; mount: string; open?: boolean }[] = [
+  { name: "100.7 MB FAT", mount: "/boot" },
+  { name: "Arch", mount: "/" },
+  { name: "Home", mount: "/home", open: true },
+  { name: "990 Pro", mount: "/mnt/990pro" },
+];
+
+export function volumeDisclosure() {
+  const t = useAdwaita();
+  return (
+    <WindowShell size={{ width: 700, height: 480 }}>
+      <PaneBody>
+        <ContentHeader
+          title="2.0 TB Disk"
+          trailingIcons={["info", "moreVert", "close"]}
+        />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: t.space.md,
+            padding: t.space.xl,
+          }}
+        >
+          {DISCS.map((disc) => (
+            <Disclosure
+              key={disc.name}
+              summary={disc.name}
+              open={disc.open ?? false}
+            >
+              <TreeRow label={disc.mount} indent={1} />
+            </Disclosure>
+          ))}
+        </div>
+      </PaneBody>
+    </WindowShell>
+  );
+}
+volumeDisclosure.parameters = { width: 700, height: 480 };

@@ -1,17 +1,15 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 
 export interface AspectRatioProps {
-  
   ratio: number;
-  
+
   width?: number;
-  
+
   height?: number;
   children: ReactNode;
   style?: Partial<StyleDesc>;
 }
-
 
 export function AspectRatio({
   ratio,

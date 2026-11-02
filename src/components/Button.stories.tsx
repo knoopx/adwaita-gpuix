@@ -1,7 +1,7 @@
 import { defineMeta, defineStory } from "storybook";
 import { AdwaitaProvider } from "../theme/adwaita";
-import { Labeled, T } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled, T } from "./text";
+import { Column, Row } from "./Box";
 import { Button } from "./Button";
 
 function AccentButtons() {
@@ -14,7 +14,7 @@ function AccentButtons() {
         <Button variant="text" label="Text" onClick={() => {}} />
       </Labeled>
       <Labeled caption="icon + label (green accent)">
-        <Button variant="text" icon="plus" label="Add" onClick={() => {}} />
+        <Button variant="text" icon="add" label="Add" onClick={() => {}} />
       </Labeled>
     </Row>
   );
@@ -100,13 +100,13 @@ export const toolbar = defineStory({
   render: () => (
     <Row gap={8} align="center">
       <Button size="icon" icon="search" onClick={() => {}} />
-      <Button size="icon" icon="plus" onClick={() => {}} />
+      <Button size="icon" icon="add" onClick={() => {}} />
       <div style={{ flexGrow: 1 }} />
-      <Button variant="suggested" icon="plus" label="New" onClick={() => {}} />
+      <Button variant="suggested" icon="add" label="New" onClick={() => {}} />
       <Button
         variant="destructive"
         size="icon"
-        icon="trash"
+        icon="delete"
         onClick={() => {}}
       />
     </Row>

@@ -1,13 +1,14 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import {
-  useAdwaita,
-  hexToRgba,
-  shade,
-  isDarkScheme,
   type AdwaitaTheme,
+  hexToRgba,
+  isDarkScheme,
+  shade,
+  useAdwaita,
 } from "../theme/adwaita";
-import { T } from "./common";
+import { disabledStyle } from "./disabled.ts";
+import { T } from "./text";
 import { Icon, type IconName } from "./icons";
 
 export type ButtonVariant =
@@ -32,8 +33,12 @@ export interface ButtonProps {
   variant?: ButtonVariant;
 
   size?: ButtonSize;
+
+  shape?: "square" | "circle";
   label?: string;
   icon?: IconName;
+
+  trailingIcon?: IconName;
   onClick?: () => void;
   disabled?: boolean;
   children?: ReactNode;
@@ -52,57 +57,68 @@ function resolveVariantTheme(
   variant: ButtonVariant,
   t: AdwaitaTheme,
 ): ButtonVariantTheme {
-  const { colors, scheme } = t;
   switch (variant) {
     case "suggested":
       return {
-        bg: colors.accent,
-        fg: colors.accent_fg,
-        hoverBg: shade(colors.accent, -0.08),
-        activeBg: shade(colors.accent, -0.18),
-        border: colors.border,
+        bg: t.color.accent.base,
+        fg: t.color.text.onAccent,
+        hoverBg: shade(t.color.accent.base, -0.08),
+        activeBg: shade(t.color.accent.base, -0.18),
+        border: t.color.border.default,
       };
     case "destructive":
       return {
-        bg: colors.destructive,
-        fg: colors.destructive_fg,
-        hoverBg: shade(colors.destructive, -0.08),
-        activeBg: shade(colors.destructive, -0.18),
-        border: colors.border,
+        bg: t.color.functional.destructive,
+        fg: t.color.functional.destructiveFg,
+        hoverBg: shade(t.color.functional.destructive, -0.08),
+        activeBg: shade(t.color.functional.destructive, -0.18),
+        border: t.color.border.default,
       };
     case "text":
       return {
         bg: "transparent",
-        fg: colors.accent,
-        hoverBg: colors.accentTint,
-        activeBg: hexToRgba(colors.accent, isDarkScheme(scheme) ? 0.3 : 0.2),
+        fg: t.color.accent.base,
+        hoverBg: t.color.accent.tint,
+        activeBg: hexToRgba(
+          t.color.accent.base,
+          isDarkScheme(t.scheme) ? 0.3 : 0.2,
+        ),
         border: "transparent",
       };
     case "icon":
       return {
         bg: "transparent",
-        fg: colors.fg,
-        hoverBg: hexToRgba(colors.fg, 0.08),
-        activeBg: hexToRgba(colors.fg, 0.16),
+        fg: t.color.text.primary,
+
+        hoverBg: t.color.surface.buttonHover,
+        activeBg: t.color.surface.buttonActive,
         border: "transparent",
-      };
-    case "secondary":
-      return {
-        bg: colors.button_bg,
-        fg: colors.fg,
-        hoverBg: colors.button_hover,
-        activeBg: colors.button_active,
-        border: colors.border,
       };
     default:
       return {
-        bg: colors.button_bg,
-        fg: colors.fg,
-        hoverBg: colors.button_hover,
-        activeBg: colors.button_active,
-        border: colors.border,
+        bg: t.color.surface.button,
+        fg: t.color.text.primary,
+        hoverBg: t.color.surface.buttonHover,
+        activeBg: t.color.surface.buttonActive,
+        border: t.color.border.default,
       };
   }
+}
+
+function buttonGeometry(
+  t: AdwaitaTheme,
+  variant: ButtonVariant,
+  size: ButtonSize,
+) {
+  const minHeight = BUTTON_SIZE_HEIGHT[size];
+  const isIcon = size === "icon";
+  const pill = variant === "pill";
+  return {
+    minHeight,
+    isIcon,
+    padding: isIcon ? 0 : pill ? t.space.lg : t.space.md,
+    radius: isIcon ? t.radius.sm : pill ? t.radius.full : t.radius.sm,
+  };
 }
 
 function buttonStyle(
@@ -111,13 +127,15 @@ function buttonStyle(
   size: ButtonSize,
   disabled?: boolean,
   style?: Partial<StyleDesc>,
+
+  circle?: boolean,
 ): Partial<StyleDesc> {
-  const { radii, spacing } = t;
   const theme = resolveVariantTheme(variant, t);
-  const pill = variant === "pill";
-  const flat = variant === "text" || variant === "icon";
-  const minHeight = BUTTON_SIZE_HEIGHT[size];
-  const isIcon = size === "icon";
+  const geo = buttonGeometry(t, variant, size);
+  const minHeight = geo.minHeight;
+  const isIcon = geo.isIcon || (circle ?? false);
+  const padding = geo.padding;
+  const radius = circle ? t.radius.full : geo.radius;
   return {
     display: "flex",
     flexDirection: "row",
@@ -126,16 +144,18 @@ function buttonStyle(
     gap: 6,
     minHeight,
     ...(isIcon ? { width: minHeight, padding: 0 } : {}),
-    paddingLeft: isIcon ? 0 : pill ? spacing.padding : spacing.paddingTight,
-    paddingRight: isIcon ? 0 : pill ? spacing.padding : spacing.paddingTight,
-    borderRadius: isIcon ? radii.button : pill ? radii.pill : radii.button,
-    borderWidth: flat ? 0 : 1,
+    paddingLeft: padding,
+    paddingRight: padding,
+    borderRadius: radius,
+    borderWidth: 0,
     borderColor: theme.border,
     backgroundColor: theme.bg,
-    opacity: disabled ? 0.5 : 1,
-    cursor: disabled ? "not-allowed" : "pointer",
-    hover: disabled ? undefined : { backgroundColor: theme.hoverBg },
-    active: disabled ? undefined : { backgroundColor: theme.activeBg },
+    ...disabledStyle(disabled, {
+      cursor: "pointer",
+      disabledCursor: "not-allowed",
+      hover: { backgroundColor: theme.hoverBg },
+      active: { backgroundColor: theme.activeBg },
+    }),
     ...style,
   };
 }
@@ -143,8 +163,10 @@ function buttonStyle(
 export function Button({
   variant = "default",
   size = "default",
+  shape,
   label,
   icon,
+  trailingIcon,
   onClick,
   disabled,
   children,
@@ -156,7 +178,10 @@ export function Button({
   return (
     <div
       onClick={disabled ? undefined : onClick}
-      style={buttonStyle(t, variant, size, disabled, style)}
+      style={{
+        ...buttonStyle(t, variant, size, disabled, style, shape === "circle"),
+        color: fg,
+      }}
     >
       {icon ? (
         <Icon name={icon} size={size === "lg" ? 18 : 16} color={fg} />
@@ -166,8 +191,16 @@ export function Button({
           {label}
         </T>
       ) : null}
-      {children}
+      {typeof children === "string" ? (
+        <T size="body" weight={600} color={fg}>
+          {children}
+        </T>
+      ) : (
+        children
+      )}
+      {trailingIcon ? (
+        <Icon name={trailingIcon} size={size === "lg" ? 18 : 16} color={fg} />
+      ) : null}
     </div>
   );
 }
-

@@ -1,8 +1,10 @@
-import { createContext, useContext, Children, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba } from "../theme/adwaita";
+import { Children, type ReactNode, createContext, useContext } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { hexToRgba, useAdwaita } from "../theme/adwaita";
 import { Icon } from "./icons";
-import { DisclosureContent } from "./common";
+import { DisclosureContent } from "./Collapsible";
+import { groupCardStyle } from "./BoxedList";
+import { isActivateKey } from "../lib/roving";
 
 export interface AccordionProps {
   type?: "single" | "multiple";
@@ -50,16 +52,15 @@ export function Accordion({
   children,
   style,
 }: AccordionProps) {
+  const t = useAdwaita();
   const items = Children.toArray(children);
   return (
     <AccordionCtx.Provider value={{ type, value, onValueChange }}>
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
+        style={groupCardStyle(t, {
           width: "100%",
           ...style,
-        }}
+        })}
       >
         {items.map((child, i) => (
           <ItemLastCtx.Provider
@@ -128,8 +129,8 @@ export function AccordionItem({
           ...(isLast
             ? {}
             : {
-                borderBottomWidth: 1,
-                borderColor: t.colors.border,
+                borderBottomWidth: t.control.dividerThickness,
+                borderColor: t.color.divider.faint,
               }),
           ...style,
         }}
@@ -154,7 +155,6 @@ export function AccordionTrigger({
   style,
 }: AccordionTriggerProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   const item = useAccordionItem();
   const isOpen = open ?? item.isOpen;
   const handleToggle = item.disabled ? undefined : (onToggle ?? item.onToggle);
@@ -163,28 +163,28 @@ export function AccordionTrigger({
       onClick={handleToggle}
       tabIndex={0}
       onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") handleToggle?.();
+        if (isActivateKey(event.key, { space: true })) handleToggle?.();
       }}
       style={{
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        gap: spacing.gap,
+        gap: t.space.sm,
         flexGrow: 1,
 
-        minHeight: 36,
-        borderRadius: radii.row,
+        minHeight: t.control.rowHeight,
+        borderRadius: t.radius.sm,
 
-        paddingLeft: spacing.paddingTight,
-        paddingRight: spacing.gap,
-        paddingTop: spacing.gap,
-        paddingBottom: spacing.gap,
+        paddingLeft: t.control.groupRowInset,
+        paddingRight: t.control.groupRowInset,
+        paddingTop: t.space.sm,
+        paddingBottom: t.space.sm,
         cursor: item.disabled ? "default" : "pointer",
 
         opacity: item.disabled ? 0.5 : 1,
         pointerEvents: item.disabled ? "none" : "auto",
 
-        hover: { backgroundColor: hexToRgba(colors.fg, 0.04) },
+        hover: { backgroundColor: t.color.surface.hover },
         ...style,
       }}
     >
@@ -201,7 +201,7 @@ export function AccordionTrigger({
       <Icon
         name={isOpen ? "chevronUp" : "chevronDown"}
         size={16}
-        color={colors.dim_fg}
+        color={t.color.text.dim}
         style={{ flexShrink: 0 }}
       />
     </div>
@@ -220,8 +220,17 @@ export function AccordionContent({
   style,
 }: AccordionContentProps) {
   const item = useAccordionItem();
+  const t = useAdwaita();
   return (
-    <DisclosureContent open={open ?? item.isOpen} style={style}>
+    <DisclosureContent
+      open={open ?? item.isOpen}
+      style={{
+        paddingLeft: t.control.groupRowInset,
+        paddingRight: t.control.groupRowInset,
+        paddingBottom: t.space.md,
+        ...style,
+      }}
+    >
       {children}
     </DisclosureContent>
   );

@@ -1,7 +1,7 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled, T } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled, T } from "./text";
+import { Column, Row } from "./Box";
 import { Icon } from "./icons";
 import { Card } from "./Card";
 import { AspectRatio } from "./AspectRatio";
@@ -21,15 +21,14 @@ interface TileProps {
 
 function Tile({ label, ratio, width, height }: TileProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <AspectRatio ratio={ratio} width={width} height={height}>
       <div
         style={{
           width: "100%",
           height: "100%",
-          backgroundColor: colors.accentTint,
-          borderRadius: radii.card,
+          backgroundColor: t.color.accent.tint,
+          borderRadius: t.radius.sm,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -59,33 +58,14 @@ export function byHeight() {
         <Tile label="16 : 9" ratio={16 / 9} height={90} />
       </Labeled>
       <Labeled caption="Fixed width+height (120×68)">
-        <Tile
-          label="120×68"
-          ratio={16 / 9}
-          width={120}
-          height={68}
-        />
+        <Tile label="120×68" ratio={16 / 9} width={120} height={68} />
       </Labeled>
       <Column gap={4} align="center">
-        <T size="caption" color={t.colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           Fills parent (180×101, no explicit dimensions)
         </T>
         <div style={{ width: 180, height: 101 }}>
-          <AspectRatio ratio={16 / 9}>
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                backgroundColor: t.colors.accentTint,
-                borderRadius: t.radii.card,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <T>16 : 9</T>
-            </div>
-          </AspectRatio>
+          <Tile label="16 : 9" ratio={16 / 9} />
         </div>
       </Column>
     </Column>
@@ -122,11 +102,10 @@ export const commonRatios = defineStory({
 
 export function content() {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <Column gap={16} align="center">
       <Column gap={4} align="center">
-        <T size="caption" color={t.colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           Image placeholder (4 : 3, width=240)
         </T>
         <AspectRatio ratio={4 / 3} width={240}>
@@ -134,8 +113,8 @@ export function content() {
             style={{
               width: "100%",
               height: "100%",
-              backgroundColor: colors.button_bg,
-              borderRadius: radii.card,
+              backgroundColor: t.color.surface.button,
+              borderRadius: t.radius.sm,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -143,15 +122,15 @@ export function content() {
               gap: 8,
             }}
           >
-            <Icon name="image" size={28} color={colors.dim_fg} />
-            <T size="caption" color={colors.dim_fg}>
+            <Icon name="image" size={28} color={t.color.text.dim} />
+            <T size="caption" color={t.color.text.dim}>
               Image
             </T>
           </div>
         </AspectRatio>
       </Column>
       <Column gap={4} align="center">
-        <T size="caption" color={t.colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           Text content (16 : 9, width=320)
         </T>
         <AspectRatio ratio={16 / 9} width={320}>
@@ -159,32 +138,18 @@ export function content() {
             title="Card in a 16 : 9 frame"
             style={{ width: "100%", height: "100%" }}
           >
-            <T size="caption" color={colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               A card constrained to the aspect frame.
             </T>
           </Card>
         </AspectRatio>
       </Column>
       <Column gap={4} align="center">
-        <T size="caption" color={t.colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           Nested card (3 : 2 tile inside a card)
         </T>
         <Card title="Nested card">
-          <AspectRatio ratio={3 / 2} width={260}>
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                backgroundColor: colors.accentTint,
-                borderRadius: radii.card,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <T>3 : 2</T>
-            </div>
-          </AspectRatio>
+          <Tile label="3 : 2" ratio={3 / 2} width={260} />
         </Card>
       </Column>
     </Column>

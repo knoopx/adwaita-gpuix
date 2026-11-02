@@ -1,8 +1,8 @@
 import { defineMeta } from "storybook";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled, T } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled, T } from "./text";
+import { Column, Row } from "./Box";
 import { Icon, type IconName } from "./icons";
 import { Badge } from "./Badge";
 
@@ -13,7 +13,7 @@ function Swatch({ color, size = 24 }: { color: string; size?: number }) {
       style={{
         width: size,
         height: size,
-        borderRadius: t.radii.button,
+        borderRadius: t.radius.sm,
         backgroundColor: color,
       }}
     />
@@ -34,10 +34,10 @@ function SwatchRow({
   const t = useAdwaita();
   return (
     <Row gap={8} justify={justify} align="center">
-      <Swatch color={t.colors.accent} />
-      <Swatch color={t.colors.success} />
-      <Swatch color={t.colors.warning} />
-      <Swatch color={t.colors.destructive} />
+      <Swatch color={t.color.accent.base} />
+      <Swatch color={t.color.functional.success} />
+      <Swatch color={t.color.functional.warning} />
+      <Swatch color={t.color.functional.destructive} />
     </Row>
   );
 }
@@ -46,9 +46,9 @@ function ColumnDemo({ align }: { align: "start" | "center" }) {
   const t = useAdwaita();
   return (
     <Column gap={8} align={align}>
-      <Swatch color={t.colors.accent} />
-      <Swatch color={t.colors.success} />
-      <Swatch color={t.colors.destructive} />
+      <Swatch color={t.color.accent.base} />
+      <Swatch color={t.color.functional.success} />
+      <Swatch color={t.color.functional.destructive} />
     </Column>
   );
 }
@@ -58,11 +58,11 @@ function GrowDemo() {
   return (
     <Row gap={8} style={{ height: 80 }}>
       <Column grow={1} padding={8} gap={4} align="center">
-        <Swatch color={t.colors.accent} />
-        <Swatch color={t.colors.warning} />
+        <Swatch color={t.color.accent.base} />
+        <Swatch color={t.color.functional.warning} />
       </Column>
       <Column grow={2} padding={8} gap={4} align="center">
-        <Swatch color={t.colors.success} />
+        <Swatch color={t.color.functional.success} />
       </Column>
     </Row>
   );
@@ -75,7 +75,7 @@ function TintRow({
   label,
 }: {
   bg: string;
-  icon: "info" | "success" | "warning" | "alert";
+  icon: "info" | "checkCircle" | "warning" | "error";
   iconColor: string;
   label: string;
 }) {
@@ -86,12 +86,12 @@ function TintRow({
       padding={12}
       align="center"
       style={{
-        borderRadius: t.radii.row,
+        borderRadius: t.radius.sm,
         backgroundColor: bg,
       }}
     >
       <Icon name={icon} size={14} color={iconColor} />
-      <T size="body" color={t.colors.fg}>
+      <T size="body" color={t.color.text.primary}>
         {label}
       </T>
     </Row>
@@ -113,7 +113,7 @@ function BorderedBox({
       gap={8}
       padding={16}
       style={{
-        borderRadius: t.radii.card,
+        borderRadius: t.radius.sm,
         borderWidth: 1,
         borderColor,
         backgroundColor: bg,
@@ -149,14 +149,14 @@ function ContentRow({
         padding={16}
         align="center"
         style={{
-          borderRadius: t.radii.card,
+          borderRadius: t.radius.sm,
           borderWidth: 1,
-          borderColor: t.colors.border,
+          borderColor: t.color.border.default,
           backgroundColor: bg,
         }}
       >
         <Icon name={icon} size={16} color={iconColor} />
-        <T size="body" color={t.colors.fg}>
+        <T size="body" color={t.color.text.primary}>
           {label}
         </T>
         <div style={{ flexGrow: 1 }} />
@@ -210,32 +210,32 @@ export function padding() {
     <Column gap={16}>
       <Labeled caption="plain — padding 0">
         <Row gap={8} align="center">
-          <Swatch color={t.colors.accent} />
-          <T size="body" color={t.colors.fg}>
+          <Swatch color={t.color.accent.base} />
+          <T size="body" color={t.color.text.primary}>
             Tight
           </T>
         </Row>
       </Labeled>
       <Labeled caption="padding 8">
         <Row gap={8} padding={8} align="center">
-          <Swatch color={t.colors.accent} />
-          <T size="body" color={t.colors.fg}>
+          <Swatch color={t.color.accent.base} />
+          <T size="body" color={t.color.text.primary}>
             Compact
           </T>
         </Row>
       </Labeled>
       <Labeled caption="padding 16">
         <Row gap={8} padding={16} align="center">
-          <Swatch color={t.colors.accent} />
-          <T size="body" color={t.colors.fg}>
+          <Swatch color={t.color.accent.base} />
+          <T size="body" color={t.color.text.primary}>
             Relaxed
           </T>
         </Row>
       </Labeled>
       <Labeled caption="padding 24">
         <Row gap={8} padding={24} align="center">
-          <Swatch color={t.colors.accent} />
-          <T size="body" color={t.colors.fg}>
+          <Swatch color={t.color.accent.base} />
+          <T size="body" color={t.color.text.primary}>
             Roomy
           </T>
         </Row>
@@ -250,25 +250,34 @@ export function bordered() {
   return (
     <Column gap={16}>
       <Labeled caption="bordered — view_bg surface">
-        <BorderedBox bg={t.colors.view_bg} borderColor={t.colors.border}>
-          <T size="body" color={t.colors.fg}>
+        <BorderedBox
+          bg={t.color.surface.view}
+          borderColor={t.color.border.default}
+        >
+          <T size="body" color={t.color.text.primary}>
             A bordered container on the view surface.
           </T>
-          <T size="caption" color={t.colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             radius card, 1px border
           </T>
         </BorderedBox>
       </Labeled>
       <Labeled caption="bordered — button_bg surface">
-        <BorderedBox bg={t.colors.button_bg} borderColor={t.colors.border}>
-          <T size="body" color={t.colors.fg}>
+        <BorderedBox
+          bg={t.color.surface.button}
+          borderColor={t.color.border.default}
+        >
+          <T size="body" color={t.color.text.primary}>
             Raised fill with a neutral border.
           </T>
         </BorderedBox>
       </Labeled>
       <Labeled caption="accent border">
-        <BorderedBox bg={t.colors.view_bg} borderColor={t.colors.accent}>
-          <T size="body" color={t.colors.fg}>
+        <BorderedBox
+          bg={t.color.surface.view}
+          borderColor={t.color.accent.base}
+        >
+          <T size="body" color={t.color.text.primary}>
             Focus / highlighted edge.
           </T>
         </BorderedBox>
@@ -284,33 +293,33 @@ export function tints() {
     <Column gap={16}>
       <Labeled caption="tinted — accent">
         <TintRow
-          bg={t.colors.accentTint}
+          bg={t.color.accent.tint}
           icon="info"
-          iconColor={t.colors.accent}
+          iconColor={t.color.accent.base}
           label="Accent-tinted background"
         />
       </Labeled>
       <Labeled caption="tinted — success">
         <TintRow
-          bg={t.colors.successTint}
-          icon="success"
-          iconColor={t.colors.success}
+          bg={t.color.functional.successTint}
+          icon="checkCircle"
+          iconColor={t.color.functional.success}
           label="Success-tinted background"
         />
       </Labeled>
       <Labeled caption="tinted — warning">
         <TintRow
-          bg={t.colors.warningTint}
+          bg={t.color.functional.warningTint}
           icon="warning"
-          iconColor={t.colors.warning}
+          iconColor={t.color.functional.warning}
           label="Warning-tinted background"
         />
       </Labeled>
       <Labeled caption="tinted — destructive">
         <TintRow
-          bg={t.colors.destructiveTint}
-          icon="alert"
-          iconColor={t.colors.destructive}
+          bg={t.color.functional.destructiveTint}
+          icon="error"
+          iconColor={t.color.functional.destructive}
           label="Destructive-tinted background"
         />
       </Labeled>
@@ -325,18 +334,18 @@ export function withContent() {
     <Column gap={16}>
       <ContentRow
         caption="box with icon + text + trailing component"
-        bg={t.colors.view_bg}
+        bg={t.color.surface.view}
         icon="folder"
-        iconColor={t.colors.accent}
+        iconColor={t.color.accent.base}
         label="Documents"
         badgeVariant="secondary"
         badge="12"
       />
       <ContentRow
         caption="box with icon + text + badge"
-        bg={t.colors.button_bg}
-        icon="success"
-        iconColor={t.colors.success}
+        bg={t.color.surface.button}
+        icon="checkCircle"
+        iconColor={t.color.functional.success}
         label="Sync complete"
         badgeVariant="success"
         badge="OK"
@@ -349,10 +358,10 @@ withContent.parameters = { height: 260 };
 export function radii() {
   const t = useAdwaita();
   const cells: Array<[string, number]> = [
-    ["radius button", t.radii.button],
-    ["radius row", t.radii.row],
-    ["radius card", t.radii.card],
-    ["radius pill", t.radii.pill],
+    ["radius button", t.radius.sm],
+    ["radius row", t.radius.sm],
+    ["radius card", t.radius.sm],
+    ["radius pill", t.radius.full],
   ];
   return (
     <Column gap={16}>
@@ -365,12 +374,12 @@ export function radii() {
             style={{
               borderRadius: radius,
               borderWidth: 1,
-              borderColor: t.colors.border,
-              backgroundColor: t.colors.button_bg,
+              borderColor: t.color.border.default,
+              backgroundColor: t.color.surface.button,
             }}
           >
-            <Swatch color={t.colors.accent} size={16} />
-            <T size="caption" color={t.colors.fg}>
+            <Swatch color={t.color.accent.base} size={16} />
+            <T size="caption" color={t.color.text.primary}>
               {caption}
             </T>
           </Row>
@@ -397,16 +406,16 @@ function NestedRow({
       padding={8}
       align="center"
       style={{
-        borderRadius: t.radii.row,
-        backgroundColor: t.colors.button_bg,
+        borderRadius: t.radius.sm,
+        backgroundColor: t.color.surface.button,
       }}
     >
       <Swatch color={swatch} size={16} />
       <Column gap={4}>
-        <T size="body" color={t.colors.fg}>
+        <T size="body" color={t.color.text.primary}>
           {title}
         </T>
-        <T size="caption" color={t.colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           {sub}
         </T>
       </Column>
@@ -422,19 +431,19 @@ export function nested() {
         gap={8}
         padding={16}
         style={{
-          borderRadius: t.radii.card,
+          borderRadius: t.radius.sm,
           borderWidth: 1,
-          borderColor: t.colors.border,
-          backgroundColor: t.colors.view_bg,
+          borderColor: t.color.border.default,
+          backgroundColor: t.color.surface.view,
         }}
       >
         <NestedRow
-          swatch={t.colors.accent}
+          swatch={t.color.accent.base}
           title="Outer row, inner column"
           sub="two levels deep"
         />
         <NestedRow
-          swatch={t.colors.success}
+          swatch={t.color.functional.success}
           title="Second row"
           sub="same nesting"
         />
@@ -447,12 +456,12 @@ nested.parameters = { height: 300 };
 export function grid() {
   const t = useAdwaita();
   const items: Array<[string, IconName, string]> = [
-    ["Home", "home", t.colors.accent],
-    ["Files", "folder", t.colors.success],
-    ["Search", "search", t.colors.warning],
-    ["Settings", "settings", t.colors.accent],
-    ["Clock", "clock", t.colors.success],
-    ["Layers", "layers", t.colors.destructive],
+    ["Home", "home", t.color.accent.base],
+    ["Files", "folder", t.color.functional.success],
+    ["Search", "search", t.color.functional.warning],
+    ["Settings", "settings", t.color.accent.base],
+    ["Clock", "clock", t.color.functional.success],
+    ["Layers", "layers", t.color.functional.destructive],
   ];
   return (
     <Labeled caption="grid — rows of columns (3 × 2)">
@@ -467,14 +476,14 @@ export function grid() {
                 padding={12}
                 align="center"
                 style={{
-                  borderRadius: t.radii.card,
+                  borderRadius: t.radius.sm,
                   borderWidth: 1,
-                  borderColor: t.colors.border,
-                  backgroundColor: t.colors.view_bg,
+                  borderColor: t.color.border.default,
+                  backgroundColor: t.color.surface.view,
                 }}
               >
                 <Icon name={icon} size={16} color={color} />
-                <T size="caption" color={t.colors.fg}>
+                <T size="caption" color={t.color.text.primary}>
                   {label}
                 </T>
               </Column>
@@ -497,15 +506,15 @@ export function dim() {
           padding={12}
           align="center"
           style={{
-            borderRadius: t.radii.row,
+            borderRadius: t.radius.sm,
             borderWidth: 1,
-            borderColor: t.colors.border,
-            backgroundColor: t.colors.button_bg,
+            borderColor: t.color.border.default,
+            backgroundColor: t.color.surface.button,
             opacity: 0.5,
           }}
         >
-          <Swatch color={t.colors.accent} size={16} />
-          <T size="body" color={t.colors.fg}>
+          <Swatch color={t.color.accent.base} size={16} />
+          <T size="body" color={t.color.text.primary}>
             Disabled row
           </T>
         </Row>
@@ -516,21 +525,21 @@ export function dim() {
           padding={12}
           align="center"
           style={{
-            borderRadius: t.radii.row,
-            backgroundColor: t.colors.button_bg,
+            borderRadius: t.radius.sm,
+            backgroundColor: t.color.surface.button,
           }}
         >
-          <Swatch color={t.colors.dim_fg} size={16} />
-          <T size="body" color={t.colors.dim_fg}>
+          <Swatch color={t.color.text.dim} size={16} />
+          <T size="body" color={t.color.text.dim}>
             Secondary content
           </T>
         </Row>
       </Labeled>
       <Labeled caption="swatch palette (dim fg)">
         <Row gap={8} align="center">
-          <Swatch color={t.colors.dim_fg} size={16} />
-          <Swatch color={t.colors.border} size={16} />
-          <Swatch color={t.colors.button_bg} size={16} />
+          <Swatch color={t.color.text.dim} size={16} />
+          <Swatch color={t.color.border.default} size={16} />
+          <Swatch color={t.color.surface.button} size={16} />
         </Row>
       </Labeled>
     </Column>

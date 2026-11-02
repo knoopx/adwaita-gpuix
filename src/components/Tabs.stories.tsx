@@ -1,14 +1,9 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { T } from "./common";
+import { T } from "./text";
 import { Column } from "./Box";
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "./Tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./Tabs";
 
 export default defineMeta({
   title: "Adwaita/Tabs",
@@ -16,13 +11,7 @@ export default defineMeta({
   parameters: { width: 528, height: 320 },
 });
 
-function Sample({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
+function Sample({ label, children }: { label: string; children: ReactNode }) {
   const t = useAdwaita();
   return (
     <div
@@ -30,10 +19,10 @@ function Sample({
         display: "flex",
         flexDirection: "column",
         gap: 4,
-        backgroundColor: t.colors.view_bg,
+        backgroundColor: t.color.surface.view,
       }}
     >
-      <T size="caption" color={t.colors.dim_fg}>
+      <T size="caption" color={t.color.text.dim}>
         {label}
       </T>
       {children}
@@ -49,7 +38,7 @@ export const horizontal = defineStory({
           items={[
             { id: "a", label: "General", icon: "settings" },
             { id: "b", label: "Files", icon: "list", closable: true },
-            { id: "c", label: "Advanced", icon: "grid" },
+            { id: "c", label: "Advanced", icon: "gridView" },
           ]}
           value="a"
           onSelect={() => {}}
@@ -119,8 +108,14 @@ export const disabled = defineStory({
         <Tabs
           items={[
             { id: "a", label: "General", icon: "settings" },
-            { id: "b", label: "Files", icon: "list", closable: true, disabled: true },
-            { id: "c", label: "Advanced", icon: "grid" },
+            {
+              id: "b",
+              label: "Files",
+              icon: "list",
+              closable: true,
+              disabled: true,
+            },
+            { id: "c", label: "Advanced", icon: "gridView" },
           ]}
           value="a"
           onSelect={() => {}}
