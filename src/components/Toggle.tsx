@@ -1,8 +1,15 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba, isDarkScheme } from "../theme/adwaita";
-import { T } from "./common";
+import { type ReactNode } from "react";
+import { type EventPayload, type StyleDesc } from "@gpuix/react";
+import {
+  type AdwaitaTheme,
+  hexToRgba,
+  isDarkScheme,
+  useAdwaita,
+} from "../theme/adwaita";
+import { T } from "./text";
+import { disabledStyle } from "./disabled.ts";
 import { Icon, type IconName } from "./icons";
+import { isActivateKey } from "../lib/roving";
 
 export type ToggleVariant = "default" | "outline";
 export type ToggleSize = "sm" | "default" | "lg";
@@ -30,6 +37,67 @@ const TOGGLE_ICON_SIZE: Record<ToggleSize, number> = {
   lg: 18,
 };
 
+function toggleStyle(
+  t: AdwaitaTheme,
+  args: {
+    pressed: boolean;
+    variant: ToggleVariant;
+    size: ToggleSize;
+    disabled?: boolean;
+  },
+): Partial<StyleDesc> {
+  const dark = isDarkScheme(t.scheme);
+  const outline = args.variant === "outline";
+  const { pressed } = args;
+  const bg = pressed
+    ? t.color.accent.tint
+    : outline
+      ? "transparent"
+      : t.color.surface.button;
+  return {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    minHeight: TOGGLE_MIN_HEIGHT[args.size],
+    paddingLeft: t.space.md,
+    paddingRight: t.space.md,
+    borderRadius: t.radius.sm,
+    borderWidth: 0,
+    backgroundColor: bg,
+    ...disabledStyle(args.disabled, {
+      disabledCursor: "not-allowed",
+      hover: {
+        backgroundColor: pressed
+          ? t.color.accent.tint
+          : t.color.surface.buttonHover,
+      },
+      active: {
+        backgroundColor: pressed
+          ? hexToRgba(t.color.accent.base, dark ? 0.35 : 0.25)
+          : t.color.surface.buttonActive,
+      },
+    }),
+  };
+}
+
+function toggleInk(t: AdwaitaTheme, pressed: boolean) {
+  return {
+    fg: pressed ? t.color.accent.base : t.color.text.primary,
+    icon: pressed ? t.color.accent.base : t.color.text.dim,
+  };
+}
+
+function toggleActivate(
+  event: EventPayload,
+  disabled: boolean | undefined,
+  onPressed: () => void,
+) {
+  if (disabled) return;
+  if (isActivateKey(event.key, { space: true })) onPressed();
+}
+
 export function Toggle({
   pressed,
   onPressed,
@@ -41,57 +109,15 @@ export function Toggle({
   style,
 }: ToggleProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
-  const dark = isDarkScheme(t.scheme);
-
-  const isOutline = variant === "outline";
-
-  const bg = pressed
-    ? colors.accentTint
-    : isOutline
-      ? "transparent"
-      : colors.button_bg;
-  const fg = pressed ? colors.accent : colors.fg;
-  const iconColor = pressed ? colors.accent : colors.dim_fg;
-  const borderColor = pressed ? colors.accent : colors.border;
+  const ink = toggleInk(t, pressed);
 
   return (
     <div
       onClick={disabled ? undefined : onPressed}
       tabIndex={disabled ? -1 : 0}
-      onKeyDown={(event) => {
-        if (disabled) return;
-        if (event.key === "Enter" || event.key === " ") onPressed();
-      }}
+      onKeyDown={(event) => toggleActivate(event, disabled, onPressed)}
       style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 6,
-        minHeight: TOGGLE_MIN_HEIGHT[size],
-        paddingLeft: spacing.paddingTight,
-        paddingRight: spacing.paddingTight,
-        borderRadius: radii.button,
-        borderWidth: 1,
-        borderColor,
-        backgroundColor: bg,
-        opacity: disabled ? 0.5 : 1,
-        cursor: disabled ? "not-allowed" : "pointer",
-        ...(disabled
-          ? {}
-          : {
-              hover: {
-                backgroundColor: pressed
-                  ? colors.accentTint
-                  : colors.button_hover,
-              },
-              active: {
-                backgroundColor: pressed
-                  ? hexToRgba(colors.accent, dark ? 0.35 : 0.25)
-                  : colors.button_active,
-              },
-            }),
+        ...toggleStyle(t, { pressed, variant, size, disabled }),
         ...style,
       }}
     >
@@ -99,12 +125,12 @@ export function Toggle({
         <Icon
           name={icon}
           size={TOGGLE_ICON_SIZE[size]}
-          color={iconColor}
+          color={ink.icon}
           style={{ pointerEvents: "none" }}
         />
       ) : null}
       {children ? (
-        <T size="body" weight={600} color={fg}>
+        <T size="body" weight={600} color={ink.fg}>
           {children}
         </T>
       ) : null}

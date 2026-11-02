@@ -1,13 +1,8 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled, T } from "./common";
-import { Row, Column } from "./Box";
-import {
-  Field,
-  FieldLabel,
-  FieldDescription,
-  FieldContent,
-} from "./Field";
+import { Labeled, T } from "./text";
+import { Column, Row } from "./Box";
+import { Field, FieldContent, FieldDescription, FieldLabel } from "./Field";
 import { Textarea } from "./Textarea";
 
 export default defineMeta({
@@ -24,10 +19,7 @@ export const states = defineStory({
         <Textarea placeholder="Type a message…" />
       </Labeled>
       <Labeled caption="with value (rows=3)" style={{ width: 320 }}>
-        <Textarea
-          value="A multi-line text area with some content."
-          rows={3}
-        />
+        <Textarea value="A multi-line text area with some content." rows={3} />
       </Labeled>
       <Labeled caption="taller (rows=5)" style={{ width: 320 }}>
         <Textarea
@@ -81,7 +73,7 @@ export function charCounter() {
       <Labeled caption="character counter" style={{ width: 320 }}>
         <Textarea value={value} rows={3} />
         <Row justify="end">
-          <T size="caption" color={t.colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             {value.length} / 280
           </T>
         </Row>

@@ -1,11 +1,11 @@
 import { defineMeta, defineStory } from "storybook";
 import { Input } from "./Input";
 import {
-  fieldStatesStory,
   fieldFocusedStory,
-  fieldTypesStory,
   fieldIconsStory,
-} from "./.storybook/story-helpers";
+  fieldStatesStory,
+  fieldTypesStory,
+} from "../../.storybook/story-helpers";
 
 export default defineMeta({
   title: "Adwaita/Input",

@@ -1,12 +1,12 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Column } from "./Box";
 import {
   InputGroup,
-  InputGroupInput,
   InputGroupAddon,
   InputGroupButton,
+  InputGroupInput,
   InputGroupText,
   InputGroupTextarea,
 } from "./InputGroup";
@@ -14,7 +14,7 @@ import { Icon, type IconName } from "./icons";
 
 function AddonIcon({ name }: { name: IconName }) {
   const t = useAdwaita();
-  return <Icon name={name} size={14} color={t.colors.dim_fg} />;
+  return <Icon name={name} size={14} color={t.color.text.dim} />;
 }
 
 export default defineMeta({

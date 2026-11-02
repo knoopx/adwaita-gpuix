@@ -1,13 +1,8 @@
-import type { StyleDesc } from "@gpuix/react";
-import {
-  useAdwaita,
-  hexToRgba,
-  shade,
-  isDarkScheme,
-  type AdwaitaTheme,
-} from "../theme/adwaita";
-import { LabeledControl } from "./common";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../theme/adwaita";
+import { LabeledControl, accentFillInteractions } from "./checkable";
 import { Icon } from "./icons";
+import { isActivateKey } from "../lib/roving";
 
 export type CheckboxState = boolean | "indeterminate";
 
@@ -27,7 +22,6 @@ function checkboxStyle(
   disabled: boolean,
   style?: Partial<StyleDesc>,
 ): Partial<StyleDesc> {
-  const { colors } = t;
   return {
     display: "flex",
     alignItems: "center",
@@ -36,25 +30,12 @@ function checkboxStyle(
     height: 18,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: filled ? colors.accent : colors.border,
-    backgroundColor: filled ? colors.accent : "transparent",
+    borderColor: filled ? t.color.accent.base : t.color.border.default,
+    backgroundColor: filled ? t.color.accent.base : "transparent",
     cursor: disabled ? "not-allowed" : "pointer",
     opacity: disabled ? 0.5 : 1,
     flexShrink: 0,
-    ...(disabled
-      ? {}
-      : {
-          hover: {
-            backgroundColor: filled
-              ? shade(colors.accent, -0.08)
-              : colors.accentTint,
-          },
-          active: {
-            backgroundColor: filled
-              ? shade(colors.accent, -0.18)
-              : hexToRgba(colors.accent, isDarkScheme(t.scheme) ? 0.3 : 0.2),
-          },
-        }),
+    ...(disabled ? {} : accentFillInteractions(t, filled)),
     ...style,
   };
 }
@@ -68,7 +49,6 @@ export function Checkbox({
   style,
 }: CheckboxProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const isIndeterminate = checked === "indeterminate";
   const isChecked = checked === true;
   const filled = isChecked || isIndeterminate;
@@ -81,13 +61,11 @@ export function Checkbox({
         disabled
           ? undefined
           : (event) => {
-              if (event.key === "Enter" || event.key === " ") toggle();
+              if (isActivateKey(event.key, { space: true })) toggle();
             }
       }
       tabIndex={disabled ? -1 : 0}
-      
-      
-      
+
       style={checkboxStyle(
         t,
         filled,
@@ -99,14 +77,14 @@ export function Checkbox({
         <Icon
           name="check"
           size={12}
-          color={colors.accent_fg}
+          color={t.color.text.onAccent}
           style={{ pointerEvents: "none" }}
         />
       ) : isIndeterminate ? (
         <Icon
-          name="minus"
+          name="remove"
           size={12}
-          color={colors.accent_fg}
+          color={t.color.text.onAccent}
           style={{ pointerEvents: "none" }}
         />
       ) : null}

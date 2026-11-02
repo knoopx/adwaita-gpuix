@@ -1,7 +1,7 @@
 import { Children, type ReactElement, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { T } from "./common";
+import { T } from "./text";
 import { Input } from "./Input";
 import { Textarea } from "./Textarea";
 
@@ -21,38 +21,11 @@ export function InputGroup({
   style,
 }: InputGroupProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   const column = align !== "row";
 
-  let orderedChildren: ReactNode = children;
-  if (column) {
-    const arr = Children.toArray(children);
-    const primary: ReactNode[] = [];
-    const accessory: ReactNode[] = [];
-    const unknown: ReactNode[] = [];
-    for (const child of arr) {
-      const type = (child as ReactElement | null | undefined)?.type;
-      if (
-        type === InputGroupInput ||
-        type === InputGroupTextarea
-      ) {
-        primary.push(child);
-      } else if (
-        type === InputGroupAddon ||
-        type === InputGroupButton ||
-        type === InputGroupText
-      ) {
-        accessory.push(child);
-      } else {
-        unknown.push(child);
-      }
-    }
-    const blockAlign = align as "block-start" | "block-end";
-    orderedChildren =
-      blockAlign === "block-start"
-        ? [...accessory, ...primary, ...unknown]
-        : [...primary, ...unknown, ...accessory];
-  }
+  const orderedChildren = column
+    ? orderChildren(partitionChildren(Children.toArray(children)), align)
+    : children;
 
   return (
     <div
@@ -60,10 +33,10 @@ export function InputGroup({
         display: "flex",
         flexDirection: column ? "column" : "row",
         alignItems: column ? "stretch" : "center",
-        borderRadius: radii.button,
+        borderRadius: t.radius.sm,
         borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderColor: t.color.border.default,
+        backgroundColor: t.color.surface.view,
         overflow: "hidden",
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? "not-allowed" : undefined,
@@ -74,6 +47,53 @@ export function InputGroup({
       {orderedChildren}
     </div>
   );
+}
+
+type ChildParts = {
+  primary: ReactNode[];
+  accessory: ReactNode[];
+  unknown: ReactNode[];
+};
+
+const PRIMARY_CHILD_TYPES: Set<unknown> = new Set([
+  InputGroupInput,
+  InputGroupTextarea,
+]);
+
+const ACCESSORY_CHILD_TYPES: Set<unknown> = new Set([
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+]);
+
+function childType(child: ReactNode): unknown {
+  return (child as ReactElement | null | undefined)?.type;
+}
+
+function partitionChildren(arr: ReactNode[]): ChildParts {
+  const primary: ReactNode[] = [];
+  const accessory: ReactNode[] = [];
+  const unknown: ReactNode[] = [];
+  for (const child of arr) {
+    const type = childType(child);
+    if (PRIMARY_CHILD_TYPES.has(type)) {
+      primary.push(child);
+    } else if (ACCESSORY_CHILD_TYPES.has(type)) {
+      accessory.push(child);
+    } else {
+      unknown.push(child);
+    }
+  }
+  return { primary, accessory, unknown };
+}
+
+function orderChildren(
+  parts: ChildParts,
+  align: InputGroupProps["align"],
+): ReactNode[] {
+  const { primary, accessory, unknown } = parts;
+  if (align === "block-start") return [...accessory, ...primary, ...unknown];
+  return [...primary, ...unknown, ...accessory];
 }
 
 export interface InputGroupInputProps {
@@ -122,11 +142,11 @@ function InputGroupTextSlot({ children, style }: InputGroupTextProps) {
       style={{
         display: "flex",
         alignItems: "center",
-        padding: t.spacing.gap,
+        padding: t.space.sm,
         ...style,
       }}
     >
-      <T size="body" color={t.colors.dim_fg}>
+      <T size="body" color={t.color.text.dim}>
         {children}
       </T>
     </div>
@@ -149,7 +169,6 @@ export function InputGroupButton({
   style,
 }: InputGroupButtonProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       onClick={onClick}
@@ -160,10 +179,10 @@ export function InputGroupButton({
         width: 28,
         height: 28,
         flexShrink: 0,
-        borderRadius: radii.button,
+        borderRadius: t.radius.sm,
         cursor: "pointer",
-        hover: { backgroundColor: colors.button_hover },
-        active: { backgroundColor: colors.button_active },
+        hover: { backgroundColor: t.color.surface.buttonHover },
+        active: { backgroundColor: t.color.surface.buttonActive },
         ...style,
       }}
     >

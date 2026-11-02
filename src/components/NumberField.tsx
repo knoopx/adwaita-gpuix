@@ -1,7 +1,8 @@
 import { useState } from "react";
-import type { EventPayload, StyleDesc } from "@gpuix/react";
-import { useAdwaita, type AdwaitaColors, type AdwaitaTheme } from "../theme/adwaita";
-import { T } from "./common";
+import { type EventPayload, type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
+import { focusRingStyle, resolveFieldBorderColor } from "./input-base";
 import { Icon } from "./icons";
 
 export interface NumberFieldProps {
@@ -48,35 +49,6 @@ function draftIsInvalid(
   return n === null || !isInRange(n, min, max);
 }
 
-function resolveBorderColor(
-  disabled: boolean,
-  focused: boolean,
-  invalid: boolean,
-  colors: AdwaitaColors,
-): string {
-  if (disabled) return colors.border;
-  if (focused) return colors.accent;
-  if (invalid) return colors.destructive;
-  return colors.border;
-}
-
-function focusRingStyle(
-  focused: boolean,
-  disabled: boolean,
-  colors: AdwaitaColors,
-): Partial<StyleDesc> {
-  if (!focused || disabled) return {};
-  return {
-    boxShadow: {
-      offsetX: 0,
-      offsetY: 0,
-      blurRadius: 8,
-      spreadRadius: 0,
-      color: colors.accentTint,
-    },
-  };
-}
-
 function outerFieldStyle(
   disabled: boolean | undefined,
   borderColor: string,
@@ -90,10 +62,10 @@ function outerFieldStyle(
     flexDirection: "row",
     alignItems: "stretch",
     minHeight: INPUT_MIN_HEIGHT,
-    borderRadius: theme.radii.button,
+    borderRadius: theme.radius.sm,
     borderWidth: 1,
     borderColor,
-    backgroundColor: theme.colors.view_bg,
+    backgroundColor: theme.color.surface.view,
     overflow: "hidden",
     opacity: disabled ? 0.5 : 1,
     ...focusRing,
@@ -107,12 +79,12 @@ function StepperButton({
   horizontal,
   onClick,
 }: {
-  icon: "minus" | "plus";
+  icon: "add" | "remove";
   disabled?: boolean;
   horizontal: boolean;
   onClick: () => void;
 }) {
-  const { colors } = useAdwaita();
+  const t = useAdwaita();
   return (
     <div
       onClick={disabled ? undefined : onClick}
@@ -121,27 +93,33 @@ function StepperButton({
         alignItems: "center",
         justifyContent: "center",
         cursor: disabled ? "default" : "pointer",
-        hover: disabled ? undefined : { backgroundColor: colors.button_hover },
-        active: disabled ? undefined : { backgroundColor: colors.button_active },
-        ...(horizontal ? { width: STEPPER_WIDTH, flexShrink: 0 } : { flexGrow: 1 }),
+        hover: disabled
+          ? undefined
+          : { backgroundColor: t.color.surface.buttonHover },
+        active: disabled
+          ? undefined
+          : { backgroundColor: t.color.surface.buttonActive },
+        ...(horizontal
+          ? { width: STEPPER_WIDTH, flexShrink: 0 }
+          : { flexGrow: 1 }),
       }}
     >
-      <Icon name={icon} size={12} color={colors.dim_fg} />
+      <Icon name={icon} size={12} color={t.color.text.dim} />
     </div>
   );
 }
 
 function NumberFieldSuffix({ suffix }: { suffix?: string }) {
-  const { colors, spacing } = useAdwaita();
+  const t = useAdwaita();
   if (!suffix) return null;
   return (
     <T
       size="body"
-      color={colors.dim_fg}
+      color={t.color.text.dim}
       style={{
         flexShrink: 0,
         alignSelf: "center",
-        paddingRight: spacing.paddingTight,
+        paddingRight: t.space.md,
         pointerEvents: "none",
       }}
     >
@@ -157,7 +135,7 @@ function NumberFieldDisplay({
   displayValue: string;
   suffix?: string;
 }) {
-  const { colors, spacing } = useAdwaita();
+  const t = useAdwaita();
   return (
     <div
       style={{
@@ -166,11 +144,11 @@ function NumberFieldDisplay({
         alignItems: "center",
         justifyContent: "center",
         flexGrow: 1,
-        gap: spacing.gap,
+        gap: t.space.sm,
         minWidth: 0,
       }}
     >
-      <T size="body" color={colors.fg}>
+      <T size="body" color={t.color.text.primary}>
         {displayValue}
       </T>
       <NumberFieldSuffix suffix={suffix} />
@@ -202,7 +180,7 @@ function NumberFieldInput({
     onChange: (e: EventPayload) => void;
   };
 }) {
-  const { colors, typography, spacing } = useAdwaita();
+  const t = useAdwaita();
   return (
     <>
       <div
@@ -212,13 +190,13 @@ function NumberFieldInput({
           alignItems: "center",
           flexGrow: 1,
           minWidth: 0,
-          gap: spacing.gap,
-          paddingLeft: spacing.paddingTight,
-          paddingRight: suffix ? 0 : spacing.paddingTight,
+          gap: t.space.sm,
+          paddingLeft: t.space.md,
+          paddingRight: suffix ? 0 : t.space.md,
           pointerEvents: "none",
         }}
       >
-        <T size="body" color={colors.fg}>
+        <T size="body" color={t.color.text.primary}>
           {displayValue}
         </T>
         <NumberFieldSuffix suffix={suffix} />
@@ -228,7 +206,7 @@ function NumberFieldInput({
         readOnly={disabled}
         onFocus={onFocus}
         {...inputHandlers}
-        theme={{ caret: colors.accent }}
+        theme={{ caret: t.color.accent.base }}
         style={{
           position: "absolute",
           top: 1,
@@ -239,10 +217,10 @@ function NumberFieldInput({
           borderWidth: 0,
           borderRadius: 0,
           backgroundColor: "transparent",
-          paddingLeft: spacing.paddingTight,
-          fontSize: typography.body,
-          fontFamily: typography.fontFamily,
-          color: colors.fg,
+          paddingLeft: t.space.md,
+          fontSize: t.type.body,
+          fontFamily: t.type.fontFamily,
+          color: t.color.text.primary,
         }}
       />
     </>
@@ -262,16 +240,26 @@ function NumberFieldHorizontal({
   displayValue: string;
   suffix?: string;
 }) {
-  const { colors } = useAdwaita();
+  const t = useAdwaita();
   const separator = { width: 1 };
-  const sepStyle = { ...separator, backgroundColor: colors.border };
+  const sepStyle = { ...separator, backgroundColor: t.color.border.default };
   return (
     <>
-      <StepperButton icon="minus" disabled={disabled} horizontal onClick={onMinus} />
+      <StepperButton
+        icon="remove"
+        disabled={disabled}
+        horizontal
+        onClick={onMinus}
+      />
       <div style={sepStyle} />
       <NumberFieldDisplay displayValue={displayValue} suffix={suffix} />
       <div style={sepStyle} />
-      <StepperButton icon="plus" disabled={disabled} horizontal onClick={onPlus} />
+      <StepperButton
+        icon="add"
+        disabled={disabled}
+        horizontal
+        onClick={onPlus}
+      />
     </>
   );
 }
@@ -296,9 +284,15 @@ function NumberFieldVertical({
     onChange: (e: EventPayload) => void;
   };
 }) {
-  const { colors } = useAdwaita();
-  const verticalSeparator = { width: 1, backgroundColor: colors.border };
-  const horizontalSeparator = { height: 1, backgroundColor: colors.border };
+  const t = useAdwaita();
+  const verticalSeparator = {
+    width: 1,
+    backgroundColor: t.color.border.default,
+  };
+  const horizontalSeparator = {
+    height: 1,
+    backgroundColor: t.color.border.default,
+  };
   return (
     <>
       <NumberFieldInput
@@ -317,9 +311,19 @@ function NumberFieldVertical({
           flexShrink: 0,
         }}
       >
-        <StepperButton icon="plus" disabled={disabled} horizontal={false} onClick={onPlus} />
+        <StepperButton
+          icon="add"
+          disabled={disabled}
+          horizontal={false}
+          onClick={onPlus}
+        />
         <div style={horizontalSeparator} />
-        <StepperButton icon="minus" disabled={disabled} horizontal={false} onClick={onMinus} />
+        <StepperButton
+          icon="remove"
+          disabled={disabled}
+          horizontal={false}
+          onClick={onMinus}
+        />
       </div>
     </>
   );
@@ -338,7 +342,6 @@ export function NumberField({
   style,
 }: NumberFieldProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const [internal, setInternal] = useState<number>(defaultValue);
   const current = value ?? internal;
 
@@ -376,13 +379,14 @@ export function NumberField({
   const horizontal = orientation === "horizontal";
   const displayValue = resolveDisplayValue(current, draft, focused);
   const invalid = draftIsInvalid(draft, focused, min, max);
-  const borderColor = resolveBorderColor(
+  const borderColor = resolveFieldBorderColor(
     disabled === true,
     focused,
     invalid,
-    colors,
+    t,
   );
-  const focusRing = focusRingStyle(focused, disabled === true, colors);
+  const focusRing =
+    focused && disabled !== true ? focusRingStyle(t.color.accent.tint) : {};
   const inputHandlers = disabled
     ? undefined
     : {

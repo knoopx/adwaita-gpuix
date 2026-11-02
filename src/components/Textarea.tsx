@@ -1,11 +1,12 @@
 import { useState } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import type { EventPayload } from "@gpuix/native";
+import { type StyleDesc } from "@gpuix/react";
+import { type EventPayload } from "@gpuix/native";
+import { hexToRgba, useAdwaita } from "../theme/adwaita";
 import {
-  useAdwaita,
-  hexToRgba,
-} from "../theme/adwaita";
-import { textFieldStyle, resolveFieldBorderColor } from "./common";
+  focusRingStyle,
+  resolveFieldBorderColor,
+  textFieldStyle,
+} from "./input-base";
 
 export interface TextareaProps {
   value?: string;
@@ -35,26 +36,12 @@ export function Textarea({
   style,
 }: TextareaProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   const [focused, setFocused] = useState(false);
 
-  const borderColor = resolveFieldBorderColor(
-    disabled,
-    focused,
-    invalid,
-    colors,
-  );
+  const borderColor = resolveFieldBorderColor(disabled, focused, invalid, t);
 
   const focusRing = focused
-    ? {
-        boxShadow: {
-          offsetX: 0,
-          offsetY: 0,
-          blurRadius: 8,
-          spreadRadius: 0,
-          color: hexToRgba(colors.accent, 0.4),
-        },
-      }
+    ? focusRingStyle(hexToRgba(t.color.accent.base, 0.4))
     : {};
 
   return (
@@ -69,13 +56,13 @@ export function Textarea({
       onSubmit={onSubmit}
       onKeyDown={onKeyDown}
       onChange={(event) => onChange?.(event.value ?? "")}
-      theme={{ caret: colors.accent, textMuted: colors.dim_fg }}
+      theme={{ caret: t.color.accent.base, textMuted: t.color.text.dim }}
       style={textFieldStyle(t, {
-        paddingTop: spacing.gap,
-        paddingBottom: spacing.gap,
-        paddingLeft: spacing.paddingTight,
-        paddingRight: spacing.paddingTight,
-        borderRadius: radii.button,
+        paddingTop: t.space.sm,
+        paddingBottom: t.space.sm,
+        paddingLeft: t.space.md,
+        paddingRight: t.space.md,
+        borderRadius: t.radius.sm,
         borderColor,
         cursor: disabled ? "not-allowed" : "text",
         opacity: disabled ? 0.5 : 1,

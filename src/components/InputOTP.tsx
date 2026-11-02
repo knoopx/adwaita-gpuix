@@ -1,7 +1,9 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba } from "../theme/adwaita";
-import { T, GapRow } from "./common";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { hexToRgba, useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
+import { GapRow } from "./Box";
+import { focusRingStyle } from "./input-base";
 
 export interface InputOTPProps {
   length: number;
@@ -24,8 +26,6 @@ export function InputOTP({
   style,
 }: InputOTPProps) {
   const t = useAdwaita();
-  const { spacing } = t;
-
   const chars = Array.from({ length: length }, (_, i) => value[i] ?? "");
 
   return (
@@ -34,7 +34,7 @@ export function InputOTP({
         position: "relative",
         display: "flex",
         flexDirection: "row",
-        gap: spacing.gap,
+        gap: t.space.sm,
         ...style,
       }}
     >
@@ -100,19 +100,10 @@ export function InputOTPSlot({
   style,
 }: InputOTPSlotProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   void index;
-  const size = spacing.rowHeight;
+  const size = t.control.rowHeight;
   const focusRing = active
-    ? {
-        boxShadow: {
-          offsetX: 0,
-          offsetY: 0,
-          blurRadius: 8,
-          spreadRadius: 0,
-          color: hexToRgba(colors.accent, 0.4),
-        },
-      }
+    ? focusRingStyle(hexToRgba(t.color.accent.base, 0.4))
     : {};
   return (
     <div
@@ -123,16 +114,16 @@ export function InputOTPSlot({
         width: size,
         height: size,
         flexShrink: 0,
-        borderRadius: radii.button,
+        borderRadius: t.radius.sm,
         borderWidth: 1,
-        borderColor: active ? colors.accent : colors.border,
-        backgroundColor: colors.button_bg,
+        borderColor: active ? t.color.accent.base : t.color.border.default,
+        backgroundColor: t.color.surface.button,
         opacity: disabled ? 0.5 : 1,
         ...focusRing,
         ...style,
       }}
     >
-      <T size="title2" color={filled ? colors.fg : colors.dim_fg}>
+      <T size="title2" color={filled ? t.color.text.primary : t.color.text.dim}>
         {char}
       </T>
     </div>
@@ -147,7 +138,7 @@ export function InputOTPSeparator({ style }: InputOTPSeparatorProps) {
   const t = useAdwaita();
   return (
     <div style={{ display: "flex", alignItems: "center", ...style }}>
-      <T size="body" color={t.colors.dim_fg}>
+      <T size="body" color={t.color.text.dim}>
         -
       </T>
     </div>

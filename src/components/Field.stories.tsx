@@ -1,18 +1,18 @@
 import { defineMeta } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import {
   Field,
-  FieldLabel,
+  FieldContent,
   FieldDescription,
   FieldError,
-  FieldContent,
-  FieldSet,
-  FieldLegend,
   FieldGroup,
-  FieldTitle,
+  FieldLabel,
+  FieldLegend,
   FieldSeparator,
+  FieldSet,
+  FieldTitle,
 } from "./Field";
 import { Entry } from "./Entry";
 import { Input } from "./Input";
@@ -121,7 +121,9 @@ export function disabled() {
           <FieldContent>
             <Entry value="Disabled value" disabled />
           </FieldContent>
-          <FieldDescription>Disabled fields stay visible but inert.</FieldDescription>
+          <FieldDescription>
+            Disabled fields stay visible but inert.
+          </FieldDescription>
         </Field>
       </Labeled>
     </Column>
@@ -142,7 +144,7 @@ export function withLeadingIcon() {
               type="email"
               placeholder="you@example.com"
               leading={
-                <Icon name="user" size={16} color={t.colors.dim_fg} />
+                <Icon name="person" size={16} color={t.color.text.dim} />
               }
             />
           </FieldContent>

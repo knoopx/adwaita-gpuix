@@ -1,6 +1,13 @@
 import { useState } from "react";
-import type { StyleDesc, EventPayload } from "@gpuix/react";
-import { useAdwaita } from "../theme/adwaita";
+import { type EventPayload, type StyleDesc } from "@gpuix/react";
+import {
+  type AdwaitaTheme,
+  hexToRgba,
+  isDarkScheme,
+  shade,
+  useAdwaita,
+} from "../theme/adwaita";
+import { disabledStyle } from "./disabled.ts";
 
 export interface SliderProps {
   value?: number | number[];
@@ -19,17 +26,199 @@ export interface SliderProps {
   style?: Partial<StyleDesc>;
 }
 
-const CROSS = 20;
+interface DragState {
+  startCoord: number;
+  startValue: number;
+  thumbIndex: number;
+}
 
-const TRACK = 4;
+function clampTo(min: number, max: number, n: number): number {
+  return Math.max(min, Math.min(max, n));
+}
 
-const THUMB = 18;
+function snapTo(min: number, max: number, step: number, n: number): number {
+  return clampTo(min, max, Math.round(n / step) * step);
+}
 
-const THUMB_DOT = 6;
+function pctOf(min: number, max: number, trackSize: number, v: number): number {
+  return ((v - min) / (max - min)) * trackSize;
+}
 
-const TRACK_OFFSET = (CROSS - TRACK) / 2;
+function knobAlongOf(p: number, span: number, trackSize: number): number {
+  return Math.max(0, Math.min(trackSize - span, Math.round(p) - span / 2));
+}
 
-const THUMB_OFFSET = (CROSS - THUMB) / 2;
+function valuesOf(current: number | number[]): number[] {
+  return Array.isArray(current)
+    ? [...current].sort((a, b) => a - b)
+    : [current as number];
+}
+
+function nearestThumb(
+  values: number[],
+  coord: number,
+  vertical: boolean,
+  pct: (v: number) => number,
+  trackSize: number,
+): number {
+  let nearest = 0;
+  let nearestDist = Infinity;
+  values.forEach((v, i) => {
+    const thumbCoord = vertical ? trackSize - pct(v) : pct(v);
+    const dist = Math.abs(coord - thumbCoord);
+    if (dist < nearestDist) {
+      nearestDist = dist;
+      nearest = i;
+    }
+  });
+  return nearest;
+}
+
+function clampAgainstNeighbours(
+  values: number[],
+  index: number,
+  next: number,
+): number {
+  if (values.length < 2) return next;
+  if (index === 0) return Math.min(next, values[1]);
+  if (index === values.length - 1) return Math.max(next, values[0]);
+  return next;
+}
+
+function sliderStep(key: string | undefined, vertical: boolean): number {
+  if (key === "ArrowLeft") return -1;
+  if (key === "ArrowRight") return 1;
+  if (!vertical) return 0;
+  if (key === "ArrowUp") return 1;
+  if (key === "ArrowDown") return -1;
+  return 0;
+}
+
+function fillRange(pcts: number[]): { start: number; end: number } {
+  const single = pcts.length === 1;
+  const start = single ? 0 : pcts[0];
+  const end = single ? pcts[0] : pcts[pcts.length - 1];
+  return { start, end };
+}
+
+function containerStyle(args: {
+  t: AdwaitaTheme;
+  vertical: boolean;
+  trackSize: number;
+  disabled?: boolean;
+  style?: Partial<StyleDesc>;
+}): Partial<StyleDesc> {
+  const { t, vertical, trackSize, disabled, style } = args;
+  return {
+    position: "relative",
+    display: "flex",
+    ...(vertical
+      ? {
+          width: t.control.sliderKnobHeight + t.control.sliderPadding * 2,
+          height: trackSize,
+        }
+      : {
+          width: trackSize,
+          height: t.control.sliderKnobHeight + t.control.sliderPadding * 2,
+        }),
+    ...disabledStyle(disabled, {
+      cursor: vertical ? "row-resize" : "grab",
+    }),
+    ...style,
+  };
+}
+
+function trackLineStyle(args: {
+  t: AdwaitaTheme;
+  vertical: boolean;
+  trackSize: number;
+  trackOffset: number;
+}): Partial<StyleDesc> {
+  const { t, vertical, trackSize, trackOffset } = args;
+  const track = t.control.sliderTroughHeight;
+  const base: Partial<StyleDesc> = {
+    position: "absolute",
+    borderRadius: track / 2,
+    backgroundColor: t.color.surface.sunken,
+    pointerEvents: "none",
+  };
+  return vertical
+    ? { ...base, left: trackOffset, top: 0, width: track, height: trackSize }
+    : {
+        ...base,
+        top: trackOffset,
+        left: 0,
+        width: trackSize,
+        height: track,
+        hover: {
+          backgroundColor: t.color.surface.hover,
+        },
+      };
+}
+
+function fillStyle(args: {
+  t: AdwaitaTheme;
+  vertical: boolean;
+  trackOffset: number;
+  fillStart: number;
+  fillSpan: number;
+}): Partial<StyleDesc> {
+  const { t, vertical, trackOffset, fillStart, fillSpan } = args;
+  const track = t.control.sliderTroughHeight;
+  const base: Partial<StyleDesc> = {
+    position: "absolute",
+    borderRadius: track / 2,
+    backgroundColor: t.color.accent.base,
+    pointerEvents: "none",
+  };
+  return vertical
+    ? { ...base, left: trackOffset, bottom: 0, width: track, height: fillSpan }
+    : {
+        ...base,
+        top: trackOffset,
+        left: fillStart,
+        width: fillSpan,
+        height: track,
+      };
+}
+
+function knobStyle(args: {
+  t: AdwaitaTheme;
+  vertical: boolean;
+  cross: number;
+  knobOffset: number;
+  trackSize: number;
+  along: number;
+}): Partial<StyleDesc> {
+  const { t, vertical, cross, knobOffset, trackSize, along } = args;
+  const knobW = t.control.sliderKnobWidth;
+  const knobH = t.control.sliderKnobHeight;
+  const base: Partial<StyleDesc> = {
+    position: "absolute",
+    width: knobW,
+    height: knobH,
+    borderRadius: knobH / 2,
+    backgroundColor: t.color.surface.raised,
+
+    borderWidth: 1,
+    borderColor: t.color.divider.default,
+    boxShadow: {
+      offsetX: 0,
+      offsetY: 1,
+      blurRadius: 4,
+      spreadRadius: 0,
+      color: hexToRgba(
+        t.color.text.primary,
+        isDarkScheme(t.scheme) ? 0.4 : 0.18,
+      ),
+    },
+    hover: { backgroundColor: t.color.surface.raised },
+    pointerEvents: "none",
+  };
+  return vertical
+    ? { ...base, left: (cross - knobW) / 2, top: trackSize - along - knobH }
+    : { ...base, top: knobOffset, left: along };
+}
 
 export function Slider({
   value,
@@ -45,8 +234,14 @@ export function Slider({
   style,
 }: SliderProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const vertical = orientation === "vertical";
+
+  const cross = t.control.sliderKnobHeight + t.control.sliderPadding * 2;
+  const track = t.control.sliderTroughHeight;
+  const knobW = t.control.sliderKnobWidth;
+  const knobH = t.control.sliderKnobHeight;
+  const trackOffset = (cross - track) / 2;
+  const knobOffset = (cross - knobH) / 2;
   const trackSize = vertical ? height : width;
 
   const [internal, setInternal] = useState<number | number[]>(
@@ -54,23 +249,17 @@ export function Slider({
   );
   const current = value ?? internal;
   const isMulti = Array.isArray(current);
-  const values = isMulti
-    ? [...(current as number[])].sort((a, b) => a - b)
-    : [current as number];
+  const values = valuesOf(current);
 
-  const clamp = (n: number) => Math.max(min, Math.min(max, n));
-  const snap = (n: number) => clamp(Math.round(n / step) * step);
+  const clamp = (n: number) => clampTo(min, max, n);
+  const snap = (n: number) => snapTo(min, max, step, n);
+  const pct = (v: number) => pctOf(min, max, trackSize, v);
 
   const emit = (next: number | number[]) => {
     if (value === undefined) setInternal(next);
     onValueChange?.(next);
   };
 
-  interface DragState {
-    startCoord: number;
-    startValue: number;
-    thumbIndex: number;
-  }
   const [drag, setDrag] = useState<DragState | null>(null);
 
   const coordOf = (event: EventPayload) =>
@@ -78,43 +267,26 @@ export function Slider({
 
   const startDrag = (event: EventPayload) => {
     if (disabled) return;
-    
-    
-    
-    
     const coord = coordOf(event);
-    
-    let nearest = 0;
-    let nearestDist = Infinity;
-    values.forEach((v, i) => {
-      const thumbCoord = vertical ? trackSize - pct(v) : pct(v);
-      const d = Math.abs(coord - thumbCoord);
-      if (d < nearestDist) {
-        nearestDist = d;
-        nearest = i;
-      }
+    const thumbIndex = nearestThumb(values, coord, vertical, pct, trackSize);
+    setDrag({
+      startCoord: coord,
+      startValue: values[thumbIndex],
+      thumbIndex,
     });
-    setDrag({ startCoord: coord, startValue: values[nearest], thumbIndex: nearest });
   };
 
   const moveDrag = (event: EventPayload) => {
     if (!drag || disabled) return;
     const coord = coordOf(event);
-    
-    const delta = (
-      (vertical ? drag.startCoord - coord : coord - drag.startCoord) /
-      trackSize
-    ) *
+    const delta =
+      ((vertical ? drag.startCoord - coord : coord - drag.startCoord) /
+        trackSize) *
       (max - min);
-    let next = snap(drag.startValue + delta);
+    const next = snap(drag.startValue + delta);
     if (isMulti) {
-      
-      if (drag.thumbIndex === 0 && values.length > 1) {
-        next = Math.min(next, values[1]);
-      } else if (drag.thumbIndex === values.length - 1 && values.length > 1) {
-        next = Math.max(next, values[0]);
-      }
-      emit(values.map((v, i) => (i === drag.thumbIndex ? next : v)));
+      const clamped = clampAgainstNeighbours(values, drag.thumbIndex, next);
+      emit(values.map((v, i) => (i === drag.thumbIndex ? clamped : v)));
     } else {
       emit(next);
     }
@@ -124,12 +296,7 @@ export function Slider({
 
   const onKeyDown = (event: EventPayload) => {
     if (disabled) return;
-    const dir =
-      event.key === "ArrowLeft" || (vertical && event.key === "ArrowDown")
-        ? -1
-        : event.key === "ArrowRight" || (vertical && event.key === "ArrowUp")
-          ? 1
-          : 0;
+    const dir = sliderStep(event.key, vertical);
     if (dir === 0) return;
     if (isMulti) {
       const arr = values as number[];
@@ -139,89 +306,9 @@ export function Slider({
     }
   };
 
-  const pct = (v: number) => ((v - min) / (max - min)) * trackSize;
-  const firstPct = Math.round(pct(values[0]));
-  const lastPct = Math.round(pct(values[values.length - 1]));
-  const isSingle = values.length === 1;
-  const fillStart = isSingle ? 0 : firstPct;
-  const fillEnd = isSingle ? firstPct : lastPct;
-  const fillSpan = fillEnd - fillStart;
-
-  const containerStyle: Partial<StyleDesc> = {
-    position: "relative",
-    display: "flex",
-    ...(vertical
-      ? { width: CROSS, height: trackSize }
-      : { width: trackSize, height: CROSS }),
-    cursor: disabled ? "default" : vertical ? "row-resize" : "grab",
-    opacity: disabled ? 0.5 : 1,
-    ...style,
-  };
-
-  const trackLineStyle: Partial<StyleDesc> = vertical
-    ? {
-        position: "absolute",
-        left: TRACK_OFFSET,
-        top: 0,
-        width: TRACK,
-        height: trackSize,
-        borderRadius: TRACK / 2,
-        backgroundColor: colors.border,
-        pointerEvents: "none",
-      }
-    : {
-        position: "absolute",
-        top: TRACK_OFFSET,
-        left: 0,
-        width: trackSize,
-        height: TRACK,
-        borderRadius: TRACK / 2,
-        backgroundColor: colors.border,
-        pointerEvents: "none",
-      };
-
-  
-  
-  
-  const fillStyle: Partial<StyleDesc> = vertical
-    ? {
-        position: "absolute",
-        left: TRACK_OFFSET,
-        bottom: 0,
-        width: TRACK,
-        height: fillSpan,
-        borderRadius: TRACK / 2,
-        backgroundColor: colors.accent,
-        pointerEvents: "none",
-      }
-    : {
-        position: "absolute",
-        top: TRACK_OFFSET,
-        left: fillStart,
-        width: fillSpan,
-        height: TRACK,
-        borderRadius: TRACK / 2,
-        backgroundColor: colors.accent,
-        pointerEvents: "none",
-      };
-
-  const thumbStyle = (v: number): Partial<StyleDesc> => {
-    const p = Math.round(pct(v));
-    const base: Partial<StyleDesc> = {
-      position: "absolute",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: THUMB,
-      height: THUMB,
-      borderRadius: THUMB / 2,
-      backgroundColor: colors.accent,
-      pointerEvents: "none",
-    };
-    return vertical
-      ? { ...base, left: THUMB_OFFSET, top: trackSize - p - THUMB / 2 }
-      : { ...base, top: THUMB_OFFSET, left: p - THUMB / 2 };
-  };
+  const pcts = values.map((v) => Math.round(pct(v)));
+  const fill = fillRange(pcts);
+  const fillSpan = fill.end - fill.start;
 
   return (
     <div
@@ -230,22 +317,30 @@ export function Slider({
       onMouseUp={disabled ? undefined : endDrag}
       onKeyDown={onKeyDown}
       tabIndex={disabled ? -1 : 0}
-      style={containerStyle}
+      style={containerStyle({ t, vertical, trackSize, disabled, style })}
     >
-      <div style={trackLineStyle} />
-      <div style={fillStyle} />
+      <div style={trackLineStyle({ t, vertical, trackSize, trackOffset })} />
+      <div
+        style={fillStyle({
+          t,
+          vertical,
+          trackOffset,
+          fillStart: fill.start,
+          fillSpan,
+        })}
+      />
       {values.map((v, i) => (
-        <div key={i} style={thumbStyle(v)}>
-          <div
-            style={{
-              width: THUMB_DOT,
-              height: THUMB_DOT,
-              borderRadius: THUMB_DOT / 2,
-              backgroundColor: colors.accent_fg,
-              pointerEvents: "none",
-            }}
-          />
-        </div>
+        <div
+          key={i}
+          style={knobStyle({
+            t,
+            vertical,
+            cross,
+            knobOffset,
+            trackSize,
+            along: knobAlongOf(pct(v), vertical ? knobH : knobW, trackSize),
+          })}
+        />
       ))}
     </div>
   );

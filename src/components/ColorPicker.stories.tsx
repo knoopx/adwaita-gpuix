@@ -1,6 +1,6 @@
 import { defineMeta } from "storybook";
-import { Labeled } from "./common";
-import { Panel } from "./.storybook/story-helpers";
+import { Labeled } from "./text";
+import { Panel } from "../../.storybook/story-helpers";
 import { ColorPicker } from "./ColorPicker";
 
 export default defineMeta({
@@ -22,10 +22,7 @@ export function withValue() {
 export function empty() {
   return (
     <Panel>
-      <Labeled
-        caption="picker without value (placeholder)"
-        style={{ gap: 6 }}
-      >
+      <Labeled caption="picker without value (placeholder)" style={{ gap: 6 }}>
         <ColorPicker />
       </Labeled>
     </Panel>

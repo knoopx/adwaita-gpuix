@@ -1,8 +1,8 @@
 import { defineMeta, defineStory } from "storybook";
-import { useAdwaita } from "../theme/adwaita";
-import { Labeled, T } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import { Switch } from "./Switch";
+import { SettingGroup } from "../../.storybook/story-helpers";
 
 export default defineMeta({
   title: "Adwaita/Switch",
@@ -92,22 +92,8 @@ export const labelPositions = defineStory({
 });
 
 export function preferences() {
-  const t = useAdwaita();
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-        padding: 12,
-        borderRadius: t.radii.card,
-        borderWidth: 1,
-        borderColor: t.colors.border,
-      }}
-    >
-      <T size="caption" color={t.colors.dim_fg}>
-        Notifications
-      </T>
+    <SettingGroup caption="Notifications">
       <Switch checked label="Email" labelPosition="start" onChange={() => {}} />
       <Switch
         checked={false}
@@ -128,7 +114,7 @@ export function preferences() {
         labelPosition="start"
         onChange={() => {}}
       />
-    </div>
+    </SettingGroup>
   );
 }
 preferences.parameters = { width: 528, height: 240 };

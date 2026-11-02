@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { T } from "./common";
+import { T } from "./text";
 
 export interface FieldProps {
   children: ReactNode;
@@ -23,7 +23,7 @@ export function Field({
         display: "flex",
         flexDirection: horizontal ? "row" : "column",
         alignItems: horizontal ? "flex-start" : "stretch",
-        gap: t.spacing.gap,
+        gap: t.space.sm,
         ...style,
       }}
     >
@@ -40,7 +40,7 @@ export interface FieldLabelProps {
 export function FieldLabel({ children, style }: FieldLabelProps) {
   const t = useAdwaita();
   return (
-    <T size="body" color={t.colors.fg} style={style}>
+    <T size="body" color={t.color.text.primary} style={style}>
       {children}
     </T>
   );
@@ -54,7 +54,7 @@ export interface FieldDescriptionProps {
 export function FieldDescription({ children, style }: FieldDescriptionProps) {
   const t = useAdwaita();
   return (
-    <T size="caption" color={t.colors.dim_fg} style={style}>
+    <T size="caption" color={t.color.text.dim} style={style}>
       {children}
     </T>
   );
@@ -69,8 +69,6 @@ export interface FieldErrorProps {
 
 export function FieldError({ children, errors, style }: FieldErrorProps) {
   const t = useAdwaita();
-  const { colors } = t;
-
   let content: ReactNode = null;
   if (children) {
     content = children;
@@ -91,7 +89,7 @@ export function FieldError({ children, errors, style }: FieldErrorProps) {
           }}
         >
           {messages.map((m, i) => (
-            <T key={i} size="caption" color={colors.destructive}>
+            <T key={i} size="caption" color={t.color.functional.destructive}>
               {"• " + m}
             </T>
           ))}
@@ -105,7 +103,7 @@ export function FieldError({ children, errors, style }: FieldErrorProps) {
   return (
     <div style={style}>
       {typeof content === "string" ? (
-        <T size="caption" color={colors.destructive}>
+        <T size="caption" color={t.color.functional.destructive}>
           {content}
         </T>
       ) : (
@@ -159,8 +157,8 @@ export interface FieldLegendProps {
 export function FieldLegend({ children, style }: FieldLegendProps) {
   const t = useAdwaita();
   return (
-    <div style={{ marginBottom: t.spacing.paddingTight, ...style }}>
-      <T size="title4" weight={600} color={t.colors.fg}>
+    <div style={{ marginBottom: t.space.md, ...style }}>
+      <T size="title4" weight={600} color={t.color.text.primary}>
         {children}
       </T>
     </div>
@@ -190,7 +188,7 @@ export interface FieldTitleProps {
 export function FieldTitle({ children, style }: FieldTitleProps) {
   const t = useAdwaita();
   return (
-    <T size="body" weight={500} color={t.colors.fg} style={style}>
+    <T size="body" weight={500} color={t.color.text.primary} style={style}>
       {children}
     </T>
   );
@@ -203,24 +201,57 @@ export interface FieldSeparatorProps {
 
 export function FieldSeparator({ children, style }: FieldSeparatorProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        gap: t.spacing.gap,
+        gap: t.space.sm,
         ...style,
       }}
     >
-      <div style={{ flexGrow: 1, height: 1, backgroundColor: colors.border }} />
+      <div
+        style={{
+          flexGrow: 1,
+          height: 1,
+          backgroundColor: t.color.border.default,
+        }}
+      />
       {children ? (
-        <T size="caption" color={colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           {children}
         </T>
       ) : null}
-      <div style={{ flexGrow: 1, height: 1, backgroundColor: colors.border }} />
+      <div
+        style={{
+          flexGrow: 1,
+          height: 1,
+          backgroundColor: t.color.border.default,
+        }}
+      />
+    </div>
+  );
+}
+
+export function FieldSlot({
+  children,
+  style,
+}: {
+  children?: ReactNode;
+  style?: Partial<StyleDesc>;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        flexShrink: 0,
+        pointerEvents: "none",
+        ...style,
+      }}
+    >
+      {children}
     </div>
   );
 }

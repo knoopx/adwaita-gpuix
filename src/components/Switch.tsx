@@ -1,12 +1,12 @@
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import {
-  useAdwaita,
+  type AdwaitaTheme,
   hexToRgba,
   isDarkScheme,
-  shade,
-  type AdwaitaTheme,
+  useAdwaita,
 } from "../theme/adwaita";
-import { LabeledControl } from "./common";
+import { LabeledControl, accentFillInteractions } from "./checkable";
+import { isActivateKey } from "../lib/roving";
 
 export interface SwitchProps {
   checked: boolean;
@@ -17,13 +17,20 @@ export interface SwitchProps {
   style?: Partial<StyleDesc>;
 }
 
+function uncheckedTrackColor(t: AdwaitaTheme): string {
+  return t.color.surface.sunken;
+}
+
+function knobColor(t: AdwaitaTheme, checked: boolean): string {
+  return checked ? t.color.text.onAccent : t.color.text.primary;
+}
+
 function switchTrackStyle(
   t: AdwaitaTheme,
   checked: boolean,
   dimmed: boolean,
   style?: Partial<StyleDesc>,
 ): Partial<StyleDesc> {
-  const { colors, radii } = t;
   return {
     width: 44,
     height: 26,
@@ -32,24 +39,11 @@ function switchTrackStyle(
     alignItems: "center",
     justifyContent: checked ? "flex-end" : "flex-start",
     padding: 3,
-    borderRadius: radii.pill,
-    backgroundColor: checked ? colors.accent : colors.border,
+    borderRadius: t.radius.full,
+    backgroundColor: checked ? t.color.accent.base : uncheckedTrackColor(t),
     cursor: dimmed ? "not-allowed" : "pointer",
     opacity: dimmed ? 0.5 : 1,
-    ...(dimmed
-      ? {}
-      : {
-          hover: {
-            backgroundColor: checked
-              ? shade(colors.accent, -0.08)
-              : colors.accentTint,
-          },
-          active: {
-            backgroundColor: checked
-              ? shade(colors.accent, -0.18)
-              : hexToRgba(colors.accent, isDarkScheme(t.scheme) ? 0.3 : 0.2),
-          },
-        }),
+    ...(dimmed ? {} : accentFillInteractions(t, checked)),
     ...style,
   };
 }
@@ -63,8 +57,6 @@ export function Switch({
   style,
 }: SwitchProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
-
   const toggle = () => onChange(!checked);
 
   const track = (
@@ -75,7 +67,7 @@ export function Switch({
         disabled
           ? undefined
           : (event) => {
-              if (event.key === "Enter" || event.key === " ") toggle();
+              if (isActivateKey(event.key, { space: true })) toggle();
             }
       }
       style={switchTrackStyle(
@@ -89,8 +81,8 @@ export function Switch({
         style={{
           width: 20,
           height: 20,
-          borderRadius: radii.pill,
-          backgroundColor: colors.accent_fg,
+          borderRadius: t.radius.full,
+          backgroundColor: knobColor(t, checked),
           pointerEvents: "none",
         }}
       />

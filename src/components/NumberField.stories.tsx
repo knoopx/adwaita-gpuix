@@ -1,7 +1,7 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
-import { Field, FieldLabel, FieldDescription } from "./Field";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
+import { Field, FieldDescription, FieldLabel } from "./Field";
 import { NumberField } from "./NumberField";
 
 export default defineMeta({

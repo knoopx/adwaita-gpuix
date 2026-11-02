@@ -1,15 +1,10 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { AdwaitaInputBase } from "./common";
+import { AdwaitaInputBase } from "./input-base";
 
 export type EntryType =
-  | "text"
-  | "password"
-  | "email"
-  | "number"
-  | "search"
-  | "url";
+  "text" | "password" | "email" | "number" | "search" | "url";
 
 export interface EntryProps {
   value?: string;
@@ -19,6 +14,10 @@ export interface EntryProps {
   invalid?: boolean;
   leading?: ReactNode;
   trailing?: ReactNode;
+
+  surface?: "view" | "control";
+
+  focused?: boolean;
   onChange?: (value: string) => void;
   onSubmit?: () => void;
   autoFocus?: boolean;
@@ -34,6 +33,8 @@ export function Entry({
   invalid,
   leading,
   trailing,
+  surface,
+  focused,
   onChange,
   onSubmit,
   autoFocus,
@@ -54,9 +55,11 @@ export function Entry({
       mask={type === "password"}
       leading={leading}
       trailing={trailing}
+      {...(surface !== undefined ? { surface } : {})}
+      {...(focused !== undefined ? { focused } : {})}
       style={{
-        paddingLeft: t.spacing.paddingTight,
-        paddingRight: t.spacing.paddingTight,
+        paddingLeft: t.space.md,
+        paddingRight: t.space.md,
         ...style,
       }}
     />

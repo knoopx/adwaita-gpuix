@@ -1,6 +1,6 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import { ToggleGroup, type ToggleOption } from "./ToggleGroup";
 
 const OPTS: ToggleOption[] = [
@@ -11,14 +11,14 @@ const OPTS: ToggleOption[] = [
 
 const ICON_OPTS: ToggleOption[] = [
   { id: "list", icon: "list" },
-  { id: "grid", icon: "grid" },
-  { id: "panel", icon: "panel" },
+  { id: "grid", icon: "gridView" },
+  { id: "panel", icon: "viewSidebar" },
 ];
 
 const VERT_OPTS: ToggleOption[] = [
   { id: "list", icon: "list", label: "List" },
-  { id: "grid", icon: "grid", label: "Grid" },
-  { id: "panel", icon: "panel", label: "Panel" },
+  { id: "grid", icon: "gridView", label: "Grid" },
+  { id: "panel", icon: "viewSidebar", label: "Panel" },
 ];
 
 export default defineMeta({
@@ -49,12 +49,7 @@ export const sizes = defineStory({
   render: () => (
     <Column gap={16} align="center">
       <Labeled caption="sm (24)">
-        <ToggleGroup
-          options={OPTS}
-          size="sm"
-          value="day"
-          onChange={() => {}}
-        />
+        <ToggleGroup options={OPTS} size="sm" value="day" onChange={() => {}} />
       </Labeled>
       <Labeled caption="default (28)">
         <ToggleGroup options={OPTS} value="week" onChange={() => {}} />
@@ -75,11 +70,7 @@ export const selection = defineStory({
   render: () => (
     <Column gap={16} align="center">
       <Labeled caption="icon options">
-        <ToggleGroup
-          options={ICON_OPTS}
-          value="grid"
-          onChange={() => {}}
-        />
+        <ToggleGroup options={ICON_OPTS} value="grid" onChange={() => {}} />
       </Labeled>
       <Labeled caption="multiple (multi-select)">
         <ToggleGroup

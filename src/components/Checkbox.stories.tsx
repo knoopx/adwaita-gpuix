@@ -1,8 +1,8 @@
 import { defineMeta, defineStory } from "storybook";
-import { useAdwaita } from "../theme/adwaita";
-import { Labeled, T } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Row } from "./Box";
 import { Checkbox } from "./Checkbox";
+import { SettingGroup } from "../../.storybook/story-helpers";
 
 type CheckboxSpec = {
   caption: string;
@@ -84,7 +84,12 @@ export const withLabel = defineStory({
           checked: "indeterminate",
           label: "Indeterminate",
         },
-        { caption: "disabled", checked: true, disabled: true, label: "Disabled" },
+        {
+          caption: "disabled",
+          checked: true,
+          disabled: true,
+          label: "Disabled",
+        },
       ]}
     />
   ),
@@ -120,20 +125,8 @@ export const labelPositions = defineStory({
 });
 
 export function form() {
-  const t = useAdwaita();
   return (
-    <Column
-      gap={8}
-      padding={12}
-      style={{
-        borderRadius: t.radii.card,
-        borderWidth: 1,
-        borderColor: t.colors.border,
-      }}
-    >
-      <T size="caption" color={t.colors.dim_fg}>
-        Notifications
-      </T>
+    <SettingGroup caption="Notifications">
       <Checkbox checked onCheckedChange={() => {}} label="Email" />
       <Checkbox checked={false} onCheckedChange={() => {}} label="Push" />
       <Checkbox
@@ -141,13 +134,8 @@ export function form() {
         onCheckedChange={() => {}}
         label="Digest"
       />
-      <Checkbox
-        checked
-        disabled
-        onCheckedChange={() => {}}
-        label="Reminders"
-      />
-    </Column>
+      <Checkbox checked disabled onCheckedChange={() => {}} label="Reminders" />
+    </SettingGroup>
   );
 }
 form.parameters = { width: 528, height: 220 };

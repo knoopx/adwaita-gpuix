@@ -1,14 +1,46 @@
 import { useState } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled, T } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled, T } from "./text";
+import { Column, Row } from "./Box";
 import { Slider } from "./Slider";
 
 export default defineMeta({
   title: "Adwaita/Slider",
   component: Slider,
   parameters: { width: 528, height: 160 },
+});
+
+function ToolbarFloor() {
+  const t = useAdwaita();
+  return (
+    <Row gap={12}>
+      <T size="body" color={t.color.text.primary}>
+        Floor
+      </T>
+      <Slider
+        defaultValue={5000}
+        min={0}
+        max={25000}
+        step={250}
+        onValueChange={() => {}}
+        width={220}
+      />
+      <T size="body" color={t.color.text.dim}>
+        5000 EUR
+      </T>
+    </Row>
+  );
+}
+
+export const toolbar = defineStory({
+  render: () => (
+    <Column gap={16} align="center">
+      <Labeled caption="toolbar: label, slider, dim numeric read-out">
+        <ToolbarFloor />
+      </Labeled>
+    </Column>
+  ),
 });
 
 export const single = defineStory({
@@ -82,7 +114,7 @@ export function labels() {
   return (
     <Column gap={16} align="center">
       <Row gap={8} align="center">
-        <T size="body" color={t.colors.fg}>
+        <T size="body" color={t.color.text.primary}>
           Volume
         </T>
         <Column gap={4}>
@@ -92,15 +124,17 @@ export function labels() {
             width={260}
           />
           <Row justify="space-between" style={{ width: 260 }}>
-            <T size="caption" color={t.colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               0
             </T>
-            <T size="caption" color={t.colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               100
             </T>
           </Row>
         </Column>
-        <T size="body" color={t.colors.dim_fg}>{volume}</T>
+        <T size="body" color={t.color.text.dim}>
+          {volume}
+        </T>
       </Row>
     </Column>
   );

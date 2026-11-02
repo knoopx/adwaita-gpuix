@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { AdwaitaInputBase } from "./common";
+import { AdwaitaInputBase } from "./input-base";
 
 export type InputType =
   "text" | "password" | "email" | "number" | "search" | "url";
@@ -44,8 +44,8 @@ export function Input({
       leading={leading}
       trailing={trailing}
       style={{
-        paddingLeft: t.spacing.paddingTight,
-        paddingRight: t.spacing.paddingTight,
+        paddingLeft: t.space.md,
+        paddingRight: t.space.md,
         ...style,
       }}
     />

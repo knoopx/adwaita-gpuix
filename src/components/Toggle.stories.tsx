@@ -1,6 +1,6 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import { Toggle } from "./Toggle";
 
 export default defineMeta({
@@ -80,26 +80,36 @@ export const withIcon = defineStory({
     <Column gap={16} align="center">
       <Row gap={16} align="center">
         <Labeled caption="icon (unpressed)">
-          <Toggle pressed={false} icon="moon" onPressed={() => {}} />
+          <Toggle pressed={false} icon="bedtime" onPressed={() => {}} />
         </Labeled>
         <Labeled caption="icon (pressed)">
-          <Toggle pressed icon="moon" onPressed={() => {}} />
+          <Toggle pressed icon="bedtime" onPressed={() => {}} />
         </Labeled>
         <Labeled caption="icon (unpressed)">
-          <Toggle pressed={false} icon="bell" variant="outline" onPressed={() => {}} />
+          <Toggle
+            pressed={false}
+            icon="notifications"
+            variant="outline"
+            onPressed={() => {}}
+          />
         </Labeled>
         <Labeled caption="icon (pressed)">
-          <Toggle pressed icon="bell" variant="outline" onPressed={() => {}} />
+          <Toggle
+            pressed
+            icon="notifications"
+            variant="outline"
+            onPressed={() => {}}
+          />
         </Labeled>
       </Row>
       <Row gap={16} align="center">
         <Labeled caption="icon + label (unpressed)">
-          <Toggle pressed={false} icon="grid" onPressed={() => {}}>
+          <Toggle pressed={false} icon="gridView" onPressed={() => {}}>
             Grid
           </Toggle>
         </Labeled>
         <Labeled caption="icon + label (pressed)">
-          <Toggle pressed icon="grid" onPressed={() => {}}>
+          <Toggle pressed icon="gridView" onPressed={() => {}}>
             Grid
           </Toggle>
         </Labeled>
@@ -118,7 +128,13 @@ export const disabled = defineStory({
         </Toggle>
       </Labeled>
       <Labeled caption="disabled (pressed)">
-        <Toggle pressed disabled icon="moon" variant="outline" onPressed={() => {}} />
+        <Toggle
+          pressed
+          disabled
+          icon="bedtime"
+          variant="outline"
+          onPressed={() => {}}
+        />
       </Labeled>
     </Row>
   ),

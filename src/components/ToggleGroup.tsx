@@ -1,8 +1,9 @@
 import { Fragment } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba, isDarkScheme } from "../theme/adwaita";
-import { SegmentedOptionCell } from "./common";
-import type { IconName } from "./icons";
+import { type StyleDesc } from "@gpuix/react";
+import { hexToRgba, isDarkScheme, useAdwaita } from "../theme/adwaita";
+import { Icon, type IconName } from "./icons";
+import { T, type TextSize } from "./text";
+import { isActivateKey } from "../lib/roving";
 
 export interface ToggleOption {
   id: string;
@@ -20,7 +21,6 @@ interface ToggleGroupBaseProps {
 
   direction?: ToggleGroupDirection;
 
-  
   spacing?: number;
 
   variant?: ToggleGroupVariant;
@@ -41,15 +41,8 @@ export type ToggleGroupProps =
       onChange: (ids: string[]) => void;
     });
 
-const SEG_MIN_HEIGHT: Record<ToggleGroupSize, number> = {
-  sm: 24,
-  default: 28,
-  lg: 36,
-};
-
 export function ToggleGroup(props: ToggleGroupProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing: sp } = t;
   const {
     options,
     direction = "horizontal",
@@ -59,10 +52,16 @@ export function ToggleGroup(props: ToggleGroupProps) {
     style,
   } = props;
   const vertical = direction === "vertical";
-  const itemRadius = vertical ? radii.button : radii.pill;
   const outline = variant === "outline";
-  const dark = isDarkScheme(t.scheme);
-  const minHeight = SEG_MIN_HEIGHT[size];
+  const segmentHeight: Record<ToggleGroupSize, number> = {
+    sm: t.control.toggleSegmentHeightSm,
+    default: t.control.viewSwitcherHeight - t.control.toggleGroupPadding * 2,
+    lg: t.control.toggleSegmentHeightLg,
+  };
+  const minHeight = segmentHeight[size];
+
+  const checkedBg = t.color.surface.raised;
+  const hoverBg = t.color.surface.hover;
 
   const active: string[] =
     props.multiple === true ? props.value : props.value ? [props.value] : [];
@@ -82,7 +81,7 @@ export function ToggleGroup(props: ToggleGroupProps) {
     <div
       style={{
         height: 1,
-        backgroundColor: colors.border,
+        backgroundColor: t.color.border.default,
         pointerEvents: "none",
       }}
     />
@@ -90,7 +89,7 @@ export function ToggleGroup(props: ToggleGroupProps) {
     <div
       style={{
         width: 1,
-        backgroundColor: colors.border,
+        backgroundColor: t.color.border.default,
         pointerEvents: "none",
       }}
     />
@@ -100,14 +99,15 @@ export function ToggleGroup(props: ToggleGroupProps) {
     <div
       style={{
         display: "flex",
-        flexDirection: vertical ? "column" : "row",
         alignItems: "stretch",
+        padding: t.control.toggleGroupPadding,
+        minHeight: t.control.viewSwitcherHeight,
+        borderRadius: t.radius.sm,
+        borderWidth: 0,
+        backgroundColor: t.color.surface.input,
+        flexDirection: vertical ? "column" : "row",
         gap: spacing,
-        padding: 2,
-        borderRadius: itemRadius,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: outline ? "transparent" : colors.button_bg,
+        ...(outline ? { backgroundColor: "transparent" } : {}),
         ...style,
       }}
     >
@@ -122,36 +122,38 @@ export function ToggleGroup(props: ToggleGroupProps) {
               tabIndex={disabled ? -1 : 0}
               onKeyDown={(event) => {
                 if (disabled) return;
-                if (event.key === "Enter" || event.key === " ") toggle(opt.id);
+                if (isActivateKey(event.key, { space: true })) toggle(opt.id);
               }}
               style={{
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
+                paddingLeft: t.control.toggleSegmentPaddingX,
+                paddingRight: t.control.toggleSegmentPaddingX,
+                borderRadius: Math.max(
+                  2,
+                  t.radius.sm - t.control.toggleGroupPadding,
+                ),
                 gap: 6,
                 minHeight,
-                paddingLeft: sp.paddingTight,
-                paddingRight: sp.paddingTight,
-                borderRadius: itemRadius,
-                backgroundColor: isActive ? colors.accentTint : "transparent",
+                backgroundColor: isActive ? checkedBg : "transparent",
                 opacity: disabled ? 0.5 : 1,
                 cursor: disabled ? "default" : "pointer",
                 ...(disabled
                   ? {}
                   : isActive
                     ? {
-                        hover: { backgroundColor: colors.accentTint },
+                        hover: { backgroundColor: checkedBg },
                         active: {
-                          backgroundColor: hexToRgba(
-                            colors.accent,
-                            dark ? 0.35 : 0.25,
-                          ),
+                          backgroundColor: t.color.surface.buttonActive,
                         },
                       }
                     : {
-                        hover: { backgroundColor: colors.button_hover },
-                        active: { backgroundColor: colors.button_active },
+                        hover: { backgroundColor: hoverBg },
+                        active: {
+                          backgroundColor: t.color.surface.buttonActive,
+                        },
                       }),
               }}
             >
@@ -168,8 +170,8 @@ export function ToggleGroup(props: ToggleGroupProps) {
                   active={isActive}
                   icon={opt.icon}
                   label={opt.label}
-                  iconActiveColor={colors.accent}
-                  labelActiveColor={colors.accent}
+                  iconActiveColor={t.color.text.primary}
+                  labelActiveColor={t.color.text.primary}
                 />
               </div>
             </div>
@@ -177,5 +179,51 @@ export function ToggleGroup(props: ToggleGroupProps) {
         );
       })}
     </div>
+  );
+}
+
+export interface SegmentedOptionCellProps {
+  active: boolean;
+  icon?: IconName;
+  iconSize?: number;
+  iconActiveColor?: string;
+  label?: string;
+  labelActiveColor?: string;
+  labelSize?: TextSize;
+  style?: Partial<StyleDesc>;
+}
+
+export function SegmentedOptionCell({
+  active,
+  icon,
+  iconSize = 16,
+  iconActiveColor,
+  label,
+  labelActiveColor,
+  labelSize = "body",
+  style,
+}: SegmentedOptionCellProps) {
+  const t = useAdwaita();
+  const fg = t.color.text.primary;
+  return (
+    <>
+      {icon ? (
+        <Icon
+          name={icon}
+          size={iconSize}
+          color={active ? (iconActiveColor ?? fg) : fg}
+        />
+      ) : null}
+      {label ? (
+        <T
+          size={labelSize}
+          weight={active ? 600 : 400}
+          color={active ? (labelActiveColor ?? fg) : fg}
+          style={style}
+        >
+          {label}
+        </T>
+      ) : null}
+    </>
   );
 }
