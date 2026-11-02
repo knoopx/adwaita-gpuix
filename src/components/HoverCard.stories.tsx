@@ -1,15 +1,12 @@
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { T, Labeled } from "./common";
+import { Labeled, T } from "./text";
 import { Row } from "./Box";
-import {
-  HoverCard,
-  HoverCardTrigger,
-  HoverCardContent,
-} from "./HoverCard";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "./HoverCard";
 import { Button } from "./Button";
 import { Icon } from "./icons";
-import { LabeledStage, SidesShowcase } from "./.storybook/story-helpers";
+import { LabeledStage, SidesShowcase } from "../../.storybook/story-helpers";
 
 function SideHoverCard({
   side,
@@ -41,12 +38,12 @@ function HoverCardRichBody() {
         alignItems: "center",
       }}
     >
-      <Icon name="user" size={20} color={t.colors.dim_fg} />
+      <Icon name="person" size={20} color={t.color.text.dim} />
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <T size="body" weight={600}>
           Ada Lovelace
         </T>
-        <T size="caption" color={t.colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           Hover card with icon + title + text.
         </T>
       </div>
@@ -55,14 +52,13 @@ function HoverCardRichBody() {
 }
 
 const PREVIEW_ROWS = [
-  { icon: "clock" as const, label: "Edited", value: "2h ago" },
-  { icon: "user" as const, label: "Owner", value: "Ada" },
-  { icon: "fileText" as const, label: "Size", value: "1.2 MB" },
+  { icon: "schedule" as const, label: "Edited", value: "2h ago" },
+  { icon: "person" as const, label: "Owner", value: "Ada" },
+  { icon: "article" as const, label: "Size", value: "1.2 MB" },
 ];
 
 function PreviewListBody() {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <div
@@ -77,10 +73,10 @@ function PreviewListBody() {
           style={{
             width: 40,
             height: 40,
-            borderRadius: radii.button,
+            borderRadius: t.radius.sm,
             borderWidth: 1,
-            borderColor: colors.border,
-            backgroundColor: colors.button_bg,
+            borderColor: t.color.border.default,
+            backgroundColor: t.color.surface.button,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -88,13 +84,13 @@ function PreviewListBody() {
             pointerEvents: "none",
           }}
         >
-          <Icon name="image" size={18} color={colors.dim_fg} />
+          <Icon name="image" size={18} color={t.color.text.dim} />
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <T size="body" weight={600}>
             Quarterly report
           </T>
-          <T size="caption" color={colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             PDF preview with metadata.
           </T>
         </div>
@@ -113,12 +109,12 @@ function PreviewListBody() {
             <Icon
               name={row.icon}
               size={14}
-              color={colors.dim_fg}
+              color={t.color.text.dim}
               style={{ pointerEvents: "none" }}
             />
             <T size="caption">{row.label}</T>
             <div style={{ flexGrow: 1 }} />
-            <T size="caption" color={colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               {row.value}
             </T>
           </div>
@@ -156,53 +152,47 @@ export const openSides = defineStory({
     <SidesShowcase
       caption="open · sides (side prop, anchored to the trigger)"
       Side={SideHoverCard}
-      texts={[
-        "Above the trigger",
-        "Right of the trigger",
-        "Below the trigger",
-        "Left of the trigger",
-      ]}
-      stage={{ width: 480, height: 120 }}
     />
   ),
 });
 
-export const richContent = defineStory({
-  render: () => (
-    <LabeledStage
-      caption="open · icon + title + text"
-      width={480}
-      height={180}
-      center
-    >
+function OpenHoverCard({
+  caption,
+  height,
+  body,
+}: {
+  caption: string;
+  height: number;
+  body: ReactNode;
+}) {
+  return (
+    <LabeledStage caption={caption} width={480} height={height} center>
       <HoverCard open={true} onOpenChange={() => {}}>
         <HoverCardTrigger>
           <Button label="Hover card" onClick={() => {}} />
         </HoverCardTrigger>
-        <HoverCardContent>
-          <HoverCardRichBody />
-        </HoverCardContent>
+        <HoverCardContent>{body}</HoverCardContent>
       </HoverCard>
     </LabeledStage>
+  );
+}
+
+export const richContent = defineStory({
+  render: () => (
+    <OpenHoverCard
+      caption="open · icon + title + text"
+      height={180}
+      body={<HoverCardRichBody />}
+    />
   ),
 });
 
 export const listPreview = defineStory({
   render: () => (
-    <LabeledStage
+    <OpenHoverCard
       caption="open · rich content (image placeholder + list)"
-      width={480}
       height={260}
-      center
-    >
-      <HoverCard open={true} onOpenChange={() => {}}>
-        <HoverCardTrigger>
-          <Button label="Hover card" onClick={() => {}} />
-        </HoverCardTrigger>
-        <HoverCardContent>
-          <PreviewListBody />
-        </HoverCardContent>
-      </HoverCard>
-    </LabeledStage>
+      body={<PreviewListBody />}
+    />
   ),
 });

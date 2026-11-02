@@ -1,27 +1,27 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
-import { useAdwaita } from "../theme/adwaita";
-import { T, Labeled } from "./common";
+import { Labeled, T } from "./text";
 import { Column } from "./Box";
 import { Button } from "./Button";
-import { Entry } from "./Entry";
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
   DrawerDescription,
   DrawerFooter,
-  DrawerClose,
+  DrawerHeader,
   DrawerShowcase,
   type DrawerSide,
+  DrawerTitle,
 } from "./Drawer";
 import {
-  PanelStage,
+  bottomPanelStory,
   PanelBody,
+  PanelFormBody,
   PanelList,
+  PanelStage,
   noop,
-} from "./.storybook/story-helpers";
+} from "../../.storybook/story-helpers";
 
 function DrawerPanel({
   side,
@@ -117,7 +117,6 @@ export const withFooter = defineStory({
 });
 
 export function form() {
-  const t = useAdwaita();
   return (
     <Labeled caption="form drawer — inputs inside the panel">
       <PanelStage height={280}>
@@ -127,16 +126,7 @@ export function form() {
               <DrawerTitle>New item</DrawerTitle>
               <DrawerClose />
             </DrawerHeader>
-            <PanelBody>
-              <T size="caption" color={t.colors.dim_fg}>
-                Name
-              </T>
-              <Entry placeholder="Item name" />
-              <T size="caption" color={t.colors.dim_fg}>
-                Email
-              </T>
-              <Entry placeholder="name@example.com" type="email" />
-            </PanelBody>
+            <PanelFormBody />
             <DrawerFooter>
               <Button label="Cancel" onClick={noop} />
               <Button variant="suggested" label="Create" onClick={noop} />
@@ -173,9 +163,9 @@ list.parameters = { width: 528, height: 400 };
 
 export const bottomSheet = defineStory({
   parameters: { width: 528, height: 280 },
-  render: () => (
-    <Labeled caption="bottom drawer — grab handle above the panel content">
-      <DrawerPanel side="bottom" title="Bottom drawer" height={200} />
-    </Labeled>
-  ),
+  render: () =>
+    bottomPanelStory(DrawerPanel, {
+      caption: "bottom drawer — grab handle above the panel content",
+      title: "Bottom drawer",
+    }),
 });

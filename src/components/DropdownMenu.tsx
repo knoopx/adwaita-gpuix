@@ -1,21 +1,20 @@
-import { createContext, useContext, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode, createContext, useContext } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import {
-  FloatingPanel,
-  MenuRow,
-  MenuLabel,
-  MenuSeparator,
-  MenuIndicator,
-  MenuShortcut,
-  MenuGroup,
-  MenuRadioGroupShell,
-  MenuSub,
-  MenuSubTrigger,
-  MenuSubContent,
-  makeMenuRadioItem,
-  MenuItemRow,
-} from "./common";
-import { type IconName } from "./icons";
+  makeMenuParts,
+  type MenuContentPartProps,
+  type MenuGroupProps,
+  type MenuItemPartProps,
+  type MenuLabelPartProps,
+  type MenuRadioGroupPartProps,
+  type MenuRadioItemPartProps,
+  type MenuSeparatorPartProps,
+  type MenuShortcutPartProps,
+  type MenuSubContentPartProps,
+  type MenuSubPartProps,
+  type MenuSubTriggerPartProps,
+  type MenuCheckboxItemPartProps,
+} from "./menu-parts";
 
 export interface DropdownMenuProps {
   open: boolean;
@@ -28,85 +27,29 @@ export interface DropdownMenuTriggerProps {
   style?: Partial<StyleDesc>;
 }
 
-export interface DropdownMenuContentProps {
-  children?: ReactNode;
-  side?: "top" | "right" | "bottom" | "left";
-  sideOffset?: number;
-  style?: Partial<StyleDesc>;
-}
+export type DropdownMenuContentProps = Omit<MenuContentPartProps, "maxHeight">;
 
-export interface DropdownMenuItemProps {
-  label: string;
-  icon?: IconName;
-  onClick?: () => void;
-  disabled?: boolean;
+export type DropdownMenuItemProps = MenuItemPartProps;
 
-  inset?: boolean;
+export type DropdownMenuLabelProps = MenuLabelPartProps;
 
-  variant?: "default" | "destructive";
+export type DropdownMenuSeparatorProps = MenuSeparatorPartProps;
 
-  shortcut?: string;
-  style?: Partial<StyleDesc>;
-}
+export type DropdownMenuGroupProps = MenuGroupProps;
 
-export interface DropdownMenuLabelProps {
-  children: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type DropdownMenuCheckboxItemProps = MenuCheckboxItemPartProps;
 
-export interface DropdownMenuSeparatorProps {
-  style?: Partial<StyleDesc>;
-}
+export type DropdownMenuRadioItemProps = MenuRadioItemPartProps;
 
-export interface DropdownMenuGroupProps {
-  children?: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type DropdownMenuRadioGroupProps = MenuRadioGroupPartProps;
 
-export interface DropdownMenuCheckboxItemProps {
-  label: string;
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-  style?: Partial<StyleDesc>;
-}
+export type DropdownMenuShortcutProps = MenuShortcutPartProps;
 
-export interface DropdownMenuRadioItemProps {
-  label: string;
-  value?: string;
-  selected?: boolean;
-  onSelect?: () => void;
-  style?: Partial<StyleDesc>;
-}
+export type DropdownMenuSubProps = MenuSubPartProps;
 
-export interface DropdownMenuRadioGroupProps {
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  children?: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type DropdownMenuSubTriggerProps = MenuSubTriggerPartProps;
 
-export interface DropdownMenuShortcutProps {
-  children: ReactNode;
-  style?: Partial<StyleDesc>;
-}
-
-export interface DropdownMenuSubProps {
-  children?: ReactNode;
-  defaultOpen?: boolean;
-  style?: Partial<StyleDesc>;
-}
-
-export interface DropdownMenuSubTriggerProps {
-  label: string;
-  icon?: IconName;
-  style?: Partial<StyleDesc>;
-}
-
-export interface DropdownMenuSubContentProps {
-  children?: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type DropdownMenuSubContentProps = MenuSubContentPartProps;
 
 interface DropdownMenuContext {
   open: boolean;
@@ -123,6 +66,8 @@ function useDropdownMenu(): DropdownMenuContext {
     );
   return ctx;
 }
+
+const menuParts = makeMenuParts(useDropdownMenu, { panelMinWidth: 180 });
 
 export function DropdownMenu({
   open,
@@ -155,139 +100,26 @@ export function DropdownMenuTrigger({
   );
 }
 
-export function DropdownMenuContent({
-  children,
-  side = "bottom",
-  sideOffset = 4,
-  style,
-}: DropdownMenuContentProps) {
-  const { open } = useDropdownMenu();
+export const DropdownMenuContent = menuParts.Content;
 
-  if (!open) return null;
+export const DropdownMenuItem = menuParts.Item;
 
-  return (
-    <FloatingPanel
-      side={side}
-      sideOffset={sideOffset}
-      minWidth={180}
-      style={style}
-    >
-      {children}
-    </FloatingPanel>
-  );
-}
+export const DropdownMenuLabel = menuParts.Label;
 
-export function DropdownMenuItem({
-  label,
-  icon,
-  onClick,
-  disabled,
-  inset,
-  variant,
-  shortcut,
-  style,
-}: DropdownMenuItemProps) {
-  const { onOpenChange } = useDropdownMenu();
-  return (
-    <MenuItemRow
-      label={label}
-      icon={icon}
-      onClick={onClick}
-      onOpenChange={onOpenChange}
-      disabled={disabled}
-      variant={variant}
-      shortcut={shortcut}
-      style={{ ...(inset ? { paddingLeft: 32 } : {}), ...style }}
-    />
-  );
-}
+export const DropdownMenuSeparator = menuParts.Separator;
 
-export function DropdownMenuLabel({ children, style }: DropdownMenuLabelProps) {
-  return <MenuLabel style={style}>{children}</MenuLabel>;
-}
+export const DropdownMenuGroup = menuParts.Group;
 
-export function DropdownMenuSeparator({ style }: DropdownMenuSeparatorProps) {
-  return <MenuSeparator style={style} />;
-}
+export const DropdownMenuCheckboxItem = menuParts.CheckboxItem;
 
-export function DropdownMenuGroup({ children, style }: DropdownMenuGroupProps) {
-  return <MenuGroup style={style}>{children}</MenuGroup>;
-}
+export const DropdownMenuRadioItem = menuParts.RadioItem;
 
-export function DropdownMenuCheckboxItem({
-  label,
-  checked,
-  onCheckedChange,
-  style,
-}: DropdownMenuCheckboxItemProps) {
-  const { onOpenChange } = useDropdownMenu();
-  return (
-    <MenuRow
-      label={label}
-      onClick={() => {
-        onCheckedChange(!checked);
-        onOpenChange(false);
-      }}
-      leading={<MenuIndicator kind="checkbox" active={checked} />}
-      style={style}
-    />
-  );
-}
+export const DropdownMenuRadioGroup = menuParts.RadioGroup;
 
-const DropdownMenuRadioItemBase = makeMenuRadioItem(useDropdownMenu);
+export const DropdownMenuShortcut = menuParts.Shortcut;
 
-export function DropdownMenuRadioItem(props: DropdownMenuRadioItemProps) {
-  return <DropdownMenuRadioItemBase {...props} />;
-}
+export const DropdownMenuSub = menuParts.Sub;
 
-export function DropdownMenuRadioGroup({
-  value,
-  defaultValue,
-  onValueChange,
-  children,
-  style,
-}: DropdownMenuRadioGroupProps) {
-  return (
-    <MenuRadioGroupShell
-      value={value}
-      defaultValue={defaultValue}
-      onValueChange={onValueChange}
-      children={children}
-      style={style}
-    />
-  );
-}
+export const DropdownMenuSubTrigger = menuParts.SubTrigger;
 
-export function DropdownMenuShortcut({
-  children,
-  style,
-}: DropdownMenuShortcutProps) {
-  return <MenuShortcut style={style}>{children}</MenuShortcut>;
-}
-
-export function DropdownMenuSub({
-  children,
-  defaultOpen,
-  style,
-}: DropdownMenuSubProps) {
-  return (
-    <MenuSub defaultOpen={defaultOpen} style={style}>
-      {children}
-    </MenuSub>
-  );
-}
-
-export function DropdownMenuSubTrigger({
-  label,
-  icon,
-  style,
-}: DropdownMenuSubTriggerProps) {
-  return <MenuSubTrigger label={label} icon={icon} style={style} />;
-}
-
-export function DropdownMenuSubContent({
-  children,
-  style,
-}: DropdownMenuSubContentProps) {
-  return <MenuSubContent style={style}>{children}</MenuSubContent>;
-}
+export const DropdownMenuSubContent = menuParts.SubContent;

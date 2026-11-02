@@ -1,11 +1,9 @@
 import { useState } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import {
-  useAdwaita,
-  type AdwaitaColors,
-  type AdwaitaTheme,
-} from "../theme/adwaita";
-import { T, inputShellStyle, listPanelStyle } from "./common";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
+import { inputShellStyle } from "./input-base";
+import { listPanelStyle } from "./FloatingPanel";
 import { Icon } from "./icons";
 
 export type CalendarMode = "single" | "multiple" | "range";
@@ -165,26 +163,25 @@ function MonthNavButton({
   onClick: () => void;
 }) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       onClick={onClick}
       style={{
         width: 24,
         height: 24,
-        borderRadius: radii.button,
+        borderRadius: t.radius.sm,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         cursor: "pointer",
-        hover: { backgroundColor: colors.button_hover },
-        active: { backgroundColor: colors.button_active },
+        hover: { backgroundColor: t.color.surface.buttonHover },
+        active: { backgroundColor: t.color.surface.buttonActive },
       }}
     >
       <Icon
         name={direction === "left" ? "arrowLeft" : "arrowRight"}
         size={14}
-        color={colors.dim_fg}
+        color={t.color.text.dim}
       />
     </div>
   );
@@ -195,30 +192,30 @@ function dayCellTextColor(
   disabled: boolean,
   inMonth: boolean,
   isToday: boolean,
-  colors: AdwaitaColors,
+  t: AdwaitaTheme,
 ): string {
-  if (filled) return colors.accent_fg;
-  if (disabled) return colors.dim_fg;
-  if (!inMonth) return colors.dim_fg;
-  if (isToday) return colors.accent;
-  return colors.fg;
+  if (filled) return t.color.text.onAccent;
+  if (disabled) return t.color.text.dim;
+  if (!inMonth) return t.color.text.dim;
+  if (isToday) return t.color.accent.base;
+  return t.color.text.primary;
 }
 
 function dayCellBackground(
   filled: boolean,
   inRange: boolean,
-  colors: AdwaitaColors,
+  t: AdwaitaTheme,
 ): string {
-  if (filled) return colors.accent;
-  if (inRange) return colors.accentTint;
+  if (filled) return t.color.accent.base;
+  if (inRange) return t.color.accent.tint;
   return "transparent";
 }
 
 function dayCellHoverStyle(
   filled: boolean,
-  colors: AdwaitaColors,
+  t: AdwaitaTheme,
 ): Partial<StyleDesc> {
-  const bg = filled ? colors.accent : colors.accentTint;
+  const bg = filled ? t.color.accent.base : t.color.accent.tint;
   return {
     hover: { backgroundColor: bg },
     active: { backgroundColor: bg },
@@ -253,7 +250,6 @@ function DayCell({
   onPick: () => void;
 }) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   const isEndpoint = isRangeStart || isRangeEnd;
   const filled = isSelected || isEndpoint;
 
@@ -266,16 +262,16 @@ function DayCell({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: radii.button,
+        borderRadius: t.radius.sm,
         cursor: disabled ? "default" : "pointer",
         opacity: dayCellOpacity(disabled, inMonth),
-        backgroundColor: dayCellBackground(filled, inRange, colors),
-        ...(disabled ? {} : dayCellHoverStyle(filled, colors)),
+        backgroundColor: dayCellBackground(filled, inRange, t),
+        ...(disabled ? {} : dayCellHoverStyle(filled, t)),
       }}
     >
       <T
         size="body"
-        color={dayCellTextColor(filled, disabled, inMonth, isToday, colors)}
+        color={dayCellTextColor(filled, disabled, inMonth, isToday, t)}
         align="center"
       >
         {String(date.getDate())}
@@ -301,7 +297,6 @@ function PickerCell({
   onClick: () => void;
 }) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       onClick={onClick}
@@ -310,13 +305,17 @@ function PickerCell({
         display: "flex",
         justifyContent: "center",
         padding: 6,
-        borderRadius: radii.button,
+        borderRadius: t.radius.sm,
         cursor: "pointer",
-        backgroundColor: active ? colors.accentTint : "transparent",
-        hover: { backgroundColor: colors.accentTint },
+        backgroundColor: active ? t.color.accent.tint : "transparent",
+        hover: { backgroundColor: t.color.accent.tint },
       }}
     >
-      <T size="body" color={active ? colors.accent : colors.dim_fg} align="center">
+      <T
+        size="body"
+        color={active ? t.color.accent.base : t.color.text.dim}
+        align="center"
+      >
         {label}
       </T>
     </div>
@@ -332,8 +331,6 @@ function PickerPanel({
   width: number;
   items: PickerItem[];
 }) {
-  
-  
   const rows: PickerItem[][] = [];
   for (let i = 0; i < items.length; i += 2) rows.push(items.slice(i, i + 2));
   return (
@@ -451,10 +448,7 @@ export function Calendar({
   style,
 }: CalendarProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
-  const disabledKeys = new Set(
-    (disabledDates ?? []).map((d) => dayKey(d)),
-  );
+  const disabledKeys = new Set((disabledDates ?? []).map((d) => dayKey(d)));
   const [viewMonth, setViewMonth] = useState(
     () => monthProp ?? initialMonth(value) ?? new Date(),
   );
@@ -512,13 +506,12 @@ export function Calendar({
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: spacing.gap,
-        padding: spacing.paddingTight,
+        gap: t.space.sm,
+        padding: t.space.md,
         minWidth: 240,
-        borderRadius: radii.card,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderRadius: t.radius.sm,
+        borderWidth: 0,
+        backgroundColor: t.color.surface.card,
         ...style,
       }}
     >
@@ -554,7 +547,12 @@ export function Calendar({
             onClick={() => setPicker(picker === "month" ? null : "month")}
             style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
           >
-            <T size="title2" weight={600} color={colors.fg} align="center">
+            <T
+              size="title2"
+              weight={600}
+              color={t.color.text.primary}
+              align="center"
+            >
               {monthName}
             </T>
           </div>
@@ -562,7 +560,12 @@ export function Calendar({
             onClick={() => setPicker(picker === "year" ? null : "year")}
             style={{ cursor: "pointer", display: "flex", alignItems: "center" }}
           >
-            <T size="title2" weight={600} color={colors.fg} align="center">
+            <T
+              size="title2"
+              weight={600}
+              color={t.color.text.primary}
+              align="center"
+            >
               {year}
             </T>
           </div>
@@ -615,7 +618,7 @@ export function Calendar({
               padding: 4,
             }}
           >
-            <T size="caption" color={colors.dim_fg} align="center">
+            <T size="caption" color={t.color.text.dim} align="center">
               {day}
             </T>
           </div>
@@ -665,7 +668,6 @@ export function DatePicker({
   style,
 }: DatePickerProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const [localOpen, setLocalOpen] = useState(false);
   const isOpen = open ?? localOpen;
 
@@ -678,11 +680,11 @@ export function DatePicker({
         }}
         style={inputShellStyle(t, {
           cursor: "pointer",
-          hover: { backgroundColor: colors.button_hover },
+          hover: { backgroundColor: t.color.surface.buttonHover },
         })}
       >
-        <Icon name="clock" size={14} color={colors.dim_fg} />
-        <T size="body" color={value ? colors.fg : colors.dim_fg}>
+        <Icon name="schedule" size={14} color={t.color.text.dim} />
+        <T size="body" color={value ? t.color.text.primary : t.color.text.dim}>
           {value ? formatDate(value) : "Select a date…"}
         </T>
       </div>
@@ -703,4 +705,3 @@ export function DatePicker({
     </div>
   );
 }
-

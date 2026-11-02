@@ -1,41 +1,41 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled, T } from "./common";
+import { Labeled, T } from "./text";
 import { Row } from "./Box";
 import {
   ContextMenu,
-  ContextMenuTrigger,
-  ContextMenuContent,
-  ContextMenuLabel,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuGroup,
   ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuGroup,
+  ContextMenuItem,
+  ContextMenuLabel,
   ContextMenuRadioGroup,
   ContextMenuRadioItem,
+  ContextMenuSeparator,
   ContextMenuSub,
-  ContextMenuSubTrigger,
   ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
 } from "./ContextMenu";
-import { LabeledStage } from "./.storybook/story-helpers";
+import { LabeledStage } from "../../.storybook/story-helpers";
 
 function CtxMenuFull() {
   return (
     <ContextMenu open={true} onOpenChange={() => {}}>
       <ContextMenuContent>
         <ContextMenuLabel>Selection</ContextMenuLabel>
-        <ContextMenuItem label="Copy" icon="copy" shortcut="Ctrl+C" />
-        <ContextMenuItem label="Paste" icon="plus" shortcut="Ctrl+V" />
-        <ContextMenuItem label="Cut" icon="minus" shortcut="Ctrl+X" />
+        <ContextMenuItem label="Copy" icon="contentCopy" shortcut="Ctrl+C" />
+        <ContextMenuItem label="Paste" icon="add" shortcut="Ctrl+V" />
+        <ContextMenuItem label="Cut" icon="remove" shortcut="Ctrl+X" />
         <ContextMenuSeparator />
         <ContextMenuGroup>
           <ContextMenuItem
             label="Delete"
-            icon="trash"
+            icon="delete"
             variant="destructive"
             shortcut="Del"
           />
-          <ContextMenuItem label="Restore" icon="rotateCcw" disabled />
+          <ContextMenuItem label="Restore" icon="rotateLeft" disabled />
         </ContextMenuGroup>
         <ContextMenuSeparator />
         <ContextMenuCheckboxItem
@@ -71,7 +71,6 @@ export default defineMeta({
 
 export function triggerArea() {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <Row gap={16} align="center">
       <Labeled caption="trigger area (closed — right-click to open)">
@@ -80,10 +79,10 @@ export function triggerArea() {
             <div
               style={{
                 padding: 16,
-                borderRadius: radii.button,
-                borderColor: colors.border,
+                borderRadius: t.radius.sm,
+                borderColor: t.color.border.default,
                 borderWidth: 1,
-                backgroundColor: colors.button_bg,
+                backgroundColor: t.color.surface.button,
                 display: "flex",
                 alignItems: "center",
               }}

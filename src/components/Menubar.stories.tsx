@@ -1,22 +1,22 @@
 import { defineMeta, defineStory } from "storybook";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Column } from "./Box";
 import {
   Menubar,
-  MenubarMenu,
-  MenubarTrigger,
+  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarLabel,
-  MenubarSeparator,
-  MenubarCheckboxItem,
+  MenubarMenu,
   MenubarRadioGroup,
   MenubarRadioItem,
+  MenubarSeparator,
   MenubarSub,
-  MenubarSubTrigger,
   MenubarSubContent,
+  MenubarSubTrigger,
+  MenubarTrigger,
 } from "./Menubar";
 
 function ContentFrame({ children }: { children: ReactNode }) {
@@ -27,10 +27,10 @@ function ContentFrame({ children }: { children: ReactNode }) {
         display: "flex",
         flexDirection: "column",
         padding: 4,
-        borderRadius: t.radii.card,
+        borderRadius: t.radius.sm,
         borderWidth: 1,
-        borderColor: t.colors.border,
-        backgroundColor: t.colors.view_bg,
+        borderColor: t.color.border.default,
+        backgroundColor: t.color.surface.view,
       }}
     >
       {children}
@@ -42,7 +42,7 @@ function ViewTrigger() {
   return (
     <MenubarTrigger label="View">
       <MenubarContent>
-        <MenubarItem label="Zoom in" icon="plus" />
+        <MenubarItem label="Zoom in" icon="add" />
       </MenubarContent>
     </MenubarTrigger>
   );
@@ -71,20 +71,20 @@ export const bar = defineStory({
         <Menubar>
           <MenubarMenu label="File">
             <MenubarContent>
-              <MenubarItem label="New file" icon="plus" shortcut="Ctrl+N" />
+              <MenubarItem label="New file" icon="add" shortcut="Ctrl+N" />
               <MenubarItem label="Open" icon="folder" shortcut="Ctrl+O" />
             </MenubarContent>
           </MenubarMenu>
           <MenubarTrigger label="Edit">
             <MenubarContent>
-              <MenubarItem label="Cut" icon="minus" shortcut="Ctrl+X" />
-              <MenubarItem label="Copy" icon="copy" shortcut="Ctrl+C" />
+              <MenubarItem label="Cut" icon="remove" shortcut="Ctrl+X" />
+              <MenubarItem label="Copy" icon="contentCopy" shortcut="Ctrl+C" />
             </MenubarContent>
           </MenubarTrigger>
           <MenubarTrigger label="View">
             <MenubarContent>
-              <MenubarItem label="Zoom in" icon="plus" />
-              <MenubarItem label="Zoom out" icon="minus" />
+              <MenubarItem label="Zoom in" icon="add" />
+              <MenubarItem label="Zoom out" icon="remove" />
             </MenubarContent>
           </MenubarTrigger>
           <HelpTrigger />
@@ -101,18 +101,18 @@ export const openMenu = defineStory({
         <Menubar>
           <MenubarMenu label="File" defaultOpen>
             <MenubarContent>
-              <MenubarItem label="New file" icon="plus" shortcut="Ctrl+N" />
+              <MenubarItem label="New file" icon="add" shortcut="Ctrl+N" />
               <MenubarItem label="Open" icon="folder" shortcut="Ctrl+O" />
               <MenubarSeparator />
-              <MenubarItem label="Save" icon="copy" shortcut="Ctrl+S" />
-              <MenubarItem label="Delete" icon="trash" variant="destructive" />
+              <MenubarItem label="Save" icon="contentCopy" shortcut="Ctrl+S" />
+              <MenubarItem label="Delete" icon="delete" variant="destructive" />
               <MenubarSeparator />
               <MenubarItem label="Close" icon="close" />
             </MenubarContent>
           </MenubarMenu>
           <MenubarTrigger label="Edit">
             <MenubarContent>
-              <MenubarItem label="Cut" icon="minus" shortcut="Ctrl+X" />
+              <MenubarItem label="Cut" icon="remove" shortcut="Ctrl+X" />
             </MenubarContent>
           </MenubarTrigger>
           <ViewTrigger />
@@ -129,14 +129,18 @@ export const submenu = defineStory({
         <Menubar>
           <MenubarMenu label="View" defaultOpen>
             <MenubarContent>
-              <MenubarItem label="Zoom in" icon="plus" shortcut="Ctrl+Plus" />
-              <MenubarItem label="Zoom out" icon="minus" shortcut="Ctrl+Minus" />
+              <MenubarItem label="Zoom in" icon="add" shortcut="Ctrl+Plus" />
+              <MenubarItem
+                label="Zoom out"
+                icon="remove"
+                shortcut="Ctrl+Minus"
+              />
               <MenubarSeparator />
               <MenubarSub defaultOpen>
                 <MenubarSubTrigger label="Zoom" icon="chevronRight" />
                 <MenubarSubContent>
-                  <MenubarItem label="Zoom in" icon="plus" />
-                  <MenubarItem label="Zoom out" icon="minus" />
+                  <MenubarItem label="Zoom in" icon="add" />
+                  <MenubarItem label="Zoom out" icon="remove" />
                   <MenubarItem label="Reset zoom" />
                 </MenubarSubContent>
               </MenubarSub>
@@ -156,11 +160,11 @@ export const disabledItems = defineStory({
         <Menubar>
           <MenubarMenu label="Edit" defaultOpen>
             <MenubarContent>
-              <MenubarItem label="Cut" icon="minus" disabled />
-              <MenubarItem label="Copy" icon="copy" shortcut="Ctrl+C" />
+              <MenubarItem label="Cut" icon="remove" disabled />
+              <MenubarItem label="Copy" icon="contentCopy" shortcut="Ctrl+C" />
               <MenubarItem label="Paste" shortcut="Ctrl+V" disabled />
               <MenubarSeparator />
-              <MenubarItem label="Delete" icon="trash" variant="destructive" />
+              <MenubarItem label="Delete" icon="delete" variant="destructive" />
             </MenubarContent>
           </MenubarMenu>
           <ViewTrigger />
@@ -177,10 +181,10 @@ export const contentItemVariants = defineStory({
         <ContentFrame>
           <MenubarContent>
             <MenubarLabel>Editing</MenubarLabel>
-            <MenubarItem label="Cut" icon="minus" shortcut="Ctrl+X" />
-            <MenubarItem label="Copy" icon="copy" />
+            <MenubarItem label="Cut" icon="remove" shortcut="Ctrl+X" />
+            <MenubarItem label="Copy" icon="contentCopy" />
             <MenubarItem label="Indented row" icon="list" inset />
-            <MenubarItem label="Delete" icon="trash" variant="destructive" />
+            <MenubarItem label="Delete" icon="delete" variant="destructive" />
             <MenubarSeparator />
             <MenubarCheckboxItem
               label="Show hidden"

@@ -1,23 +1,25 @@
 import { type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { T, CloseButton, OverlayDescription } from "./common";
+import { T } from "./text";
+import { CloseButton, OverlayDescription } from "./overlay";
 import {
-  createPanelContext,
-  renderPanelShell,
-  makePanelTrigger,
-  makePanelClose,
-  makePanelHeader,
-  makePanelFooter,
-  PanelShowcase,
-  PanelShowcaseRow,
-  PanelShowcaseColumn,
-  PanelShowcaseSection,
-  PanelSideStages,
-  PanelShowcaseStage,
+  PANEL_SIDES,
   PaddedSection,
-  type PanelSide,
   type PanelRootProps,
+  PanelShowcase,
+  PanelShowcaseColumn,
+  PanelShowcaseRow,
+  PanelShowcaseSection,
+  PanelShowcaseStage,
+  type PanelSide,
+  PanelSideStages,
+  createPanelContext,
+  makePanelClose,
+  makePanelFooter,
+  makePanelHeader,
+  makePanelTrigger,
+  renderPanelShell,
 } from "./PanelBase";
 import { Button } from "./Button";
 
@@ -62,18 +64,17 @@ export interface SheetCloseProps {
   style?: Partial<StyleDesc>;
 }
 
-const { PanelCtx: SheetCtx, usePanel: useSheet } =
-  createPanelContext("Sheet");
+const { PanelCtx: SheetCtx, usePanel: useSheet } = createPanelContext("Sheet");
 
 export function Sheet({
   open,
   onOpenChange,
   side = "right",
   contained = false,
+  inset,
   children,
   style,
 }: SheetProps) {
-  const t = useAdwaita();
   const ctxValue = { open, onOpenChange, contained, side };
 
   return (
@@ -83,9 +84,9 @@ export function Sheet({
             onOpenChange,
             contained,
             side,
+            inset,
             children,
             style,
-            colors: t.colors,
           })
         : null}
     </SheetCtx.Provider>
@@ -117,8 +118,8 @@ export function SheetContent({
           onClick={() => onOpenChange(false)}
           style={{
             position: "absolute",
-            top: t.spacing.gap,
-            right: t.spacing.gap,
+            top: t.space.sm,
+            right: t.space.sm,
           }}
         />
       ) : null}
@@ -131,7 +132,7 @@ export const SheetHeader = makePanelHeader(useSheet);
 export function SheetTitle({ children, style }: SheetTitleProps) {
   const t = useAdwaita();
   return (
-    <T size="title3" weight={700} color={t.colors.fg} style={style}>
+    <T size="title3" weight={700} color={t.color.text.primary} style={style}>
       {children}
     </T>
   );
@@ -177,12 +178,7 @@ export function SheetShowcase(): ReactNode {
         </PanelShowcaseColumn>
       </PanelShowcaseRow>
       <PanelSideStages
-        stages={[
-          { side: "left", label: "side=left" },
-          { side: "right", label: "side=right" },
-          { side: "top", label: "side=top" },
-          { side: "bottom", label: "side=bottom" },
-        ]}
+        stages={PANEL_SIDES}
         renderPanel={(side) => (
           <Sheet open={true} onOpenChange={noop} side={side} contained>
             <SheetBody title={`${side} sheet`} />

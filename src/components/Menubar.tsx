@@ -1,23 +1,31 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode, useState } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
+import { MenuBarShell, MenuRow } from "./menu";
+import { FloatingPanel } from "./FloatingPanel";
+import { PANEL_SHADOW } from "./overlay";
+import { Icon } from "./icons";
 import {
-  MenuBarShell,
-  FloatingPanel,
-  MenuRow,
-  MenuLabel,
-  MenuSeparator,
-  MenuIndicator,
-  MenuShortcut,
-  MenuRadioGroupShell,
-  useMenuRadioGroup,
-  MenuRadioRow,
-  MenuSub,
-  MenuSubTrigger,
-  MenuSubContent,
-  destructiveRowProps,
-} from "./common";
-import { Icon, type IconName } from "./icons";
+  makeMenuParts,
+  type MenuGroupProps,
+  type MenuItemPartProps,
+  type MenuLabelPartProps,
+  type MenuRadioGroupPartProps,
+  type MenuRadioItemPartProps,
+  type MenuSeparatorPartProps,
+  type MenuShortcutPartProps,
+  type MenuSubContentPartProps,
+  type MenuSubPartProps,
+  type MenuSubTriggerPartProps,
+  type MenuCheckboxItemPartProps,
+} from "./menu-parts";
+
+const BAR_ROW: Partial<StyleDesc> = {
+  gap: 6,
+  padding: 6,
+  paddingLeft: 10,
+  paddingRight: 10,
+};
 
 export interface MenubarProps {
   children?: ReactNode;
@@ -31,19 +39,7 @@ export interface MenubarMenuProps {
   style?: Partial<StyleDesc>;
 }
 
-export interface MenubarItemProps {
-  label: string;
-  icon?: IconName;
-  onClick?: () => void;
-  disabled?: boolean;
-
-  inset?: boolean;
-
-  variant?: "default" | "destructive";
-
-  shortcut?: string;
-  style?: Partial<StyleDesc>;
-}
+export type MenubarItemProps = MenuItemPartProps;
 
 export interface MenubarTriggerProps {
   label: string;
@@ -57,59 +53,28 @@ export interface MenubarContentProps {
   style?: Partial<StyleDesc>;
 }
 
-export interface MenubarLabelProps {
-  children: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type MenubarLabelProps = MenuLabelPartProps;
 
-export interface MenubarSeparatorProps {
-  style?: Partial<StyleDesc>;
-}
+export type MenubarSeparatorProps = MenuSeparatorPartProps;
 
-export interface MenubarCheckboxItemProps {
-  label: string;
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-  style?: Partial<StyleDesc>;
-}
+export type MenubarCheckboxItemProps = MenuCheckboxItemPartProps;
 
-export interface MenubarRadioItemProps {
-  label: string;
-  value?: string;
-  selected?: boolean;
-  onSelect?: () => void;
-  style?: Partial<StyleDesc>;
-}
+export type MenubarRadioItemProps = MenuRadioItemPartProps;
 
-export interface MenubarRadioGroupProps {
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  children?: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type MenubarRadioGroupProps = MenuRadioGroupPartProps;
 
-export interface MenubarSubProps {
-  children?: ReactNode;
-  defaultOpen?: boolean;
-  style?: Partial<StyleDesc>;
-}
+export type MenubarSubProps = MenuSubPartProps;
 
-export interface MenubarSubTriggerProps {
-  label: string;
-  icon?: IconName;
-  style?: Partial<StyleDesc>;
-}
+export type MenubarSubTriggerProps = MenuSubTriggerPartProps;
 
-export interface MenubarSubContentProps {
-  children?: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type MenubarSubContentProps = MenuSubContentPartProps;
 
-export interface MenubarShortcutProps {
-  children: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type MenubarShortcutProps = MenuShortcutPartProps;
+
+const menuParts = makeMenuParts(
+  () => ({ open: false, onOpenChange: () => {} }),
+  { rowStyle: BAR_ROW },
+);
 
 export function Menubar({ children, style }: MenubarProps) {
   return <MenuBarShell style={style}>{children}</MenuBarShell>;
@@ -122,7 +87,6 @@ function MenubarDropdown({
   style,
 }: MenubarMenuProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const [open, setOpen] = useState(defaultOpen ?? false);
 
   return (
@@ -132,9 +96,9 @@ function MenubarDropdown({
         onClick={() => setOpen(!open)}
         trailing={
           <Icon
-            name="chevronDown"
+            name="expandMore"
             size={12}
-            color={colors.dim_fg}
+            color={t.color.text.dim}
             style={{ flexShrink: 0 }}
           />
         }
@@ -143,21 +107,15 @@ function MenubarDropdown({
           padding: 6,
           paddingLeft: 10,
           paddingRight: 10,
-          backgroundColor: open ? colors.accentTint : "transparent",
-          active: { backgroundColor: colors.button_active },
+          backgroundColor: open ? t.color.accent.tint : "transparent",
+          active: { backgroundColor: t.color.surface.buttonActive },
         }}
       />
       {open ? (
         <FloatingPanel
           minWidth={160}
           style={{
-            boxShadow: {
-              offsetX: 0,
-              offsetY: 4,
-              blurRadius: 16,
-              spreadRadius: 0,
-              color: "rgba(0,0,0,0.35)",
-            },
+            boxShadow: PANEL_SHADOW,
           }}
         >
           {children}
@@ -171,36 +129,7 @@ export function MenubarMenu(props: MenubarMenuProps) {
   return <MenubarDropdown {...props} />;
 }
 
-export function MenubarItem({
-  label,
-  icon,
-  onClick,
-  disabled,
-  inset,
-  variant,
-  shortcut,
-  style,
-}: MenubarItemProps) {
-  const t = useAdwaita();
-  const destructive = variant === "destructive";
-  return (
-    <MenuRow
-      label={label}
-      icon={icon}
-      disabled={disabled}
-      onClick={onClick}
-      {...(destructive ? destructiveRowProps(t) : {})}
-      trailing={shortcut ? <MenuShortcut>{shortcut}</MenuShortcut> : undefined}
-      style={{
-        gap: 6,
-        padding: 6,
-        paddingLeft: inset ? 32 : 10,
-        paddingRight: 10,
-        ...style,
-      }}
-    />
-  );
-}
+export const MenubarItem = menuParts.Item;
 
 export function MenubarTrigger({
   label,
@@ -235,103 +164,20 @@ export function MenubarContent({ children, style }: MenubarContentProps) {
   );
 }
 
-export function MenubarLabel({ children, style }: MenubarLabelProps) {
-  return <MenuLabel style={style}>{children}</MenuLabel>;
-}
+export const MenubarLabel = menuParts.Label;
 
-export function MenubarSeparator({ style }: MenubarSeparatorProps) {
-  return <MenuSeparator style={style} />;
-}
+export const MenubarSeparator = menuParts.Separator;
 
-export function MenubarCheckboxItem({
-  label,
-  checked,
-  onCheckedChange,
-  style,
-}: MenubarCheckboxItemProps) {
-  return (
-    <MenuRow
-      label={label}
-      leading={<MenuIndicator kind="checkbox" active={checked} />}
-      onClick={() => onCheckedChange(!checked)}
-      style={{
-        gap: 6,
-        padding: 6,
-        paddingLeft: 10,
-        paddingRight: 10,
-        ...style,
-      }}
-    />
-  );
-}
+export const MenubarCheckboxItem = menuParts.CheckboxItem;
 
-export function MenubarRadioGroup({
-  value,
-  defaultValue,
-  onValueChange,
-  children,
-  style,
-}: MenubarRadioGroupProps) {
-  return (
-    <MenuRadioGroupShell
-      value={value}
-      defaultValue={defaultValue}
-      onValueChange={onValueChange}
-      children={children}
-      style={style}
-    />
-  );
-}
+export const MenubarRadioGroup = menuParts.RadioGroup;
 
-export function MenubarRadioItem({
-  label,
-  value,
-  selected,
-  onSelect,
-  style,
-}: MenubarRadioItemProps) {
-  const group = useMenuRadioGroup();
-  return (
-    <MenuRadioRow
-      label={label}
-      value={value}
-      selected={selected}
-      group={group}
-      onSelect={onSelect}
-      style={{
-        gap: 6,
-        padding: 6,
-        paddingLeft: 10,
-        paddingRight: 10,
-        ...style,
-      }}
-    />
-  );
-}
+export const MenubarRadioItem = menuParts.RadioItem;
 
-export function MenubarSub({ children, defaultOpen, style }: MenubarSubProps) {
-  return <MenuSub defaultOpen={defaultOpen} style={style}>{children}</MenuSub>;
-}
+export const MenubarSub = menuParts.Sub;
 
-export function MenubarSubTrigger({
-  label,
-  icon,
-  style,
-}: MenubarSubTriggerProps) {
-  return (
-    <MenuSubTrigger
-      label={label}
-      icon={icon}
-      rowStyle={{ gap: 6, padding: 6, paddingLeft: 10, paddingRight: 10 }}
-      style={style}
-    />
-  );
-}
+export const MenubarSubTrigger = menuParts.SubTrigger;
 
-export function MenubarSubContent({ children, style }: MenubarSubContentProps) {
-  return <MenuSubContent style={style}>{children}</MenuSubContent>;
-}
+export const MenubarSubContent = menuParts.SubContent;
 
-export function MenubarShortcut({ children, style }: MenubarShortcutProps) {
-  return <MenuShortcut style={style}>{children}</MenuShortcut>;
-}
+export const MenubarShortcut = menuParts.Shortcut;

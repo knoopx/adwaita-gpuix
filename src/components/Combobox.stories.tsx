@@ -1,44 +1,37 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import {
   Combobox,
-  ComboboxInput,
-  ComboboxTrigger,
+  ComboboxChips,
   ComboboxContent,
+  ComboboxEmpty,
   ComboboxGroup,
+  ComboboxInput,
+  ComboboxItem,
+  type ComboboxItemEntry,
   ComboboxLabel,
   ComboboxList,
-  ComboboxItem,
-  ComboboxEmpty,
   ComboboxSeparator,
-  ComboboxChips,
-  type ComboboxItemEntry,
+  ComboboxTrigger,
 } from "./Combobox";
 
 const COMBO_ITEMS = ["low", "medium", "high"];
 
-function Stage({
-  height,
-  children,
-}: {
-  height: number;
-  children: ReactNode;
-}) {
+function Stage({ height, children }: { height: number; children: ReactNode }) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <div
       style={{
         position: "relative",
         width: 480,
         height,
-        borderRadius: 12,
+        borderRadius: 8,
         borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderColor: t.color.border.default,
+        backgroundColor: t.color.surface.view,
         overflow: "hidden",
       }}
     >
@@ -184,8 +177,8 @@ export const openWithIcons = defineStory({
   parameters: { width: 528, height: 260 },
   render: () => {
     const fonts = [
-      { value: "sans", label: "Sans", icon: "type" as const },
-      { value: "serif", label: "Serif", icon: "fileText" as const },
+      { value: "sans", label: "Sans", icon: "textFormat" as const },
+      { value: "serif", label: "Serif", icon: "article" as const },
       { value: "mono", label: "Monospace", icon: "code" as const },
     ];
     return (

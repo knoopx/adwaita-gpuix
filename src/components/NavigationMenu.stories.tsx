@@ -1,17 +1,17 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { T, Labeled } from "./common";
+import { Labeled, T } from "./text";
 import { Icon } from "./icons";
-import { Row, Column } from "./Box";
+import { Column, Row } from "./Box";
 import {
   NavigationMenu,
-  NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuTrigger,
-  NavigationMenuLink,
   NavigationMenuContent,
   NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
 } from "./NavigationMenu";
 
 function NavDemo({
@@ -89,13 +89,13 @@ export const withIcons = defineStory({
               </NavigationMenuTrigger>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink label="Library" icon="grid" />
+              <NavigationMenuLink label="Library" icon="gridView" />
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink label="Settings" icon="settings" />
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink label="Profile" icon="user" active />
+              <NavigationMenuLink label="Profile" icon="person" active />
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
@@ -145,10 +145,10 @@ export function popdownIndicator() {
             position: "relative",
             width: 240,
             height: 150,
-            borderRadius: t.radii.card,
+            borderRadius: t.radius.sm,
             borderWidth: 1,
-            borderColor: t.colors.border,
-            backgroundColor: t.colors.view_bg,
+            borderColor: t.color.border.default,
+            backgroundColor: t.color.surface.view,
             overflow: "hidden",
           }}
         >

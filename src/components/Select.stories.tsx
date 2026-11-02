@@ -1,18 +1,18 @@
 import { defineMeta, defineStory } from "storybook";
-import type { ReactNode } from "react";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { type ReactNode } from "react";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
-  SelectItem,
   SelectGroup,
+  SelectItem,
   SelectLabel,
   SelectSeparator,
+  SelectTrigger,
+  SelectValue,
 } from "./Select";
-import { SELECT_LEVELS, SELECT_SIZES } from "./.storybook/story-helpers";
+import { SELECT_LEVELS, SELECT_SIZES } from "../../.storybook/story-helpers";
 
 function LabeledSelect({
   caption,

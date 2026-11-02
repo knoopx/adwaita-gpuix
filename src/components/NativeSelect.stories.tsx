@@ -1,9 +1,12 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Row } from "./Box";
-import { NativeSelect } from "./NativeSelect";
-import type { NativeSelectGroup, NativeSelectOption } from "./NativeSelect";
-import { SELECT_LEVELS, SELECT_SIZES } from "./.storybook/story-helpers";
+import {
+  NativeSelect,
+  type NativeSelectGroup,
+  type NativeSelectOption,
+} from "./NativeSelect";
+import { SELECT_LEVELS, SELECT_SIZES } from "../../.storybook/story-helpers";
 
 const LEVELS: NativeSelectOption[] = SELECT_LEVELS;
 const SIZES: NativeSelectOption[] = SELECT_SIZES.slice(0, 12);

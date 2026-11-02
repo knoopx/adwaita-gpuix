@@ -1,17 +1,16 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Column } from "./Box";
 import { Icon } from "./icons";
 import {
   AlertDialog,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
-  MessageDialog,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "./AlertDialog";
 
 export default defineMeta({
@@ -19,6 +18,17 @@ export default defineMeta({
   component: AlertDialog,
   parameters: { width: 528, height: 400 },
 });
+
+function MessageDialog({ size = "default" }: { size?: "default" | "sm" }) {
+  return (
+    <AlertDialog
+      size={size}
+      heading="Heads up"
+      body="A plain message dialog."
+      actions={[{ label: "OK", variant: "suggested", onClick: () => {} }]}
+    />
+  );
+}
 
 export const flat = defineStory({
   parameters: { height: 540 },
@@ -35,12 +45,7 @@ export const flat = defineStory({
         />
       </Labeled>
       <Labeled caption="suggested action, size sm">
-        <AlertDialog
-          size="sm"
-          heading="Heads up"
-          body="A plain message dialog."
-          actions={[{ label: "OK", variant: "suggested", onClick: () => {} }]}
-        />
+        <MessageDialog size="sm" />
       </Labeled>
     </Column>
   ),
@@ -51,11 +56,7 @@ export const basic = defineStory({
   render: () => (
     <Column gap={16} align="center">
       <Labeled caption="basic — title + body + suggested action">
-        <AlertDialog
-          heading="Heads up"
-          body="A plain message dialog."
-          actions={[{ label: "OK", variant: "suggested", onClick: () => {} }]}
-        />
+        <MessageDialog />
       </Labeled>
     </Column>
   ),
@@ -100,7 +101,9 @@ export function media() {
     <Column gap={16} align="center">
       <Labeled caption="with media (size default)">
         <AlertDialog
-          media={<Icon name="warning" size={32} color={t.colors.warning} />}
+          media={
+            <Icon name="warning" size={32} color={t.color.functional.warning} />
+          }
           heading="Storage full"
           body="Free up space to continue syncing."
           actions={[
@@ -125,7 +128,9 @@ export const longText = defineStory({
         <AlertDialog
           heading="This is a long dialog title that should wrap across multiple lines"
           body="This is a long description that wraps across several lines to show how the dialog keeps extended text centred and readable."
-          actions={[{ label: "Got it", variant: "suggested", onClick: () => {} }]}
+          actions={[
+            { label: "Got it", variant: "suggested", onClick: () => {} },
+          ]}
         />
       </Labeled>
     </Column>
@@ -162,16 +167,12 @@ export const compound = defineStory({
   ),
 });
 
-export const messageDialog = defineStory({
+export const message = defineStory({
   parameters: { height: 280 },
   render: () => (
     <Column gap={16} align="center">
-      <Labeled caption="alias of AlertDialog">
-        <MessageDialog
-          heading="Heads up"
-          body="A plain message dialog."
-          actions={[{ label: "OK", variant: "suggested", onClick: () => {} }]}
-        />
+      <Labeled caption="single-action message dialog">
+        <MessageDialog />
       </Labeled>
     </Column>
   ),

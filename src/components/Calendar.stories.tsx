@@ -1,6 +1,6 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import { Calendar, DatePicker } from "./Calendar";
 
 export default defineMeta({
@@ -89,11 +89,7 @@ export const todayHighlighted = defineStory({
         caption="today (accent) · selected day · out-of-month dimmed"
         style={{ alignItems: "center" }}
       >
-        <Calendar
-          month={today}
-          selected={selected}
-          onSelect={() => {}}
-        />
+        <Calendar month={today} selected={selected} onSelect={() => {}} />
       </Labeled>
     );
   },

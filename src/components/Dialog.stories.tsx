@@ -1,20 +1,20 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { T, Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled, T } from "./text";
+import { Column, Row } from "./Box";
 import { Icon } from "./icons";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
   DialogShowcase,
+  DialogTitle,
 } from "./Dialog";
 
 const noop = () => {};
@@ -45,9 +45,7 @@ function ModalDemo({
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           {body}
-          <DialogFooter destructive={destructiveFooter}>
-            {footer}
-          </DialogFooter>
+          <DialogFooter destructive={destructiveFooter}>{footer}</DialogFooter>
         </DialogContent>
       </Dialog>
     </Labeled>
@@ -134,7 +132,7 @@ export function iconHeader() {
               <Icon
                 name="warning"
                 size={24}
-                color={t.colors.warning}
+                color={t.color.functional.warning}
                 style={{ pointerEvents: "none" }}
               />
               <Column gap={4}>
@@ -146,7 +144,11 @@ export function iconHeader() {
             </Row>
           </DialogHeader>
           <DialogFooter destructive>
-            <Button variant="destructive" label="Delete oldest" onClick={noop} />
+            <Button
+              variant="destructive"
+              label="Delete oldest"
+              onClick={noop}
+            />
             <Button label="Cancel" onClick={noop} />
             <Button variant="suggested" label="Open settings" onClick={noop} />
           </DialogFooter>
@@ -168,7 +170,7 @@ export function customClose() {
       footer={
         <>
           <DialogClose>
-            <T size="caption" color={t.colors.dim_fg}>
+            <T size="caption" color={t.color.text.dim}>
               Close
             </T>
           </DialogClose>

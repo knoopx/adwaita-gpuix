@@ -1,19 +1,20 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { T, Labeled, MenuRow, destructiveRowProps } from "./common";
+import { Labeled, T } from "./text";
+import { MenuRow, destructiveRowProps } from "./menu";
 import { Row } from "./Box";
 import {
   Popover,
-  PopoverTrigger,
-  PopoverContent,
   PopoverAnchor,
+  PopoverContent,
+  PopoverDescription,
   PopoverHeader,
   PopoverTitle,
-  PopoverDescription,
+  PopoverTrigger,
 } from "./Popover";
 import { Button } from "./Button";
 import { Icon } from "./icons";
-import { LabeledStage, SidesShowcase } from "./.storybook/story-helpers";
+import { LabeledStage, SidesShowcase } from "../../.storybook/story-helpers";
 
 function SidePopover({
   side,
@@ -44,7 +45,6 @@ export default defineMeta({
 
 export function closedTrigger() {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <Row gap={16} align="center">
       <Labeled caption="button trigger (panel closed)">
@@ -66,7 +66,7 @@ export function closedTrigger() {
                 padding: 8,
               }}
             >
-              <Icon name="settings" size={16} color={colors.dim_fg} />
+              <Icon name="settings" size={16} color={t.color.text.dim} />
               <T size="body">Settings</T>
             </div>
           </PopoverTrigger>
@@ -81,13 +81,6 @@ export const sides = defineStory({
     <SidesShowcase
       caption="side prop, anchored in a stage"
       Side={SidePopover}
-      texts={[
-        "Above the trigger",
-        "Right of the trigger",
-        "Below the trigger",
-        "Left of the trigger",
-      ]}
-      stage={{ width: 480, height: 120 }}
     />
   ),
 });
@@ -140,11 +133,11 @@ export function listContent() {
             style={{ padding: 4, gap: 2, minWidth: 180 }}
           >
             <MenuRow label="Copy link" icon="link" onClick={() => {}} />
-            <MenuRow label="Duplicate" icon="copy" onClick={() => {}} />
-            <MenuRow label="Rename" icon="user" onClick={() => {}} />
+            <MenuRow label="Duplicate" icon="contentCopy" onClick={() => {}} />
+            <MenuRow label="Rename" icon="person" onClick={() => {}} />
             <MenuRow
               label="Delete"
-              icon="trash"
+              icon="delete"
               onClick={() => {}}
               labelColor={destructive.labelColor}
               iconColor={destructive.iconColor}

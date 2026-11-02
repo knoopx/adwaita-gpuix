@@ -1,7 +1,13 @@
-import { createContext, useContext, type ReactNode } from "react";
-import type { StyleDesc, EventPayload } from "@gpuix/react";
+import { type ReactNode, createContext, useContext } from "react";
+import { type EventPayload, type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { T, OverlayShell, dialogCardStyle, OverlayTitle, OverlayDescription } from "./common";
+import { T } from "./text";
+import {
+  OverlayDescription,
+  OverlayShell,
+  OverlayTitle,
+  dialogCardStyle,
+} from "./overlay";
 import { Button, type ButtonVariant } from "./Button";
 
 export interface AlertDialogAction {
@@ -97,7 +103,6 @@ function AlertDialogCardBody({
   style,
 }: Omit<AlertDialogProps, "open" | "onOpenChange" | "contained">) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   const minWidth = size === "sm" ? 288 : 320;
 
   return (
@@ -107,8 +112,8 @@ function AlertDialogCardBody({
           style={{
             width: 64,
             height: 64,
-            borderRadius: radii.card,
-            backgroundColor: colors.button_bg,
+            borderRadius: t.radius.sm,
+            backgroundColor: t.color.surface.button,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -119,12 +124,17 @@ function AlertDialogCardBody({
         </div>
       ) : null}
       {heading ? (
-        <T size="title2" weight={700} color={colors.fg} align="center">
+        <T
+          size="title2"
+          weight={700}
+          color={t.color.text.primary}
+          align="center"
+        >
           {heading}
         </T>
       ) : null}
       {body ? (
-        <T size="body" color={colors.dim_fg} align="center">
+        <T size="body" color={t.color.text.dim} align="center">
           {body}
         </T>
       ) : null}
@@ -264,5 +274,3 @@ export function AlertDialogCancel({
     </Button>
   );
 }
-
-export const MessageDialog = AlertDialog;

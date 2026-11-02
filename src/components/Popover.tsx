@@ -1,7 +1,9 @@
-import { createContext, useContext, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba } from "../theme/adwaita";
-import { FloatingPanel, TextPart } from "./common";
+import { type ReactNode, createContext, useContext } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { hexToRgba, useAdwaita } from "../theme/adwaita";
+import { FloatingPanel } from "./FloatingPanel";
+import { TextPart } from "./text";
+import { PANEL_SHADOW } from "./overlay";
 
 export interface PopoverProps {
   open: boolean;
@@ -70,9 +72,9 @@ export function PopoverTrigger({ children, style }: PopoverTriggerProps) {
       onClick={() => onOpenChange(true)}
       style={{
         cursor: "pointer",
-        borderRadius: t.radii.row,
-        hover: { backgroundColor: hexToRgba(t.colors.fg, 0.08) },
-        active: { backgroundColor: hexToRgba(t.colors.fg, 0.16) },
+        borderRadius: t.radius.sm,
+        hover: { backgroundColor: t.color.surface.hover },
+        active: { backgroundColor: t.color.surface.active },
         ...style,
       }}
     >
@@ -97,16 +99,7 @@ export function PopoverContent({
       sideOffset={sideOffset}
       padding={8}
       gap={8}
-      style={{
-        boxShadow: {
-          offsetX: 0,
-          offsetY: 4,
-          blurRadius: 16,
-          spreadRadius: 0,
-          color: "rgba(0,0,0,0.35)",
-        },
-        ...style,
-      }}
+      style={{ boxShadow: PANEL_SHADOW, ...style }}
     >
       {children}
     </FloatingPanel>

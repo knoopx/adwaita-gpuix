@@ -1,21 +1,16 @@
 import {
   Children,
+  type ReactNode,
   createContext,
   isValidElement,
   useContext,
   useState,
-  type ReactNode,
 } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import {
-  MenuLabel,
-  MenuRow,
-  MenuSeparator,
-  MenuShortcut,
-  T,
-  inputShellStyle,
-} from "./common";
+import { MenuLabel, MenuRow, MenuSeparator, MenuShortcut } from "./menu";
+import { T } from "./text";
+import { inputShellStyle } from "./input-base";
 import { Icon, type IconName } from "./icons";
 import { Dialog, DialogContent } from "./Dialog";
 
@@ -24,9 +19,9 @@ export interface CommandProps {
   onOpenChange?: (open: boolean) => void;
 
   closeOnSelect?: boolean;
-  
+
   defaultQuery?: string;
-  
+
   anchored?: boolean;
   children?: ReactNode;
   style?: Partial<StyleDesc>;
@@ -64,7 +59,7 @@ export interface CommandItemProps {
   searchTerms?: string;
 
   shortcut?: string;
-  
+
   trailing?: ReactNode;
   style?: Partial<StyleDesc>;
 }
@@ -126,8 +121,6 @@ export function Command({
 }: CommandProps) {
   const [query, setQuery] = useState(defaultQuery ?? "");
   const t = useAdwaita();
-  const { colors, radii } = t;
-
   if (open === false) return null;
 
   const panel = (
@@ -138,10 +131,9 @@ export function Command({
         gap: 2,
         padding: 12,
         minWidth: 320,
-        borderRadius: radii.card,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderRadius: t.radius.sm,
+        borderWidth: 0,
+        backgroundColor: t.color.surface.card,
         ...style,
       }}
     >
@@ -177,14 +169,12 @@ export function CommandInput({
 }: CommandInputProps) {
   const { query, setQuery } = useCommand();
   const t = useAdwaita();
-  const { colors, typography } = t;
-
   return (
     <div style={inputShellStyle(t, style)}>
       <Icon
         name="search"
         size={14}
-        color={colors.dim_fg}
+        color={t.color.text.dim}
         style={{ pointerEvents: "none" }}
       />
       <input
@@ -197,9 +187,9 @@ export function CommandInput({
         }}
         style={{
           flexGrow: 1,
-          fontSize: typography.body,
-          fontFamily: typography.fontFamily,
-          color: colors.fg,
+          fontSize: t.type.body,
+          fontFamily: t.type.fontFamily,
+          color: t.color.text.primary,
         }}
       />
     </div>
@@ -235,10 +225,10 @@ export function CommandEmpty({ style }: CommandEmptyProps) {
       <Icon
         name="search"
         size={20}
-        color={t.colors.dim_fg}
+        color={t.color.text.dim}
         style={{ pointerEvents: "none" }}
       />
-      <T size="body" color={t.colors.dim_fg}>
+      <T size="body" color={t.color.text.dim}>
         No results found.
       </T>
     </div>
@@ -277,8 +267,6 @@ export function CommandItem({
 }: CommandItemProps) {
   const { query, onOpenChange, closeOnSelect } = useCommand();
   const t = useAdwaita();
-  const { colors } = t;
-
   if (!itemMatchesQuery(label, searchTerms, query)) return null;
 
   return (
@@ -292,7 +280,7 @@ export function CommandItem({
             <Icon
               name={icon}
               size={14}
-              color={colors.dim_fg}
+              color={t.color.text.dim}
               style={{ pointerEvents: "none" }}
             />
           ) : null
@@ -308,16 +296,16 @@ export function CommandItem({
             <MenuShortcut>{shortcut}</MenuShortcut>
           ) : selected ? (
             <Icon
-              name="success"
+              name="checkCircle"
               size={12}
-              color={colors.accent}
+              color={t.color.accent.base}
               style={{ pointerEvents: "none" }}
             />
           ) : null)
         }
         style={{
           justifyContent: "space-between",
-          backgroundColor: selected ? colors.accentTint : "transparent",
+          backgroundColor: selected ? t.color.accent.tint : "transparent",
         }}
       />
     </div>

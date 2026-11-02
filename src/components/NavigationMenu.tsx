@@ -1,7 +1,9 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode, createContext, useContext, useState } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { MenuBarShell, FloatingPanel, MenuRow } from "./common";
+import { MenuBarShell, MenuRow } from "./menu";
+import { FloatingPanel } from "./FloatingPanel";
+import { PANEL_SHADOW } from "./overlay";
 import { Icon, type IconName } from "./icons";
 
 export interface NavigationMenuProps {
@@ -102,7 +104,7 @@ export function NavigationMenuIndicator({
         width: 12,
         height: 3,
         borderRadius: 2,
-        backgroundColor: t.colors.accent,
+        backgroundColor: t.color.accent.base,
         ...style,
       }}
     />
@@ -140,7 +142,6 @@ export function NavigationMenuTrigger({
   style,
 }: NavigationMenuTriggerProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const ctx = useNavigationMenu();
   const open = item !== undefined && ctx?.open === item;
   return (
@@ -164,18 +165,18 @@ export function NavigationMenuTrigger({
         borderRadius: 6,
         cursor: disabled ? "default" : "pointer",
         opacity: disabled ? 0.5 : 1,
-        backgroundColor: open ? colors.accentTint : "transparent",
+        backgroundColor: open ? t.color.accent.tint : "transparent",
         ...(disabled
           ? {}
           : {
-              hover: { backgroundColor: colors.accentTint },
-              active: { backgroundColor: colors.button_active },
+              hover: { backgroundColor: t.color.accent.tint },
+              active: { backgroundColor: t.color.surface.buttonActive },
             }),
         ...style,
       }}
     >
       {children}
-      <Icon name="chevronDown" size={12} color={colors.dim_fg} />
+      <Icon name="expandMore" size={12} color={t.color.text.dim} />
     </div>
   );
 }
@@ -195,16 +196,7 @@ export function NavigationMenuContent({
       sideOffset={sideOffset}
       minWidth={180}
       padding={8}
-      style={{
-        boxShadow: {
-          offsetX: 0,
-          offsetY: 4,
-          blurRadius: 16,
-          spreadRadius: 0,
-          color: "rgba(0,0,0,0.35)",
-        },
-        ...style,
-      }}
+      style={{ boxShadow: PANEL_SHADOW, ...style }}
     >
       {children}
     </FloatingPanel>
@@ -220,16 +212,15 @@ export function NavigationMenuLink({
   style,
 }: NavigationMenuLinkProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <MenuRow
       label={label}
       icon={icon}
       disabled={disabled}
       onClick={onClick}
-      labelColor={active ? colors.accent : undefined}
+      labelColor={active ? t.color.accent.base : undefined}
       style={{
-        backgroundColor: active ? colors.accentTint : "transparent",
+        backgroundColor: active ? t.color.accent.tint : "transparent",
         ...style,
       }}
     />

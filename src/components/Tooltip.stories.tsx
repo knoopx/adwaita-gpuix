@@ -1,19 +1,15 @@
 import { defineMeta, defineStory } from "storybook";
-import {
-  useAdwaita,
-  accentForeground,
-  hexToRgba,
-} from "../theme/adwaita";
-import { T } from "./common";
+import { accentForeground, hexToRgba, useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
 import { Column } from "./Box";
 import {
   Tooltip,
+  TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-  TooltipContent,
 } from "./Tooltip";
 import { Button } from "./Button";
-import { LabeledStage, SidesShowcase } from "./.storybook/story-helpers";
+import { LabeledStage, SidesShowcase } from "../../.storybook/story-helpers";
 
 function SideTooltip({
   side,
@@ -62,7 +58,12 @@ export const openSides = defineStory({
   render: () => (
     <SidesShowcase
       Side={SideTooltip}
-      texts={["Tooltip above", "Tooltip right", "Tooltip below", "Tooltip left"]}
+      texts={[
+        "Tooltip above",
+        "Tooltip right",
+        "Tooltip below",
+        "Tooltip left",
+      ]}
       rowGap={24}
       centerRow={false}
     />
@@ -91,7 +92,12 @@ export const contentSide = defineStory({
 
 export const uncontrolled = defineStory({
   render: () => (
-    <LabeledStage caption="defaultOpen (uncontrolled)" width={200} height={120} center>
+    <LabeledStage
+      caption="defaultOpen (uncontrolled)"
+      width={200}
+      height={120}
+      center
+    >
       <Tooltip defaultOpen>
         <TooltipTrigger>
           <Button label="Default open" onClick={() => {}} />
@@ -104,7 +110,7 @@ export const uncontrolled = defineStory({
 
 export function multiline() {
   const t = useAdwaita();
-  const bubbleFg = accentForeground(t.colors.osd_bg);
+  const bubbleFg = accentForeground(t.color.surface.osd);
   return (
     <LabeledStage
       caption="title + body (ReactNode children)"
@@ -139,15 +145,20 @@ export function multiline() {
 
 export const wrapping = defineStory({
   render: () => (
-    <LabeledStage caption="long text wraps (maxWidth)" width={320} height={140} center>
+    <LabeledStage
+      caption="long text wraps (maxWidth)"
+      width={320}
+      height={140}
+      center
+    >
       <TooltipProvider>
         <Tooltip open>
           <TooltipTrigger>
             <Button label="Long text" onClick={() => {}} />
           </TooltipTrigger>
           <TooltipContent>
-            A tooltip whose text is long enough to wrap onto several
-            lines inside the bubble.
+            A tooltip whose text is long enough to wrap onto several lines
+            inside the bubble.
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

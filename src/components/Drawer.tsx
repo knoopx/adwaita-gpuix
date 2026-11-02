@@ -1,21 +1,23 @@
 import { type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { T, OverlayTitle, OverlayDescription } from "./common";
+import { T } from "./text";
+import { OverlayDescription, OverlayTitle } from "./overlay";
 import {
-  createPanelContext,
-  renderPanelShell,
-  makePanelTrigger,
-  makePanelClose,
-  makePanelHeader,
-  makePanelFooter,
-  PanelShowcase,
-  PanelShowcaseRow,
-  PanelShowcaseColumn,
-  PanelSideStages,
+  PANEL_SIDES,
   PaddedSection,
-  type PanelSide,
   type PanelRootProps,
+  PanelShowcase,
+  PanelShowcaseColumn,
+  PanelShowcaseRow,
+  type PanelSide,
+  PanelSideStages,
+  createPanelContext,
+  makePanelClose,
+  makePanelFooter,
+  makePanelHeader,
+  makePanelTrigger,
+  renderPanelShell,
 } from "./PanelBase";
 import { Button } from "./Button";
 
@@ -71,7 +73,7 @@ function DrawerDragHandle({ color }: { color: string }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: t.spacing.gap,
+        padding: t.space.sm,
       }}
     >
       <div
@@ -106,9 +108,10 @@ export function Drawer({
             side,
             children,
             style,
-            colors: t.colors,
             panelExtra:
-              side === "bottom" ? <DrawerDragHandle color={t.colors.border} /> : null,
+              side === "bottom" ? (
+                <DrawerDragHandle color={t.color.border.default} />
+              ) : null,
           })
         : null}
     </DrawerCtx.Provider>
@@ -163,6 +166,13 @@ function DrawerBody({ title }: { title: string }) {
   );
 }
 
+const DRAWER_SIDES: { side: PanelSide; label: string }[] = PANEL_SIDES.map(
+  (stage) =>
+    stage.side === "bottom"
+      ? { ...stage, label: "side=bottom (drag handle)" }
+      : stage,
+);
+
 export function DrawerShowcase(): ReactNode {
   return (
     <PanelShowcase>
@@ -176,12 +186,7 @@ export function DrawerShowcase(): ReactNode {
         </PanelShowcaseColumn>
       </PanelShowcaseRow>
       <PanelSideStages
-        stages={[
-          { side: "left", label: "side=left" },
-          { side: "right", label: "side=right" },
-          { side: "top", label: "side=top" },
-          { side: "bottom", label: "side=bottom (drag handle)" },
-        ]}
+        stages={DRAWER_SIDES}
         renderPanel={(side) => (
           <Drawer open={true} onOpenChange={noop} side={side} contained>
             <DrawerBody title={`${side} drawer`} />

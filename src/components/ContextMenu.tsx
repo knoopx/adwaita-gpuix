@@ -1,20 +1,20 @@
-import { createContext, useContext, type ReactNode } from "react";
-import type { StyleDesc, EventPayload } from "@gpuix/react";
+import { type ReactNode, createContext, useContext } from "react";
+import { type EventPayload, type StyleDesc } from "@gpuix/react";
 import {
-  FloatingPanel,
-  MenuRow,
-  MenuIndicator,
-  MenuShortcut,
-  MenuLabel,
-  MenuSeparator,
-  MenuGroup,
-  MenuRadioGroupShell,
-  MenuSub,
-  MenuSubTrigger,
-  MenuSubContent,
-  makeMenuRadioItem,
-  MenuItemRow,
-} from "./common";
+  makeMenuParts,
+  type MenuContentPartProps,
+  type MenuGroupProps,
+  type MenuItemPartProps,
+  type MenuLabelPartProps,
+  type MenuRadioGroupPartProps,
+  type MenuRadioItemPartProps,
+  type MenuSeparatorPartProps,
+  type MenuShortcutPartProps,
+  type MenuSubContentPartProps,
+  type MenuSubPartProps,
+  type MenuSubTriggerPartProps,
+  type MenuCheckboxItemPartProps,
+} from "./menu-parts";
 import { type IconName } from "./icons";
 
 export interface ContextMenuProps {
@@ -28,83 +28,29 @@ export interface ContextMenuTriggerProps {
   style?: Partial<StyleDesc>;
 }
 
-export interface ContextMenuContentProps {
-  children?: ReactNode;
-  side?: "top" | "right" | "bottom" | "left";
-  sideOffset?: number;
-  
-  maxHeight?: number;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuContentProps = MenuContentPartProps;
 
-export interface ContextMenuItemProps {
-  label: string;
-  icon?: IconName;
-  onClick?: () => void;
-  disabled?: boolean;
-  variant?: "default" | "destructive";
-  shortcut?: string;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuItemProps = Omit<MenuItemPartProps, "inset">;
 
-export interface ContextMenuGroupProps {
-  children?: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuGroupProps = MenuGroupProps;
 
-export interface ContextMenuLabelProps {
-  children: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuLabelProps = MenuLabelPartProps;
 
-export interface ContextMenuSeparatorProps {
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuSeparatorProps = MenuSeparatorPartProps;
 
-export interface ContextMenuShortcutProps {
-  children: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuShortcutProps = MenuShortcutPartProps;
 
-export interface ContextMenuCheckboxItemProps {
-  label: string;
-  checked: boolean;
-  onCheckedChange: (checked: boolean) => void;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuCheckboxItemProps = MenuCheckboxItemPartProps;
 
-export interface ContextMenuRadioItemProps {
-  label: string;
-  value?: string;
-  selected?: boolean;
-  onSelect?: () => void;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuRadioItemProps = MenuRadioItemPartProps;
 
-export interface ContextMenuRadioGroupProps {
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  children?: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuRadioGroupProps = MenuRadioGroupPartProps;
 
-export interface ContextMenuSubProps {
-  children?: ReactNode;
-  defaultOpen?: boolean;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuSubProps = MenuSubPartProps;
 
-export interface ContextMenuSubTriggerProps {
-  label: string;
-  icon?: IconName;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuSubTriggerProps = MenuSubTriggerPartProps;
 
-export interface ContextMenuSubContentProps {
-  children?: ReactNode;
-  style?: Partial<StyleDesc>;
-}
+export type ContextMenuSubContentProps = MenuSubContentPartProps;
 
 interface ContextMenuContext {
   open: boolean;
@@ -119,6 +65,11 @@ function useContextMenu(): ContextMenuContext {
     throw new Error("ContextMenu components must be used within <ContextMenu>");
   return ctx;
 }
+
+const menuParts = makeMenuParts(useContextMenu, {
+  panelMinWidth: 160,
+  panelXOffset: 4,
+});
 
 export function ContextMenu({
   open,
@@ -149,137 +100,26 @@ export function ContextMenuTrigger({
   );
 }
 
-export function ContextMenuContent({
-  children,
-  side = "bottom",
-  sideOffset = 4,
-  style,
-}: ContextMenuContentProps) {
-  const { open } = useContextMenu();
+export const ContextMenuContent = menuParts.Content;
 
-  if (!open) return null;
+export const ContextMenuItem = menuParts.Item;
 
-  return (
-    <FloatingPanel
-      side={side}
-      sideOffset={sideOffset}
-      xOffset={4}
-      minWidth={160}
-      style={style}
-    >
-      {children}
-    </FloatingPanel>
-  );
-}
+export const ContextMenuGroup = menuParts.Group;
 
-export function ContextMenuItem({
-  label,
-  icon,
-  onClick,
-  disabled,
-  variant,
-  shortcut,
-  style,
-}: ContextMenuItemProps) {
-  const { onOpenChange } = useContextMenu();
-  return (
-    <MenuItemRow
-      label={label}
-      icon={icon}
-      onClick={onClick}
-      onOpenChange={onOpenChange}
-      disabled={disabled}
-      variant={variant}
-      shortcut={shortcut}
-      style={style}
-    />
-  );
-}
+export const ContextMenuLabel = menuParts.Label;
 
-export function ContextMenuGroup({ children, style }: ContextMenuGroupProps) {
-  return <MenuGroup style={style}>{children}</MenuGroup>;
-}
+export const ContextMenuSeparator = menuParts.Separator;
 
-export function ContextMenuLabel({ children, style }: ContextMenuLabelProps) {
-  return <MenuLabel style={style}>{children}</MenuLabel>;
-}
+export const ContextMenuShortcut = menuParts.Shortcut;
 
-export function ContextMenuSeparator({ style }: ContextMenuSeparatorProps) {
-  return <MenuSeparator style={style} />;
-}
+export const ContextMenuCheckboxItem = menuParts.CheckboxItem;
 
-export function ContextMenuShortcut({
-  children,
-  style,
-}: ContextMenuShortcutProps) {
-  return <MenuShortcut style={style}>{children}</MenuShortcut>;
-}
+export const ContextMenuRadioGroup = menuParts.RadioGroup;
 
-export function ContextMenuCheckboxItem({
-  label,
-  checked,
-  onCheckedChange,
-  style,
-}: ContextMenuCheckboxItemProps) {
-  const { onOpenChange } = useContextMenu();
-  return (
-    <MenuRow
-      label={label}
-      leading={<MenuIndicator kind="checkbox" active={checked} />}
-      onClick={() => {
-        onCheckedChange(!checked);
-        onOpenChange(false);
-      }}
-      style={style}
-    />
-  );
-}
+export const ContextMenuRadioItem = menuParts.RadioItem;
 
-export function ContextMenuRadioGroup({
-  value,
-  defaultValue,
-  onValueChange,
-  children,
-  style,
-}: ContextMenuRadioGroupProps) {
-  return (
-    <MenuRadioGroupShell
-      value={value}
-      defaultValue={defaultValue}
-      onValueChange={onValueChange}
-      children={children}
-      style={style}
-    />
-  );
-}
+export const ContextMenuSub = menuParts.Sub;
 
-const ContextMenuRadioItemBase = makeMenuRadioItem(useContextMenu);
+export const ContextMenuSubTrigger = menuParts.SubTrigger;
 
-export function ContextMenuRadioItem(props: ContextMenuRadioItemProps) {
-  return <ContextMenuRadioItemBase {...props} />;
-}
-
-export function ContextMenuSub({
-  children,
-  defaultOpen,
-  style,
-}: ContextMenuSubProps) {
-  return <MenuSub defaultOpen={defaultOpen} style={style}>{children}</MenuSub>;
-}
-
-export function ContextMenuSubTrigger({
-  label,
-  icon,
-  style,
-}: ContextMenuSubTriggerProps) {
-  return <MenuSubTrigger label={label} icon={icon} style={style} />;
-}
-
-export function ContextMenuSubContent({
-  children,
-  style,
-}: ContextMenuSubContentProps) {
-  return <MenuSubContent style={style}>{children}</MenuSubContent>;
-}
-
-
+export const ContextMenuSubContent = menuParts.SubContent;

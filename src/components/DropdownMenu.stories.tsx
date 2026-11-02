@@ -1,34 +1,34 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Row } from "./Box";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuGroup,
-  DropdownMenuCheckboxItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuSub,
-  DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
 } from "./DropdownMenu";
 import { Button } from "./Button";
-import { LabeledStage } from "./.storybook/story-helpers";
+import { LabeledStage } from "../../.storybook/story-helpers";
 
 function DDMFullMenu() {
   return (
     <DropdownMenu open={true} onOpenChange={() => {}}>
       <DropdownMenuContent>
         <DropdownMenuLabel>File</DropdownMenuLabel>
-        <DropdownMenuItem label="New file" icon="plus" shortcut="Ctrl+N" />
+        <DropdownMenuItem label="New file" icon="add" shortcut="Ctrl+N" />
         <DropdownMenuItem label="Open" icon="folder" shortcut="Ctrl+O" />
         <DropdownMenuItem label="Indented row" icon="list" inset />
-        <DropdownMenuItem label="Disabled item" icon="user" disabled />
-        <DropdownMenuItem label="Delete" icon="trash" variant="destructive" />
+        <DropdownMenuItem label="Disabled item" icon="person" disabled />
+        <DropdownMenuItem label="Delete" icon="delete" variant="destructive" />
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuCheckboxItem
@@ -89,14 +89,22 @@ export const openAllRowKinds = defineStory({
 
 export const basicMenu = defineStory({
   render: () => (
-    <LabeledStage caption="open · basic items + separators" width={280} height={230}>
+    <LabeledStage
+      caption="open · basic items + separators"
+      width={280}
+      height={230}
+    >
       <Row justify="center" style={{ paddingTop: 8 }}>
         <DropdownMenu open={true} onOpenChange={() => {}}>
           <DropdownMenuContent>
-            <DropdownMenuItem label="New file" icon="plus" shortcut="Ctrl+N" />
+            <DropdownMenuItem label="New file" icon="add" shortcut="Ctrl+N" />
             <DropdownMenuItem label="Open" icon="folder" shortcut="Ctrl+O" />
             <DropdownMenuSeparator />
-            <DropdownMenuItem label="Save" icon="copy" shortcut="Ctrl+S" />
+            <DropdownMenuItem
+              label="Save"
+              icon="contentCopy"
+              shortcut="Ctrl+S"
+            />
             <DropdownMenuSeparator />
             <DropdownMenuItem label="Close" />
           </DropdownMenuContent>
@@ -138,7 +146,7 @@ export const sideLeft = defineStory({
         <DropdownMenu open={true} onOpenChange={() => {}}>
           <DropdownMenuContent side="left">
             <DropdownMenuLabel>Side</DropdownMenuLabel>
-            <DropdownMenuItem label="Left-anchored item" icon="plus" />
+            <DropdownMenuItem label="Left-anchored item" icon="add" />
           </DropdownMenuContent>
         </DropdownMenu>
       </Row>

@@ -1,21 +1,24 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import {
   Combobox as ComboboxRootPrimitive,
-  ComboboxInput as ComboboxInputPrimitive,
-  ComboboxTrigger as ComboboxTriggerPrimitive,
-  ComboboxValue as ComboboxValuePrimitive,
   ComboboxContent as ComboboxContentPrimitive,
-  ComboboxList as ComboboxListPrimitive,
-  ComboboxItem as ComboboxItemPrimitive,
   ComboboxEmpty as ComboboxEmptyPrimitive,
   ComboboxGroup as ComboboxGroupPrimitive,
+  ComboboxInput as ComboboxInputPrimitive,
+  ComboboxItem as ComboboxItemPrimitive,
   ComboboxLabel as ComboboxLabelPrimitive,
+  ComboboxList as ComboboxListPrimitive,
   ComboboxSeparator as ComboboxSeparatorPrimitive,
+  ComboboxTrigger as ComboboxTriggerPrimitive,
+  ComboboxValue as ComboboxValuePrimitive,
   type ComboboxValue as ComboboxValueType,
 } from "@gpuix/react/combobox";
 import { useAdwaita } from "../theme/adwaita";
-import { T, listPanelStyle, textFieldStyle } from "./common";
+import { T } from "./text";
+import { listPanelStyle } from "./FloatingPanel";
+import { textFieldStyle } from "./input-base";
+import { optionItemStyle } from "./Select";
 import { Icon, type IconName } from "./icons";
 
 export interface ComboboxProps {
@@ -70,7 +73,6 @@ export function ComboboxInput({
   style,
 }: ComboboxInputProps) {
   const t = useAdwaita();
-  const { radii, colors } = t;
   const showClearButton = showClear === true && (value ?? "").length > 0;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 4, ...style }}>
@@ -83,7 +85,7 @@ export function ComboboxInput({
           minHeight: 34,
           paddingLeft: 12,
           paddingRight: showClearButton ? 4 : 12,
-          borderRadius: radii.button,
+          borderRadius: t.radius.sm,
           opacity: disabled ? 0.5 : 1,
         })}
       />
@@ -96,16 +98,16 @@ export function ComboboxInput({
             justifyContent: "center",
             width: 28,
             height: 28,
-            borderRadius: radii.button,
+            borderRadius: t.radius.sm,
             cursor: "pointer",
-            hover: { backgroundColor: colors.button_hover },
-            active: { backgroundColor: colors.button_active },
+            hover: { backgroundColor: t.color.surface.buttonHover },
+            active: { backgroundColor: t.color.surface.buttonActive },
           }}
         >
           <Icon
             name="close"
             size={14}
-            color={colors.dim_fg}
+            color={t.color.text.dim}
             style={{ pointerEvents: "none" }}
           />
         </div>
@@ -121,7 +123,6 @@ export interface ComboboxTriggerProps {
 
 export function ComboboxTrigger({ disabled, style }: ComboboxTriggerProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <ComboboxTriggerPrimitive
       disabled={disabled}
@@ -131,23 +132,24 @@ export function ComboboxTrigger({ disabled, style }: ComboboxTriggerProps) {
         justifyContent: "center",
         width: 34,
         minHeight: 34,
-        borderRadius: radii.button,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        borderRadius: t.radius.sm,
+        borderWidth: 0,
+        backgroundColor: t.color.surface.button,
         cursor: disabled ? "default" : "pointer",
         opacity: disabled ? 0.5 : 1,
-        hover: disabled ? undefined : { backgroundColor: colors.button_hover },
+        hover: disabled
+          ? undefined
+          : { backgroundColor: t.color.surface.buttonHover },
         active: disabled
           ? undefined
-          : { backgroundColor: colors.button_active },
+          : { backgroundColor: t.color.surface.buttonActive },
         ...style,
       }}
     >
       <Icon
-        name="chevronDown"
+        name="expandMore"
         size={14}
-        color={colors.dim_fg}
+        color={t.color.text.dim}
         style={{ pointerEvents: "none" }}
       />
     </ComboboxTriggerPrimitive>
@@ -166,14 +168,13 @@ export function ComboboxValue({
   style,
 }: ComboboxValueProps) {
   const t = useAdwaita();
-  const { colors, typography } = t;
   return (
     <ComboboxValuePrimitive
       placeholder={placeholder}
       style={{
-        fontSize: typography.body,
-        fontFamily: typography.fontFamily,
-        color: colors.fg,
+        fontSize: t.type.body,
+        fontFamily: t.type.fontFamily,
+        color: t.color.text.primary,
         ...style,
       }}
     >
@@ -238,25 +239,17 @@ export function ComboboxItem({
   style,
 }: ComboboxItemProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <ComboboxItemPrimitive
       value={value}
       disabled={disabled}
-      style={({ selected: isSelected, highlighted, disabled: d }) => ({
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 8,
-        padding: 8,
-        borderRadius: t.radii.row,
-        cursor: d ? "default" : "pointer",
-        backgroundColor:
-          isSelected || highlighted ? colors.accentTint : "transparent",
-        opacity: d ? 0.5 : 1,
-        ...style,
-      })}
+      style={({ selected: isSelected, highlighted, disabled: d }) =>
+        optionItemStyle(
+          t,
+          { selected: isSelected, highlighted, disabled: d },
+          style,
+        )
+      }
     >
       <div
         style={{
@@ -271,14 +264,16 @@ export function ComboboxItem({
       >
         {selected ? (
           <Icon
-            name="success"
+            name="checkCircle"
             size={14}
-            color={colors.accent}
+            color={t.color.accent.base}
             style={{ pointerEvents: "none" }}
           />
         ) : null}
-        {icon ? <Icon name={icon} size={16} color={colors.fg} /> : null}
-        <T size="body" color={colors.fg}>
+        {icon ? (
+          <Icon name={icon} size={16} color={t.color.text.primary} />
+        ) : null}
+        <T size="body" color={t.color.text.primary}>
           {children}
         </T>
       </div>
@@ -296,10 +291,9 @@ export function ComboboxEmpty({
   style,
 }: ComboboxEmptyProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <ComboboxEmptyPrimitive style={{ padding: 8, ...style }}>
-      <T size="body" color={colors.dim_fg}>
+      <T size="body" color={t.color.text.dim}>
         {children}
       </T>
     </ComboboxEmptyPrimitive>
@@ -313,10 +307,9 @@ export interface ComboboxLabelProps {
 
 export function ComboboxLabel({ children, style }: ComboboxLabelProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <ComboboxLabelPrimitive style={{ padding: 8, paddingBottom: 4, ...style }}>
-      <T size="caption" color={colors.dim_fg}>
+      <T size="caption" color={t.color.text.dim}>
         {children}
       </T>
     </ComboboxLabelPrimitive>
@@ -340,12 +333,11 @@ export interface ComboboxSeparatorProps {
 
 export function ComboboxSeparator({ style }: ComboboxSeparatorProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <ComboboxSeparatorPrimitive
       style={{
         height: 1,
-        backgroundColor: colors.border,
+        backgroundColor: t.color.border.default,
         ...style,
       }}
     />
@@ -370,7 +362,6 @@ export function ComboboxChips({
   style,
 }: ComboboxChipsProps) {
   const t = useAdwaita();
-  const { colors, radii, typography } = t;
   return (
     <div
       style={{
@@ -379,9 +370,9 @@ export function ComboboxChips({
         alignItems: "center",
         gap: 6,
         borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
-        borderRadius: radii.button,
+        borderColor: t.color.border.default,
+        backgroundColor: t.color.surface.view,
+        borderRadius: t.radius.sm,
         minHeight: 34,
         padding: 4,
         paddingLeft: 8,
@@ -398,13 +389,12 @@ export function ComboboxChips({
             padding: 4,
             paddingLeft: 8,
             paddingRight: 4,
-            borderRadius: radii.pill,
-            borderWidth: 1,
-            borderColor: colors.border,
-            backgroundColor: colors.button_bg,
+            borderRadius: t.radius.full,
+            borderWidth: 0,
+            backgroundColor: t.color.surface.button,
           }}
         >
-          <T size="caption" color={colors.fg}>
+          <T size="caption" color={t.color.text.primary}>
             {v}
           </T>
           <div
@@ -417,14 +407,14 @@ export function ComboboxChips({
               height: 16,
               borderRadius: 4,
               cursor: "pointer",
-              hover: { backgroundColor: colors.button_hover },
-              active: { backgroundColor: colors.button_active },
+              hover: { backgroundColor: t.color.surface.buttonHover },
+              active: { backgroundColor: t.color.surface.buttonActive },
             }}
           >
             <Icon
               name="close"
               size={10}
-              color={colors.dim_fg}
+              color={t.color.text.dim}
               style={{ pointerEvents: "none" }}
             />
           </div>
@@ -439,13 +429,11 @@ export function ComboboxChips({
           minWidth: 60,
           borderWidth: 0,
           backgroundColor: "transparent",
-          fontSize: typography.body,
-          fontFamily: typography.fontFamily,
-          color: colors.fg,
+          fontSize: t.type.body,
+          fontFamily: t.type.fontFamily,
+          color: t.color.text.primary,
         }}
       />
     </div>
   );
 }
-
-

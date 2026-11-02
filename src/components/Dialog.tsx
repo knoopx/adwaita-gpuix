@@ -1,16 +1,22 @@
-import type { ReactNode } from "react";
-import type { StyleDesc, EventPayload } from "@gpuix/react";
-import { motion } from "@gpuix/react";
+import { Children, type ReactNode, createContext, useContext } from "react";
+import { type EventPayload, type StyleDesc, motion } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
 import {
-  T,
-  Scrim,
   CloseButton,
-  dialogCardStyle,
-  OverlayTitle,
   OverlayDescription,
-} from "./common";
+  OverlayTitle,
+  Scrim,
+  dialogCardStyle,
+} from "./overlay";
 import { Button } from "./Button";
+import {
+  PanelShowcase,
+  PanelShowcaseColumn,
+  PanelShowcaseRow,
+  PanelShowcaseSection,
+  PanelShowcaseStage,
+} from "./PanelBase";
 
 export interface DialogRootProps {
   open: boolean;
@@ -65,7 +71,6 @@ interface DialogContext {
   contained: boolean;
 }
 
-import { Children, createContext, useContext } from "react";
 const DialogCtx = createContext<DialogContext | null>(null);
 
 function useDialog(): DialogContext {
@@ -108,7 +113,7 @@ export function DialogContent({
 }: DialogContentProps) {
   const { open, onOpenChange, contained } = useDialog();
   const t = useAdwaita();
-  const gap = t.spacing.gap;
+  const gap = t.space.sm;
 
   if (!open) return null;
 
@@ -186,7 +191,7 @@ export function DialogFooter({
   style,
 }: DialogFooterProps) {
   const t = useAdwaita();
-  const gap = t.spacing.gap;
+  const gap = t.space.sm;
 
   if (!destructive) {
     return (
@@ -205,7 +210,8 @@ export function DialogFooter({
   }
 
   const kids = Children.toArray(children);
-  if (kids.length < 2) return <DialogFooter children={children} style={style} />;
+  if (kids.length < 2)
+    return <DialogFooter children={children} style={style} />;
 
   const [first, ...rest] = kids;
   return (
@@ -219,7 +225,9 @@ export function DialogFooter({
         ...style,
       }}
     >
-      <div style={{ display: "flex", flexDirection: "row", gap, flexShrink: 0 }}>
+      <div
+        style={{ display: "flex", flexDirection: "row", gap, flexShrink: 0 }}
+      >
         {first}
       </div>
       <div
@@ -239,14 +247,10 @@ export function DialogFooter({
 export function DialogClose({ children, style }: DialogCloseProps) {
   const { onOpenChange } = useDialog();
 
-  // icon mode: keep the compact 24x24 close-button box (e.g. the auto X).
   if (children == null) {
     return <CloseButton onClick={() => onOpenChange(false)} style={style} />;
   }
 
-  // text mode: render a text button so a custom label matches the footer
-  // buttons (content-sized width, 34px min-height) instead of overflowing
-  // the fixed 24x24 icon box.
   return (
     <Button variant="text" onClick={() => onOpenChange(false)} style={style}>
       {children}
@@ -254,114 +258,81 @@ export function DialogClose({ children, style }: DialogCloseProps) {
   );
 }
 
-function StageBox({
-  width,
-  height,
-  children,
+function ShowcaseDialog({
+  title,
+  description,
+  showCloseButton = true,
+  destructive = false,
 }: {
-  width: number;
-  height: number;
-  children: ReactNode;
+  title: string;
+  description: string;
+  showCloseButton?: boolean;
+  destructive?: boolean;
 }) {
   const t = useAdwaita();
-  const { colors } = t;
+  const cancelAndSave = (
+    <>
+      <Button label="Cancel" onClick={noop} />
+      <Button variant="suggested" label="Save" onClick={noop} />
+    </>
+  );
   return (
-    <div
-      style={{
-        position: "relative",
-        width,
-        height,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
-        overflow: "hidden",
-      }}
-    >
-      {children}
-    </div>
+    <PanelShowcaseStage width={480} height={190}>
+      <Dialog open={true} onOpenChange={noop} contained>
+        <DialogContent showCloseButton={showCloseButton}>
+          <DialogHeader>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
+          </DialogHeader>
+          {destructive ? (
+            <DialogFooter destructive>
+              <Button variant="destructive" label="Delete" onClick={noop} />
+              {cancelAndSave}
+            </DialogFooter>
+          ) : (
+            <DialogFooter>
+              <DialogClose>
+                <T size="caption" color={t.color.text.dim}>
+                  Close
+                </T>
+              </DialogClose>
+              {cancelAndSave}
+            </DialogFooter>
+          )}
+        </DialogContent>
+      </Dialog>
+    </PanelShowcaseStage>
   );
 }
 
 export function DialogShowcase(): ReactNode {
-  const t = useAdwaita();
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: 16,
-          alignItems: "center",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+    <PanelShowcase>
+      <PanelShowcaseRow>
+        <PanelShowcaseColumn>
           <Dialog open={false} onOpenChange={noop}>
             <DialogTrigger>
               <Button label="Open dialog" onClick={noop} />
             </DialogTrigger>
           </Dialog>
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 16,
-          alignItems: "center",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <T size="caption" color={t.colors.dim_fg}>
-            adwaita idiom — destructive action on the left, cancel / suggested
-            on the right (auto close button)
-          </T>
-          <StageBox width={480} height={190}>
-            <Dialog open={true} onOpenChange={noop} contained>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Dialog title</DialogTitle>
-                  <DialogDescription>
-                    A description of what this dialog is about.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter destructive>
-                  <Button variant="destructive" label="Delete" onClick={noop} />
-                  <Button label="Cancel" onClick={noop} />
-                  <Button variant="suggested" label="Save" onClick={noop} />
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </StageBox>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <T size="caption" color={t.colors.dim_fg}>
-            showCloseButton=false + custom DialogClose in the footer
-          </T>
-          <StageBox width={480} height={190}>
-            <Dialog open={true} onOpenChange={noop} contained>
-              <DialogContent showCloseButton={false}>
-                <DialogHeader>
-                  <DialogTitle>Custom close</DialogTitle>
-                  <DialogDescription>
-                    The auto close button is disabled; the footer carries a
-                    DialogClose.
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose>
-                    <T size="caption" color={t.colors.dim_fg}>
-                      Close
-                    </T>
-                  </DialogClose>
-                  <Button label="Cancel" onClick={noop} />
-                  <Button variant="suggested" label="Save" onClick={noop} />
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </StageBox>
-        </div>
-      </div>
-    </div>
+        </PanelShowcaseColumn>
+      </PanelShowcaseRow>
+      <PanelShowcaseSection>
+        <PanelShowcaseColumn caption="adwaita idiom — destructive action on the left, cancel / suggested on the right (auto close button)">
+          <ShowcaseDialog
+            title="Dialog title"
+            description="A description of what this dialog is about."
+            destructive
+          />
+        </PanelShowcaseColumn>
+        <PanelShowcaseColumn caption="showCloseButton=false + custom DialogClose in the footer">
+          <ShowcaseDialog
+            title="Custom close"
+            description="The auto close button is disabled; the footer carries a DialogClose."
+            showCloseButton={false}
+          />
+        </PanelShowcaseColumn>
+      </PanelShowcaseSection>
+    </PanelShowcase>
   );
 }

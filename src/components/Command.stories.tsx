@@ -1,19 +1,55 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import { Kbd, KbdGroup } from "./Kbd";
-import type { IconName } from "./icons";
+import { type IconName } from "./icons";
 import {
   Command,
-  CommandInput,
-  CommandList,
+  CommandDialog,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
+  CommandList,
   CommandSeparator,
-  CommandDialog,
 } from "./Command";
-import { Stage } from "./.storybook/story-helpers";
+import { Stage } from "../../.storybook/story-helpers";
+import { type ReactNode } from "react";
+
+const GENERAL_ITEMS: {
+  label: string;
+  icon: IconName;
+  shortcut?: string;
+  searchTerms?: string;
+  selected?: boolean;
+}[] = [
+  { label: "New file", icon: "add", shortcut: "Ctrl+N" },
+  {
+    label: "Open file",
+    icon: "folder",
+    shortcut: "Ctrl+O",
+    selected: true,
+  },
+];
+
+function GeneralGroup({ extra }: { extra?: ReactNode }) {
+  return (
+    <CommandGroup label="General">
+      {GENERAL_ITEMS.map((item) => (
+        <CommandItem
+          key={item.label}
+          label={item.label}
+          icon={item.icon}
+          shortcut={item.shortcut}
+          searchTerms={item.searchTerms}
+          selected={item.selected}
+          onSelect={() => {}}
+        />
+      ))}
+      {extra}
+    </CommandGroup>
+  );
+}
 
 export default defineMeta({
   title: "Adwaita/Command",
@@ -29,37 +65,26 @@ export const openPalette = defineStory({
         <Command anchored={false}>
           <CommandInput placeholder="Type a command…" />
           <CommandList>
-            <CommandGroup label="General">
-              <CommandItem
-                label="New file"
-                icon="plus"
-                shortcut="Ctrl+N"
-                onSelect={() => {}}
-              />
-              <CommandItem
-                label="Open file"
-                icon="folder"
-                shortcut="Ctrl+O"
-                selected
-                onSelect={() => {}}
-              />
-              <CommandItem
-                label="Search files"
-                icon="search"
-                searchTerms="find locate"
-                onSelect={() => {}}
-              />
-            </CommandGroup>
+            <GeneralGroup
+              extra={
+                <CommandItem
+                  label="Search files"
+                  icon="search"
+                  searchTerms="find locate"
+                  onSelect={() => {}}
+                />
+              }
+            />
             <CommandSeparator />
             <CommandGroup label="Actions">
               <CommandItem
                 label="Delete"
-                icon="trash"
+                icon="delete"
                 shortcut="Del"
                 disabled
                 onSelect={() => {}}
               />
-              <CommandItem label="Rename" icon="fileText" onSelect={() => {}} />
+              <CommandItem label="Rename" icon="article" onSelect={() => {}} />
             </CommandGroup>
           </CommandList>
         </Command>
@@ -84,22 +109,11 @@ export const floatingPalette = defineStory({
         <Command>
           <CommandInput placeholder="Type a command…" />
           <CommandList>
-            <CommandGroup label="General">
-              <CommandItem
-                label="New file"
-                icon="plus"
-                shortcut="Ctrl+N"
-                onSelect={() => {}}
-              />
-              <CommandItem
-                label="Open file"
-                icon="folder"
-                shortcut="Ctrl+O"
-                selected
-                onSelect={() => {}}
-              />
-              <CommandItem label="Save" icon="fileText" shortcut="Ctrl+S" />
-            </CommandGroup>
+            <GeneralGroup
+              extra={
+                <CommandItem label="Save" icon="article" shortcut="Ctrl+S" />
+              }
+            />
           </CommandList>
         </Command>
       </Labeled>
@@ -138,10 +152,10 @@ export const withIcons = defineStory({
   render: () => {
     const commands: { label: string; icon: IconName; selected?: boolean }[] = [
       { label: "Preferences", icon: "settings" },
-      { label: "New file", icon: "plus" },
+      { label: "New file", icon: "add" },
       { label: "Open folder", icon: "folder", selected: true },
       { label: "Refresh", icon: "refresh" },
-      { label: "Clipboard history", icon: "copy" },
+      { label: "Clipboard history", icon: "contentCopy" },
     ];
     return (
       <Column gap={16} align="center">
@@ -215,15 +229,15 @@ export const disabledItems = defineStory({
           <CommandInput placeholder="Type a command…" />
           <CommandList>
             <CommandGroup>
-              <CommandItem label="Copy" icon="copy" shortcut="Ctrl+C" />
+              <CommandItem label="Copy" icon="contentCopy" shortcut="Ctrl+C" />
               <CommandItem
                 label="Paste"
-                icon="copy"
+                icon="contentCopy"
                 shortcut="Ctrl+V"
                 disabled
               />
               <CommandItem label="Select all" icon="list" shortcut="Ctrl+A" />
-              <CommandItem label="Clear history" icon="trash" disabled />
+              <CommandItem label="Clear history" icon="delete" disabled />
             </CommandGroup>
           </CommandList>
         </Command>
@@ -259,7 +273,7 @@ export const commandDialog = defineStory({
   render: () => (
     <Column gap={16} align="center">
       <Labeled caption="command dialog (contained, in a stage)">
-        <Stage width={480} height={220} radius={12}>
+        <Stage width={480} height={220} radius={8}>
           <Row justify="center" align="center" style={{ height: "100%" }}>
             <CommandDialog open={true} onOpenChange={() => {}} contained>
               <CommandInput placeholder="Type a command…" />
@@ -267,7 +281,7 @@ export const commandDialog = defineStory({
                 <CommandGroup label="General">
                   <CommandItem
                     label="New file"
-                    icon="plus"
+                    icon="add"
                     shortcut="Ctrl+N"
                     onSelect={() => {}}
                   />

@@ -1,19 +1,20 @@
-import { Children } from "react";
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { Children, type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import {
   Select as SelectRootPrimitive,
-  SelectTrigger as SelectTriggerPrimitive,
-  SelectValue as SelectValuePrimitive,
   SelectContent as SelectContentPrimitive,
-  SelectItem as SelectItemPrimitive,
   SelectGroup as SelectGroupPrimitive,
+  SelectItem as SelectItemPrimitive,
   SelectLabel as SelectLabelPrimitive,
   SelectSeparator as SelectSeparatorPrimitive,
+  SelectTrigger as SelectTriggerPrimitive,
+  SelectValue as SelectValuePrimitive,
 } from "@gpuix/react/select";
-import { useAdwaita } from "../theme/adwaita";
-import { T, listPanelStyle, selectTriggerStyle } from "./common";
+import { type AdwaitaTheme, useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
+import { listPanelStyle } from "./FloatingPanel";
 import { Icon } from "./icons";
+import { DISABLED_OPACITY } from "./disabled";
 
 export interface SelectProps {
   items?: readonly { value: string; label?: ReactNode; textValue?: string }[];
@@ -47,7 +48,6 @@ export function SelectTrigger({
   style,
 }: SelectTriggerProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <SelectTriggerPrimitive
       disabled={disabled}
@@ -56,14 +56,20 @@ export function SelectTrigger({
           minHeight: size === "sm" ? 28 : 34,
         });
         return d
-          ? { ...base, cursor: "default", opacity: 0.5, hover: undefined, ...style }
+          ? {
+              ...base,
+              cursor: "default",
+              opacity: 0.5,
+              hover: undefined,
+              ...style,
+            }
           : open
-            ? { ...base, borderColor: colors.accent, ...style }
+            ? { ...base, borderColor: t.color.accent.base, ...style }
             : { ...base, ...style };
       }}
     >
       {children}
-      <Icon name="chevronDown" size={14} color={colors.dim_fg} />
+      <Icon name="expandMore" size={14} color={t.color.text.dim} />
     </SelectTriggerPrimitive>
   );
 }
@@ -80,24 +86,21 @@ export function SelectValue({
   style,
 }: SelectValueProps) {
   const t = useAdwaita();
-  const { colors, typography } = t;
   const placeholderNode =
-    placeholder === undefined
-      ? undefined
-      : typeof placeholder === "string"
-        ? (
-            <T size="body" color={colors.dim_fg}>
-              {placeholder}
-            </T>
-          )
-        : placeholder;
+    placeholder === undefined ? undefined : typeof placeholder === "string" ? (
+      <T size="body" color={t.color.text.dim}>
+        {placeholder}
+      </T>
+    ) : (
+      placeholder
+    );
   return (
     <SelectValuePrimitive
       placeholder={placeholderNode}
       style={{
-        color: colors.fg,
-        fontSize: typography.body,
-        fontFamily: typography.fontFamily,
+        color: t.color.text.primary,
+        fontSize: t.type.body,
+        fontFamily: t.type.fontFamily,
         flexGrow: 1,
         minWidth: 0,
         whiteSpace: "nowrap",
@@ -171,25 +174,13 @@ export function SelectItem({
   style,
 }: SelectItemProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <SelectItemPrimitive
       value={value}
       disabled={disabled}
-      style={({ selected, highlighted, disabled: d }) => ({
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 8,
-        padding: 8,
-        borderRadius: radii.row,
-        cursor: d ? "default" : "pointer",
-        backgroundColor:
-          selected || highlighted ? colors.accentTint : "transparent",
-        opacity: d ? 0.5 : 1,
-        ...style,
-      })}
+      style={({ selected, highlighted, disabled: d }) =>
+        optionItemStyle(t, { selected, highlighted, disabled: d }, style)
+      }
     >
       {({ selected }) => (
         <div
@@ -203,8 +194,10 @@ export function SelectItem({
             pointerEvents: "none",
           }}
         >
-          {selected ? <Icon name="check" size={14} color={colors.accent} /> : null}
-          <T size="body" color={colors.fg}>
+          {selected ? (
+            <Icon name="check" size={14} color={t.color.accent.base} />
+          ) : null}
+          <T size="body" color={t.color.text.primary}>
             {children}
           </T>
         </div>
@@ -237,7 +230,7 @@ export function SelectLabel({ children, style }: SelectLabelProps) {
         ...style,
       }}
     >
-      <T size="caption" color={t.colors.dim_fg}>
+      <T size="caption" color={t.color.text.dim}>
         {children}
       </T>
     </SelectLabelPrimitive>
@@ -254,9 +247,59 @@ export function SelectSeparator({ style }: SelectSeparatorProps) {
     <SelectSeparatorPrimitive
       style={{
         height: 1,
-        backgroundColor: t.colors.border,
+        backgroundColor: t.color.border.default,
         ...style,
       }}
     />
   );
+}
+
+export function selectTriggerStyle(
+  t: AdwaitaTheme,
+  style?: Partial<StyleDesc>,
+): Partial<StyleDesc> {
+  return {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+    minHeight: 34,
+    paddingLeft: 12,
+    paddingRight: 8,
+    borderRadius: t.radius.full,
+    borderWidth: 1,
+    borderColor: t.color.border.default,
+    backgroundColor: t.color.surface.view,
+    cursor: "pointer",
+    hover: { backgroundColor: t.color.surface.button },
+    ...style,
+  };
+}
+
+export interface OptionState {
+  selected: boolean;
+  highlighted: boolean;
+  disabled: boolean;
+}
+
+export function optionItemStyle(
+  t: AdwaitaTheme,
+  { selected, highlighted, disabled }: OptionState,
+  style?: Partial<StyleDesc>,
+): Partial<StyleDesc> {
+  return {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+    padding: 8,
+    borderRadius: t.radius.sm,
+    cursor: disabled ? "default" : "pointer",
+    backgroundColor:
+      selected || highlighted ? t.color.accent.tint : "transparent",
+    opacity: disabled ? DISABLED_OPACITY : 1,
+    ...style,
+  };
 }

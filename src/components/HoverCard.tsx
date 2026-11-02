@@ -1,7 +1,8 @@
-import { createContext, useContext, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba } from "../theme/adwaita";
-import { FloatingPanel } from "./common";
+import { type ReactNode, createContext, useContext } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { hexToRgba, useAdwaita } from "../theme/adwaita";
+import { FloatingPanel } from "./FloatingPanel";
+import { PANEL_SHADOW } from "./overlay";
 
 export interface HoverCardProps {
   open: boolean;
@@ -36,7 +37,12 @@ function useHoverCard(): HoverCardContext {
   return ctx;
 }
 
-export function HoverCard({ open, onOpenChange, children, style }: HoverCardProps) {
+export function HoverCard({
+  open,
+  onOpenChange,
+  children,
+  style,
+}: HoverCardProps) {
   return (
     <HoverCardCtx.Provider value={{ open, onOpenChange }}>
       <div style={{ display: "flex", position: "relative", ...style }}>
@@ -55,8 +61,8 @@ export function HoverCardTrigger({ children, style }: HoverCardTriggerProps) {
       onMouseLeave={() => onOpenChange(false)}
       style={{
         cursor: "pointer",
-        borderRadius: t.radii.row,
-        hover: { backgroundColor: hexToRgba(t.colors.fg, 0.08) },
+        borderRadius: t.radius.sm,
+        hover: { backgroundColor: t.color.surface.hover },
         ...style,
       }}
     >
@@ -82,16 +88,7 @@ export function HoverCardContent({
       padding={8}
       gap={8}
       minWidth={200}
-      style={{
-        boxShadow: {
-          offsetX: 0,
-          offsetY: 4,
-          blurRadius: 16,
-          spreadRadius: 0,
-          color: "rgba(0,0,0,0.35)",
-        },
-        ...style,
-      }}
+      style={{ boxShadow: PANEL_SHADOW, ...style }}
     >
       {children}
     </FloatingPanel>

@@ -1,13 +1,17 @@
 import {
+  type ReactNode,
   createContext,
   useContext,
   useRef,
   useState,
-  type ReactNode,
 } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, accentForeground } from "../theme/adwaita";
-import { T } from "./common";
+import { type StyleDesc } from "@gpuix/react";
+import {
+  type AdwaitaTheme,
+  accentForeground,
+  useAdwaita,
+} from "../theme/adwaita";
+import { T } from "./text";
 
 export interface TooltipProviderProps {
   children: ReactNode;
@@ -34,6 +38,89 @@ export interface TooltipContentProps {
   side?: "top" | "right" | "bottom" | "left";
   sideOffset?: number;
   style?: Partial<StyleDesc>;
+}
+
+type TooltipSide = "top" | "right" | "bottom" | "left";
+
+const SIDE_OFFSET: Record<
+  TooltipSide,
+  (offset: number) => { x: number; y: number }
+> = {
+  top: (offset) => ({ x: 0, y: -offset }),
+  bottom: (offset) => ({ x: 0, y: offset }),
+  left: (offset) => ({ x: -offset, y: 0 }),
+  right: (offset) => ({ x: offset, y: 0 }),
+};
+
+const SIDE_ARROW_AFTER: Record<TooltipSide, boolean> = {
+  top: true,
+  left: true,
+  bottom: false,
+  right: false,
+};
+
+const SIDE_FLEX_DIRECTION: Record<TooltipSide, "row" | "column"> = {
+  top: "column",
+  bottom: "column",
+  left: "row",
+  right: "row",
+};
+
+const TOOLTIP_ARROW_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><rect x="3" y="3" width="6" height="6" rx="1" transform="rotate(45 6 6)" fill="';
+const TOOLTIP_ARROW_SVG_END = '"/></svg>';
+
+function tooltipArrowImg(bubbleBg: string) {
+  return (
+    <img
+      src={
+        "data:image/svg+xml," +
+        encodeURIComponent(TOOLTIP_ARROW_SVG + bubbleBg + TOOLTIP_ARROW_SVG_END)
+      }
+      style={{ width: 12, height: 12, pointerEvents: "none" }}
+    />
+  );
+}
+
+function tooltipBubbleStyle(t: AdwaitaTheme): Partial<StyleDesc> {
+  return {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    padding: 4,
+    paddingLeft: 10,
+    paddingRight: 10,
+    maxWidth: 240,
+    borderRadius: t.radius.sm,
+    backgroundColor: t.color.surface.osd,
+    boxShadow: {
+      offsetX: 0,
+      offsetY: 2,
+      blurRadius: 8,
+      spreadRadius: 0,
+      color: "rgba(0,0,0,0.35)",
+    },
+  };
+}
+
+function TooltipBubbleContent({
+  color,
+  children,
+}: {
+  color: string;
+  children: ReactNode;
+}) {
+  if (typeof children !== "string") return <>{children}</>;
+  return (
+    <T
+      size="caption"
+      color={color}
+      align="center"
+      style={{ whiteSpace: "normal" }}
+    >
+      {children}
+    </T>
+  );
 }
 
 const TooltipProviderCtx = createContext<number>(0);
@@ -140,76 +227,30 @@ export function TooltipContent({
   const effectiveSide = side ?? ctx.side;
   if (!ctx.open) return null;
 
-  const bubbleBg = t.colors.osd_bg;
-  const bubbleFg = accentForeground(bubbleBg);
-  const horizontal = effectiveSide === "left" || effectiveSide === "right";
-  const arrowAfter = effectiveSide === "top" || effectiveSide === "left";
-  const offset =
-    effectiveSide === "top"
-      ? { x: 0, y: -sideOffset }
-      : effectiveSide === "bottom"
-        ? { x: 0, y: sideOffset }
-        : effectiveSide === "left"
-          ? { x: -sideOffset, y: 0 }
-          : { x: sideOffset, y: 0 };
-
-  const arrowSvg =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><rect x="3" y="3" width="6" height="6" rx="1" transform="rotate(45 6 6)" fill="' +
-    bubbleBg +
-    '"/></svg>';
-  const arrowImg = (
-    <img
-      src={"data:image/svg+xml," + encodeURIComponent(arrowSvg)}
-      style={{ width: 12, height: 12, pointerEvents: "none" }}
-    />
-  );
+  const bubbleFg = accentForeground(t.color.surface.osd);
+  const arrowImg = tooltipArrowImg(t.color.surface.osd);
+  const arrowAfter = SIDE_ARROW_AFTER[effectiveSide];
   return (
-    <anchored side={effectiveSide} offset={offset}>
+    <anchored
+      side={effectiveSide}
+      offset={SIDE_OFFSET[effectiveSide](sideOffset)}
+    >
       <div
         style={{
           display: "flex",
-          flexDirection: horizontal ? "row" : "column",
+          flexDirection: SIDE_FLEX_DIRECTION[effectiveSide],
           alignItems: "center",
           justifyContent: "center",
           gap: 2,
-          // Floats over the trigger; must never swallow its events.
+
           pointerEvents: "none",
         }}
       >
         {arrowAfter ? null : arrowImg}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: 4,
-            paddingLeft: 10,
-            paddingRight: 10,
-            maxWidth: 240,
-            borderRadius: t.radii.button,
-            backgroundColor: bubbleBg,
-            boxShadow: {
-              offsetX: 0,
-              offsetY: 2,
-              blurRadius: 8,
-              spreadRadius: 0,
-              color: "rgba(0,0,0,0.35)",
-            },
-            ...style,
-          }}
-        >
-          {typeof children === "string" ? (
-            <T
-              size="caption"
-              color={bubbleFg}
-              align="center"
-              style={{ whiteSpace: "normal" }}
-            >
-              {children}
-            </T>
-          ) : (
-            <>{children}</>
-          )}
+        <div style={{ ...tooltipBubbleStyle(t), ...style }}>
+          <TooltipBubbleContent color={bubbleFg}>
+            {children}
+          </TooltipBubbleContent>
         </div>
         {arrowAfter ? arrowImg : null}
       </div>
