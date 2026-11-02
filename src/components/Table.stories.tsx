@@ -1,17 +1,17 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled, T } from "./common";
+import { Labeled, T } from "./text";
 import { Column } from "./Box";
 import {
   Table,
-  TableHeader,
   TableBody,
-  TableFooter,
-  TableFootCell,
-  TableRow,
-  TableHead,
-  TableCell,
   TableCaption,
+  TableCell,
+  TableFootCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "./Table";
 
 const USER_ROWS: string[][] = [
@@ -188,10 +188,10 @@ export function empty() {
                 alignItems: "center",
                 justifyContent: "center",
                 flexGrow: 1,
-                padding: t.spacing.gap,
+                padding: t.space.sm,
               }}
             >
-              <T size="body" color={t.colors.dim_fg}>
+              <T size="body" color={t.color.text.dim}>
                 No items
               </T>
             </div>
@@ -250,7 +250,7 @@ export function scrolling() {
         </TableHeader>
         <TableBody>
           <virtual-list
-            estimatedItemHeight={t.spacing.rowHeight}
+            estimatedItemHeight={t.control.rowHeight}
             style={{ flexGrow: 1, minHeight: 0 }}
           >
             {SCROLL_ROWS.map((row, i) => (

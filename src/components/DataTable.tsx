@@ -1,8 +1,8 @@
-import { useMemo, type Ref } from "react";
-import { T } from "./common";
+import { type Ref, useMemo } from "react";
+import { T } from "./text";
 import { useAdwaita } from "../theme/adwaita";
-import type { PublicInstance, StyleDesc } from "@gpuix/react";
-import { alignTables, type TabularSides } from "../lib/Tabular";
+import { type PublicInstance, type StyleDesc } from "@gpuix/react";
+import { type TabularSides, alignTables } from "../lib/Tabular";
 
 const MAX_ROWS = 500;
 
@@ -21,15 +21,17 @@ function dispLen(s: string, cap: number): number {
 export function DataTable({
   sides,
   scrollRef,
+  name,
 }: {
   sides: TabularSides;
 
   scrollRef?: Ref<PublicInstance>;
+
+  name?: string | null;
 }) {
   const t = useAdwaita();
-  const { colors, spacing, typography } = t;
-  const mono = typography.fontFamilyMono;
-  const pad = spacing.gap;
+  const mono = t.type.fontFamilyMono;
+  const pad = t.space.sm;
 
   const aligned = useMemo(
     () => alignTables(sides.old, sides.next, sides.hasHeader),
@@ -80,8 +82,6 @@ export function DataTable({
 
   const tableWidth = gutterWidth + colWidths.reduce((a, b) => a + b, 0);
 
-  
-  
   const colStyle = (width: number): StyleDesc => ({
     width,
     flexGrow: 1,
@@ -117,46 +117,61 @@ export function DataTable({
           paddingLeft: pad,
           paddingRight: pad,
           borderBottomWidth: 1,
-          borderColor: colors.border,
-          backgroundColor: colors.headerbar_bg,
+          borderColor: t.color.border.default,
+          backgroundColor: t.color.surface.headerbar,
           flexShrink: 0,
         }}
       >
+        {name && (
+          <T
+            size="caption"
+            color={t.color.text.primary}
+            style={{
+              fontFamily: mono,
+              flexGrow: 1,
+              minWidth: 0,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {name}
+          </T>
+        )}
         <T
           size="caption"
-          color={colors.dim_fg}
+          color={t.color.text.dim}
           style={{ whiteSpace: "nowrap" }}
         >
           {`rows ${rows.length}`}
         </T>
         <T
           size="caption"
-          color={colors.success}
+          color={t.color.functional.success}
           style={{ whiteSpace: "nowrap" }}
         >
           {`+${counts.added}`}
         </T>
         <T
           size="caption"
-          color={colors.destructive}
+          color={t.color.functional.destructive}
           style={{ whiteSpace: "nowrap" }}
         >
           {`−${counts.removed}`}
         </T>
         <T
           size="caption"
-          color={colors.warning}
+          color={t.color.functional.warning}
           style={{ whiteSpace: "nowrap" }}
         >
           {`~${counts.changed} cells`}
         </T>
         <T
           size="caption"
-          color={colors.dim_fg}
+          color={t.color.text.dim}
           style={{
             whiteSpace: "nowrap",
-            flexGrow: 1,
-            textAlign: "right" as const,
+            ...(name ? { flexShrink: 0 } : { flexGrow: 1 }),
           }}
         >
           {sides.delim === "\t" ? "tsv" : `delim "${sides.delim}"`}
@@ -173,7 +188,6 @@ export function DataTable({
           minWidth: 0,
           overflow: "scroll",
           padding: pad,
-          backgroundColor: colors.view_bg,
         }}
       >
         <div
@@ -191,9 +205,9 @@ export function DataTable({
               flexDirection: "row",
               alignItems: "center",
               height: ROW_H,
-              backgroundColor: colors.headerbar_bg,
+              backgroundColor: t.color.surface.headerbar,
               borderBottomWidth: 1,
-              borderColor: colors.border,
+              borderColor: t.color.border.default,
               flexShrink: 0,
             }}
           >
@@ -208,7 +222,7 @@ export function DataTable({
               <T
                 size="caption"
                 weight={700}
-                color={colors.dim_fg}
+                color={t.color.text.dim}
                 style={{ fontFamily: mono, whiteSpace: "nowrap" }}
               >
                 {"#"}
@@ -219,7 +233,7 @@ export function DataTable({
                 <T
                   size="caption"
                   weight={700}
-                  color={colors.dim_fg}
+                  color={t.color.text.dim}
                   style={cellStyle()}
                 >
                   {label}
@@ -231,9 +245,9 @@ export function DataTable({
           {shown.map((r, ri) => {
             const bg =
               r.kind === "added"
-                ? colors.successTint
+                ? t.color.functional.successTint
                 : r.kind === "removed"
-                  ? colors.destructiveTint
+                  ? t.color.functional.destructiveTint
                   : "transparent";
             const gutterText =
               r.kind === "pair"
@@ -243,10 +257,10 @@ export function DataTable({
                   : `${r.oldNo}:·`;
             const gutterColor =
               r.kind === "added"
-                ? colors.success
+                ? t.color.functional.success
                 : r.kind === "removed"
-                  ? colors.destructive
-                  : colors.dim_fg;
+                  ? t.color.functional.destructive
+                  : t.color.text.dim;
             return (
               <div
                 key={ri}
@@ -257,7 +271,7 @@ export function DataTable({
                   height: ROW_H,
                   backgroundColor: bg,
                   borderBottomWidth: 1,
-                  borderColor: colors.border,
+                  borderColor: t.color.border.default,
                   flexShrink: 0,
                 }}
               >
@@ -285,13 +299,17 @@ export function DataTable({
                           style={{
                             ...colStyle(colWidths[c] as number),
                             backgroundColor: cell.changed
-                              ? colors.warningTint
+                              ? t.color.functional.warningTint
                               : "transparent",
                           }}
                         >
                           <T
                             size="caption"
-                            color={cell.changed ? colors.warning : colors.fg}
+                            color={
+                              cell.changed
+                                ? t.color.functional.warning
+                                : t.color.text.primary
+                            }
                             weight={cell.changed ? 600 : 400}
                             style={cellStyle()}
                           >
@@ -308,8 +326,8 @@ export function DataTable({
                           size="caption"
                           color={
                             r.kind === "added"
-                              ? colors.success
-                              : colors.destructive
+                              ? t.color.functional.success
+                              : t.color.functional.destructive
                           }
                           style={cellStyle()}
                         >
@@ -329,12 +347,11 @@ export function DataTable({
                 justifyContent: "center",
                 height: ROW_H,
                 flexShrink: 0,
-                backgroundColor: colors.view_bg,
               }}
             >
               <T
                 size="caption"
-                color={colors.dim_fg}
+                color={t.color.text.dim}
                 style={{ whiteSpace: "nowrap" }}
               >
                 {`… ${rows.length - MAX_ROWS} more rows not shown`}
@@ -346,5 +363,3 @@ export function DataTable({
     </div>
   );
 }
-
-

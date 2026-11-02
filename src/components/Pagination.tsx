@@ -1,7 +1,8 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita } from "../theme/adwaita";
-import { T } from "./common";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
+import { DISABLED_OPACITY } from "./disabled.ts";
 import { Icon } from "./icons";
 
 export interface PaginationProps {
@@ -26,6 +27,37 @@ export function pageSequence(
   return seq;
 }
 
+function pageButtonStyle(
+  t: AdwaitaTheme,
+  active: boolean | undefined,
+  disabled: boolean | undefined,
+  style?: Partial<StyleDesc>,
+): Partial<StyleDesc> {
+  const selected = active ? t.color.accent.base : t.color.surface.button;
+  return {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 32,
+    borderRadius: t.radius.sm,
+    borderWidth: 0,
+    backgroundColor: selected,
+    opacity: disabled ? DISABLED_OPACITY : 1,
+    cursor: disabled ? "not-allowed" : "pointer",
+    ...(disabled
+      ? {}
+      : {
+          hover: {
+            backgroundColor: active ? selected : t.color.surface.buttonHover,
+          },
+          active: {
+            backgroundColor: active ? selected : t.color.surface.buttonActive,
+          },
+        }),
+    ...style,
+  };
+}
+
 interface PageButtonProps {
   active?: boolean;
   disabled?: boolean;
@@ -33,7 +65,6 @@ interface PageButtonProps {
   style?: Partial<StyleDesc>;
   children: ReactNode;
 }
-
 
 function PageButton({
   active,
@@ -43,35 +74,10 @@ function PageButton({
   children,
 }: PageButtonProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       onClick={disabled ? undefined : onClick}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: 32,
-        height: 32,
-        borderRadius: radii.button,
-        borderWidth: 1,
-        borderColor: active ? "transparent" : colors.border,
-        backgroundColor: active ? colors.accent : "transparent",
-        opacity: disabled ? 0.5 : 1,
-        cursor: disabled ? "not-allowed" : "pointer",
-        ...(disabled
-          ? {}
-          : {
-              hover: {
-                backgroundColor: active ? colors.accent : colors.button_hover,
-              },
-              active: {
-                backgroundColor:
-                  active ? colors.accent : colors.button_active,
-              },
-            }),
-        ...style,
-      }}
+      style={pageButtonStyle(t, active, disabled, { width: 32, ...style })}
     >
       {children}
     </div>
@@ -85,8 +91,6 @@ export function Pagination({
   style,
 }: PaginationProps) {
   const t = useAdwaita();
-  const { colors } = t;
-
   const sequence = pageSequence(page, pages);
 
   return (
@@ -103,17 +107,21 @@ export function Pagination({
         disabled={page <= 1}
         onClick={() => onPageChange(Math.max(1, page - 1))}
       >
-        <Icon name="chevronLeft" size={16} color={colors.dim_fg} />
+        <Icon name="chevronLeft" size={16} color={t.color.text.dim} />
       </PageButton>
 
       {sequence.map((n, i) =>
         n === "ellipsis" ? (
           <PaginationEllipsis key={`e-${i}`} />
         ) : (
-          <PageButton key={n} active={n === page} onClick={() => onPageChange(n)}>
+          <PageButton
+            key={n}
+            active={n === page}
+            onClick={() => onPageChange(n)}
+          >
             <T
               size="body"
-              color={n === page ? colors.accent_fg : colors.fg}
+              color={n === page ? t.color.text.onAccent : t.color.text.primary}
               style={{ pointerEvents: "none" }}
             >
               {String(n)}
@@ -126,7 +134,7 @@ export function Pagination({
         disabled={page >= pages}
         onClick={() => onPageChange(Math.min(pages, page + 1))}
       >
-        <Icon name="chevronRight" size={16} color={colors.dim_fg} />
+        <Icon name="chevronRight" size={16} color={t.color.text.dim} />
       </PageButton>
     </div>
   );
@@ -176,33 +184,14 @@ export function PaginationLink({
   style,
 }: PaginationLinkProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       onClick={onClick}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        minWidth: 32,
-        height: 32,
-        borderRadius: radii.button,
-        borderWidth: 1,
-        borderColor: active ? "transparent" : colors.border,
-        backgroundColor: active ? colors.accent : "transparent",
-        cursor: "pointer",
-        hover: {
-          backgroundColor: active ? colors.accent : colors.button_hover,
-        },
-        active: {
-          backgroundColor: active ? colors.accent : colors.button_active,
-        },
-        ...style,
-      }}
+      style={pageButtonStyle(t, active, false, { minWidth: 32, ...style })}
     >
       <T
         size="body"
-        color={active ? colors.accent_fg : colors.fg}
+        color={active ? t.color.text.onAccent : t.color.text.primary}
         style={{ pointerEvents: "none" }}
       >
         {children}
@@ -225,7 +214,7 @@ export function PaginationPrevious({
   const t = useAdwaita();
   return (
     <PageButton disabled={disabled} onClick={onClick} style={style}>
-      <Icon name="chevronLeft" size={16} color={t.colors.dim_fg} />
+      <Icon name="chevronLeft" size={16} color={t.color.text.dim} />
     </PageButton>
   );
 }
@@ -244,7 +233,7 @@ export function PaginationNext({
   const t = useAdwaita();
   return (
     <PageButton disabled={disabled} onClick={onClick} style={style}>
-      <Icon name="chevronRight" size={16} color={t.colors.dim_fg} />
+      <Icon name="chevronRight" size={16} color={t.color.text.dim} />
     </PageButton>
   );
 }
@@ -266,7 +255,7 @@ export function PaginationEllipsis({ style }: PaginationEllipsisProps) {
         ...style,
       }}
     >
-      <T size="body" color={t.colors.dim_fg} style={{ pointerEvents: "none" }}>
+      <T size="body" color={t.color.text.dim} style={{ pointerEvents: "none" }}>
         …
       </T>
     </div>

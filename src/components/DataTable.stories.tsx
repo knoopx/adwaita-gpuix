@@ -1,10 +1,10 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Column } from "./Box";
 import { DataTable } from "./DataTable";
-import type { TabularSides } from "../lib/Tabular";
-import { HP_MP_ROWS } from "./.storybook/story-helpers";
+import { type TabularSides } from "../lib/Tabular";
+import { HP_MP_ROWS } from "../../.storybook/story-helpers";
 
 const SIDES: TabularSides = {
   delim: "\t",
@@ -88,9 +88,11 @@ function manySides(): TabularSides {
 
 function DataTableDemo({
   sides,
+  name,
   height = 150,
 }: {
   sides: TabularSides;
+  name?: string | null;
   height?: number;
 }) {
   const t = useAdwaita();
@@ -100,13 +102,13 @@ function DataTableDemo({
         display: "flex",
         flexDirection: "column",
         height,
-        borderRadius: t.radii.card,
+        borderRadius: t.radius.sm,
         borderWidth: 1,
-        borderColor: t.colors.border,
+        borderColor: t.color.border.default,
         overflow: "hidden",
       }}
     >
-      <DataTable sides={sides} />
+      <DataTable sides={sides} name={name} />
     </div>
   );
 }
@@ -172,6 +174,20 @@ export const semicolonDelimiter = defineStory({
     <Column gap={16} align="center">
       <Labeled caption="semicolon delimiter — shown in the summary bar">
         <DataTableDemo sides={SIDES_SEMICOLON} height={130} />
+      </Labeled>
+    </Column>
+  ),
+});
+
+export const namedFile = defineStory({
+  render: () => (
+    <Column gap={16} align="center">
+      <Labeled caption="the body names its own file (no panel header)">
+        <DataTableDemo
+          sides={SIDES}
+          name="data/latency-benchmark.csv"
+          height={150}
+        />
       </Labeled>
     </Column>
   ),

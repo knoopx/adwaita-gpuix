@@ -1,21 +1,15 @@
-import { useEffect, useState, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, type AdwaitaTheme } from "../theme/adwaita";
+import { type ReactNode, useEffect, useState } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../theme/adwaita";
 import { Icon } from "./icons";
-import { T } from "./common";
+import { T } from "./text";
 
 export interface JsonViewProps {
-  
   src: unknown;
-  
   name?: string;
-  
   collapsed?: boolean | number;
-  
   indent?: number;
-  
   shortenText?: number;
-  
   displayDataTypes?: boolean;
   style?: Partial<StyleDesc>;
 }
@@ -30,20 +24,24 @@ type JsonKind =
   | "undefined"
   | "other";
 
+const PRIMITIVE_KINDS: Record<string, JsonKind> = {
+  string: "string",
+  number: "number",
+  boolean: "boolean",
+  object: "object",
+};
+
 function kindOf(v: unknown): JsonKind {
   if (v === null) return "null";
   if (v === undefined) return "undefined";
-  const t = typeof v;
-  if (t === "string") return "string";
-  if (t === "number") return "number";
-  if (t === "boolean") return "boolean";
-  if (Array.isArray(v)) return "array";
-  if (t === "object") return "object";
-  return "other";
+  const kind = typeof v;
+  if (kind === "object") return Array.isArray(v) ? "array" : "object";
+  return PRIMITIVE_KINDS[kind] ?? "other";
 }
 
 function isContainer(v: unknown): boolean {
-  return kindOf(v) === "object" || kindOf(v) === "array";
+  const kind = kindOf(v);
+  return kind === "object" || kind === "array";
 }
 
 function sizeOf(v: unknown): number {
@@ -52,10 +50,7 @@ function sizeOf(v: unknown): number {
   return 0;
 }
 
-function initialOpen(
-  src: unknown,
-  collapsed: boolean | number,
-): Set<string> {
+function initialOpen(src: unknown, collapsed: boolean | number): Set<string> {
   const open = new Set<string>();
   const maxDepth =
     collapsed === true ? 0 : collapsed === false ? Infinity : collapsed;
@@ -63,40 +58,115 @@ function initialOpen(
     if (parts.length >= maxDepth) return;
     if (!isContainer(v)) return;
     open.add(parts.length === 0 ? "$" : parts.join("."));
-    if (Array.isArray(v)) {
-      v.forEach((child, i) => walk(child, [...parts, i]));
-    } else if (v && typeof v === "object") {
-      for (const [k, child] of Object.entries(v)) walk(child, [...parts, k]);
+    for (const child of childrenOf(v)) {
+      walk(child.value, [...parts, child.key]);
     }
   };
   walk(src, []);
   return open;
 }
 
+const SCALAR_COLORS: Partial<Record<JsonKind, (t: AdwaitaTheme) => string>> = {
+  string: (t) => t.color.functional.success,
+  number: (t) => t.color.accent.base,
+  boolean: (t) => t.color.functional.warning,
+};
+
+function scalarColor(t: AdwaitaTheme, kind: JsonKind): string {
+  const pick = SCALAR_COLORS[kind];
+  return pick ? pick(t) : t.color.text.dim;
+}
+
 function formatScalar(v: unknown, shorten: number): string {
-  const kind = kindOf(v);
-  if (kind === "string") {
-    const raw = v as string;
-    const body =
-      shorten > 0 && raw.length > shorten ? `${raw.slice(0, shorten)}…` : raw;
-    return `"${body}"`;
-  }
   if (v instanceof Date) return `"${v.toISOString()}"`;
-  return String(v);
+  if (kindOf(v) !== "string") return String(v);
+  const raw = v as string;
+  const body =
+    shorten > 0 && raw.length > shorten ? `${raw.slice(0, shorten)}…` : raw;
+  return `"${body}"`;
 }
 
 function typeLabel(v: unknown): string {
   const kind = kindOf(v);
-  if (kind === "object") return "object";
-  if (kind === "array") return "array";
-  return kind === "other" ? (v instanceof Date ? "date" : "value") : kind;
+  if (kind === "other") return v instanceof Date ? "date" : "value";
+  return kind;
 }
 
 function monoStyle(t: AdwaitaTheme): Partial<StyleDesc> {
   return {
-    fontFamily: t.typography.fontFamilyMono,
-    fontSize: t.typography.caption,
+    fontFamily: t.type.fontFamilyMono,
+    fontSize: t.type.caption,
   };
+}
+
+function rowStyle(depth: number, indent: number): Partial<StyleDesc> {
+  return {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    minHeight: 20,
+    paddingLeft: depth > 0 ? indent : 0,
+  };
+}
+
+function headerStyle(
+  depth: number,
+  indent: number,
+  empty: boolean,
+): Partial<StyleDesc> {
+  const t = useAdwaita();
+  return {
+    ...rowStyle(depth, indent),
+    cursor: empty ? "default" : "pointer",
+    hover: empty ? undefined : { backgroundColor: t.color.accent.tint },
+    borderRadius: 4,
+  };
+}
+
+interface ChildEntry {
+  key: string | number;
+  value: unknown;
+}
+
+function childrenOf(value: unknown): ChildEntry[] {
+  if (Array.isArray(value))
+    return value.map((child, i) => ({ key: i, value: child }));
+  if (value && typeof value === "object")
+    return Object.entries(value as Record<string, unknown>).map(
+      ([key, child]) => ({ key, value: child }),
+    );
+  return [];
+}
+
+function childPath(path: string, key: string | number): string {
+  if (path === "$") return String(key);
+  return `${path}.${key}`;
+}
+
+function Punctuation({ children }: { children: ReactNode }) {
+  const t = useAdwaita();
+  return (
+    <T color={t.color.text.dim} style={monoStyle(t)}>
+      {children}
+    </T>
+  );
+}
+
+function Spacer() {
+  return <div style={{ width: 12, flexShrink: 0 }} />;
+}
+
+function Chevron({ open }: { open: boolean }) {
+  const t = useAdwaita();
+  return (
+    <Icon
+      name={open ? "chevronDown" : "chevronRight"}
+      size={12}
+      color={t.color.text.dim}
+      style={{ flexShrink: 0, pointerEvents: "none" }}
+    />
+  );
 }
 
 function NodeKeyLabel({
@@ -107,27 +177,20 @@ function NodeKeyLabel({
   isRoot: boolean;
 }) {
   const t = useAdwaita();
-  const { colors } = t;
   const mono = monoStyle(t);
+  const isIndex = typeof name === "number";
+  const quoted = !isRoot && !isIndex && name !== null;
+  const label = name === null ? "root" : quoted ? `"${name}"` : String(name);
   return (
     <>
-      {name === null || isRoot ? (
-        <T color={colors.fg} style={mono}>
-          {name ?? "root"}
-        </T>
-      ) : typeof name === "number" ? (
-        <T color={colors.accent} style={mono}>
-          {name}
-        </T>
-      ) : (
-        <T color={colors.fg} style={mono}>
-          {`"${name}"`}
-        </T>
-      )}
-      {!isRoot && name !== null && typeof name !== "number" ? (
-        <T color={colors.dim_fg} style={mono}>
-          :
-        </T>
+      <T
+        color={isIndex ? t.color.accent.base : t.color.text.primary}
+        style={mono}
+      >
+        {label}
+      </T>
+      {!isRoot && !isIndex && name !== null ? (
+        <Punctuation>:</Punctuation>
       ) : null}
     </>
   );
@@ -146,164 +209,133 @@ interface NodeRowProps {
   showTypes: boolean;
 }
 
-function NodeRow(props: NodeRowProps) {
-  const { name, value, path, depth, isRoot, open, toggle, indent, shorten, showTypes } =
-    props;
+function ScalarRow({
+  name,
+  isRoot,
+  value,
+  depth,
+  indent,
+  shorten,
+  showTypes,
+}: Omit<NodeRowProps, "path" | "open" | "toggle">) {
   const t = useAdwaita();
-  const { colors, typography } = t;
+  return (
+    <div style={rowStyle(depth, indent)}>
+      <Spacer />
+      <NodeKeyLabel name={name} isRoot={isRoot} />
+      <T color={scalarColor(t, kindOf(value))} style={monoStyle(t)}>
+        {formatScalar(value, shorten)}
+      </T>
+      {showTypes ? <Punctuation>{typeLabel(value)}</Punctuation> : null}
+    </div>
+  );
+}
 
-  const mono = monoStyle(t);
+function braceLabel(
+  isArray: boolean,
+  size: number,
+  isOpen: boolean,
+  empty: boolean,
+): string {
+  if (empty) return isArray ? "[]" : "{}";
+  if (isOpen) return isArray ? "[" : "{";
+  return isArray ? `[… ${size}]` : `{… ${size}}`;
+}
 
-  
-  if (!isContainer(value)) {
-    const kind = kindOf(value);
-    const valueColor =
-      kind === "string"
-        ? colors.success
-        : kind === "number"
-          ? colors.accent
-          : kind === "boolean"
-            ? colors.warning
-            : colors.dim_fg;
-    return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 4,
-          minHeight: 20,
-          paddingLeft: depth > 0 ? indent : 0,
-        }}
-      >
-        <div style={{ width: 12, flexShrink: 0 }} />
-        <NodeKeyLabel name={name} isRoot={isRoot} />
-        <T color={valueColor} style={mono}>
-          {formatScalar(value, shorten)}
-        </T>
-        {showTypes ? (
-          <T color={colors.dim_fg} style={mono}>
-            {typeLabel(value)}
-          </T>
-        ) : null}
-      </div>
-    );
-  }
-
-  
-  const isArray = kindOf(value) === "array";
-  const size = sizeOf(value);
-  const isOpen = open.has(path);
+function ContainerHeader({
+  name,
+  isRoot,
+  isArray,
+  size,
+  isOpen,
+  path,
+  toggle,
+  depth,
+  indent,
+  showTypes,
+}: Pick<
+  NodeRowProps,
+  "name" | "isRoot" | "path" | "toggle" | "depth" | "indent" | "showTypes"
+> & {
+  isArray: boolean;
+  size: number;
+  isOpen: boolean;
+}) {
   const empty = size === 0;
-
-  const header = (
+  return (
     <div
       onClick={empty ? undefined : () => toggle(path)}
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 4,
-        minHeight: 20,
-        paddingLeft: depth > 0 ? indent : 0,
-        cursor: empty ? "default" : "pointer",
-        hover: empty ? undefined : { backgroundColor: colors.accentTint },
-        borderRadius: 4,
-      }}
+      style={headerStyle(depth, indent, empty)}
     >
-      {empty ? (
-        <div style={{ width: 12, flexShrink: 0 }} />
-      ) : (
-        <Icon
-          name={isOpen ? "chevronDown" : "chevronRight"}
-          size={12}
-          color={colors.dim_fg}
-          style={{ flexShrink: 0, pointerEvents: "none" }}
-        />
-      )}
+      {empty ? <Spacer /> : <Chevron open={isOpen} />}
       <NodeKeyLabel name={name} isRoot={isRoot} />
-      {empty ? (
-        <T color={colors.dim_fg} style={mono}>
-          {isArray ? "[]" : "{}"}
-        </T>
-      ) : isOpen ? (
-        <T color={colors.dim_fg} style={mono}>
-          {isArray ? "[" : "{"}
-        </T>
-      ) : (
-        <T color={colors.dim_fg} style={mono}>
-          {isArray ? `[… ${size}]` : `{… ${size}}`}
-        </T>
-      )}
+      <Punctuation>{braceLabel(isArray, size, isOpen, empty)}</Punctuation>
       {showTypes && !empty ? (
-        <T color={colors.dim_fg} style={mono}>
-          {isArray ? "array" : "object"}
-        </T>
+        <Punctuation>{isArray ? "array" : "object"}</Punctuation>
       ) : null}
     </div>
   );
+}
 
-  if (!isOpen || empty) return header;
-
-  const children: ReactNode[] = [];
-  if (isArray) {
-    const arr = value as unknown[];
-    arr.forEach((child, i) => {
-      children.push(
-        <NodeRow
-          key={i}
-          name={i}
-          value={child}
-          path={`${path}.${i}`}
-          depth={depth + 1}
-          isRoot={false}
-          open={open}
-          toggle={toggle}
-          indent={indent}
-          shorten={shorten}
-          showTypes={showTypes}
-        />,
-      );
-    });
-  } else {
-    for (const [k, child] of Object.entries(value as Record<string, unknown>)) {
-      children.push(
-        <NodeRow
-          key={k}
-          name={k}
-          value={child}
-          path={path === "$" ? k : `${path}.${k}`}
-          depth={depth + 1}
-          isRoot={false}
-          open={open}
-          toggle={toggle}
-          indent={indent}
-          shorten={shorten}
-          showTypes={showTypes}
-        />,
-      );
-    }
-  }
+function ContainerRow(props: NodeRowProps) {
+  const t = useAdwaita();
+  const { value, path, depth, open, toggle, indent, shorten, showTypes } =
+    props;
+  const isArray = kindOf(value) === "array";
+  const size = sizeOf(value);
+  const isOpen = open.has(path);
 
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      {header}
-      {children}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          minHeight: 20,
-          paddingLeft: depth > 0 ? indent : 0,
-        }}
-      >
-        <div style={{ width: 12, flexShrink: 0 }} />
-        <T color={colors.dim_fg} style={mono}>
-          {isArray ? "]" : "}"}
-        </T>
-      </div>
+      <ContainerHeader
+        name={props.name}
+        isRoot={props.isRoot}
+        isArray={isArray}
+        size={size}
+        isOpen={isOpen}
+        path={path}
+        toggle={toggle}
+        depth={depth}
+        indent={indent}
+        showTypes={showTypes}
+      />
+      {isOpen && size > 0
+        ? childrenOf(value).map((child) => (
+            <NodeRow
+              key={child.key}
+              name={child.key}
+              value={child.value}
+              path={childPath(path, child.key)}
+              depth={depth + 1}
+              isRoot={false}
+              open={open}
+              toggle={toggle}
+              indent={indent}
+              shorten={shorten}
+              showTypes={showTypes}
+            />
+          ))
+        : null}
+      {isOpen && size > 0 ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            minHeight: 20,
+            paddingLeft: depth > 0 ? indent : 0,
+          }}
+        >
+          <Spacer />
+          <Punctuation>{isArray ? "]" : "}"}</Punctuation>
+        </div>
+      ) : null}
     </div>
   );
+}
+
+function NodeRow(props: NodeRowProps) {
+  if (!isContainer(props.value)) return <ScalarRow {...props} />;
+  return <ContainerRow {...props} />;
 }
 
 export function JsonView({
@@ -315,7 +347,9 @@ export function JsonView({
   displayDataTypes = false,
   style,
 }: JsonViewProps) {
-  const [open, setOpen] = useState<Set<string>>(() => initialOpen(src, collapsed));
+  const [open, setOpen] = useState<Set<string>>(() =>
+    initialOpen(src, collapsed),
+  );
 
   useEffect(() => {
     setOpen(initialOpen(src, collapsed));

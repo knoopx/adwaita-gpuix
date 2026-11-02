@@ -1,6 +1,6 @@
 import { defineMeta } from "storybook";
-import { Labeled } from "./common";
-import { Panel } from "./.storybook/story-helpers";
+import { Labeled } from "./text";
+import { Panel } from "../../.storybook/story-helpers";
 import { JsonView } from "./JsonView";
 
 const sample = {
@@ -37,7 +37,10 @@ export function tree() {
 export function collapsed() {
   return (
     <Panel>
-      <Labeled caption="collapsed to depth 1 (… n summaries)" style={{ gap: 6 }}>
+      <Labeled
+        caption="collapsed to depth 1 (… n summaries)"
+        style={{ gap: 6 }}
+      >
         <JsonView src={sample} collapsed={1} />
       </Labeled>
     </Panel>

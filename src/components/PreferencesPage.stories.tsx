@@ -1,206 +1,329 @@
-import { defineMeta, defineStory } from "storybook";
-import { T, Labeled } from "./common";
-import { PreferencesPage, PreferencesGroup } from "./PreferencesPage";
+import { defineMeta } from "storybook";
+import { useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
+import { Icon } from "./icons";
+import { Switch } from "./Switch";
+import { Entry } from "./Entry";
+import { ToggleGroup } from "./ToggleGroup";
+import { type ViewSwitcherItem } from "./chrome/ViewSwitcher";
+import { PreferencesGroup, PreferencesPage } from "./PreferencesPage";
 import {
-  ActionRow,
-  ButtonRow,
+  BoxedList,
+  BoxedRow,
   ComboRow,
   EntryRow,
-  ExpanderRow,
-  SpinRow,
   SwitchRow,
 } from "./BoxedList";
+import {
+  ContentHeader,
+  PaneBody,
+  SETTINGS_NAV_APPEARANCE,
+  SettingsWindow,
+  WindowShell,
+} from "../../.storybook/window-shell";
 
 export default defineMeta({
   title: "Adwaita/PreferencesPage",
   component: PreferencesPage,
-  parameters: { width: 528, height: 560 },
+  parameters: { width: 900, height: 640 },
 });
 
-export const allRowKinds = defineStory({
-  render: () => (
-    <Labeled caption="all row kinds (two groups)">
-      <PreferencesPage>
-        <PreferencesGroup title="General">
-          <SwitchRow
-            title="Enable sounds"
-            checked={true}
-            onChange={() => {}}
-          />
-          <SwitchRow
-            title="Do not disturb"
-            checked={false}
-            onChange={() => {}}
-          />
-          <ActionRow
-            title="Reset settings"
-            subtitle="Restore the defaults"
-            prefix="settings"
-            suffix="chevronDown"
-            onClick={() => {}}
-          />
-          <EntryRow title="Display name" value="Ada" />
-        </PreferencesGroup>
-        <PreferencesGroup title="Appearance">
-          <SpinRow
-            title="Zoom"
-            value={100}
-            min={50}
-            max={200}
-            step={10}
-            onChange={() => {}}
-          />
-          <ComboRow
-            title="Theme"
-            value="Auto"
-            options={["Auto", "Light", "Dark"]}
-            onChange={() => {}}
-          />
-          <ButtonRow title="Sign out" label="Sign out" onClick={() => {}} />
-          <ButtonRow
-            title="Delete account"
-            label="Delete"
-            destructive
-            onClick={() => {}}
-          />
-          <ExpanderRow title="Advanced" subtitle="Show advanced options">
-            <T>Advanced options are revealed here.</T>
-          </ExpanderRow>
-        </PreferencesGroup>
-      </PreferencesPage>
-    </Labeled>
-  ),
-});
+const noop = () => {};
 
-export const switchRows = defineStory({
-  parameters: { width: 528, height: 300 },
-  render: () => (
-    <Labeled caption="switch rows (with subtitle and disabled)">
-      <PreferencesPage>
-        <PreferencesGroup title="Notifications">
-          <SwitchRow
-            title="Push notifications"
-            checked={true}
-            onChange={() => {}}
-          />
-          <SwitchRow
-            title="Sound alerts"
-            subtitle="Play a sound with each notification"
-            checked={true}
-            onChange={() => {}}
-          />
-          <SwitchRow
-            title="Weekly summary"
-            checked={false}
-            onChange={() => {}}
-          />
-          <SwitchRow
-            title="Do not disturb"
-            subtitle="Until tomorrow morning"
-            checked={true}
-            disabled
-            onChange={() => {}}
-          />
-        </PreferencesGroup>
-      </PreferencesPage>
-    </Labeled>
-  ),
-});
-
-export const choiceRows = defineStory({
-  parameters: { width: 528, height: 280 },
-  render: () => (
-    <Labeled caption="choice rows (combo + spin)">
-      <PreferencesPage>
-        <PreferencesGroup title="Appearance">
-          <ComboRow
-            title="Theme"
-            value="Auto"
-            options={["Auto", "Light", "Dark"]}
-            onChange={() => {}}
-          />
-          <ComboRow
-            title="Accent colour"
-            value="Blue"
-            options={["Blue", "Teal", "Green", "Yellow", "Red"]}
-            onChange={() => {}}
-          />
-          <SpinRow
-            title="Zoom"
-            value={100}
-            min={50}
-            max={200}
-            step={10}
-            onChange={() => {}}
-          />
-        </PreferencesGroup>
-      </PreferencesPage>
-    </Labeled>
-  ),
-});
-
-export const entryRows = defineStory({
-  parameters: { width: 528, height: 280 },
-  render: () => (
-    <Labeled caption="entry rows (value, placeholder, action)">
-      <PreferencesPage>
-        <PreferencesGroup title="Profile">
-          <EntryRow title="Display name" value="Ada" />
-          <EntryRow title="Email" value="ada@example.com" />
-          <EntryRow title="Nickname" placeholder="Shown to other users" />
-          <ActionRow
-            title="Account"
-            subtitle="Manage your account details"
-            prefix="user"
-            suffix="chevronRight"
-            onClick={() => {}}
-          />
-        </PreferencesGroup>
-      </PreferencesPage>
-    </Labeled>
-  ),
-});
-
-const scrollableItems: { title: string; checked: boolean }[] = [
-  { title: "New messages", checked: true },
-  { title: "Mentions", checked: true },
-  { title: "Reactions", checked: false },
-  { title: "Follows", checked: false },
-  { title: "Reminders", checked: true },
-  { title: "Weekly summary", checked: false },
-  { title: "Sound alerts", checked: false },
-  { title: "Vibration", checked: true },
-  { title: "Do not disturb", checked: false },
-  { title: "Quiet hours", checked: false },
-  { title: "Email digests", checked: true },
-  { title: "Push on Wi-Fi only", checked: false },
-  { title: "Battery saver", checked: true },
-  { title: "Sync now", checked: false },
+const KOMIKKU_VIEWS = [
+  { id: "general", icon: "settings" as const, label: "General" },
+  { id: "library", icon: "gridView" as const, label: "Library" },
+  { id: "reader", icon: "license" as const, label: "Reader" },
+  { id: "advanced", icon: "autoAwesome" as const, label: "Advanced" },
 ];
 
-export const scrollablePage = defineStory({
-  parameters: { width: 528, height: 400 },
-  render: () => (
-    <Labeled
-      caption="long page (scrollable, virtual-list)"
-      style={{ width: "100%" }}
+export function appearancePage() {
+  return (
+    <SettingsWindow
+      size={{ width: 900, height: 420 }}
+      nav={SETTINGS_NAV_APPEARANCE}
+      selected="appearance"
+      header={<ContentHeader title="Appearance" trailingIcons={["close"]} />}
     >
-      <PreferencesPage
-        scrollable
-        estimatedItemHeight={40}
-        style={{ width: "100%" }}
-      >
-        <PreferencesGroup title="Notifications">
-          {scrollableItems.map((item) => (
-            <SwitchRow
-              key={item.title}
-              title={item.title}
-              checked={item.checked}
-              onChange={() => {}}
+      <PaneBody>
+        <PreferencesPage>
+          <PreferencesGroup title="Style">
+            <BoxedRow
+              title="Style"
+              trailing={
+                <ToggleGroup
+                  size="lg"
+                  value="default"
+                  onChange={noop}
+                  options={[
+                    { id: "default", label: "Default" },
+                    { id: "dark", label: "Dark" },
+                  ]}
+                />
+              }
             />
-          ))}
-        </PreferencesGroup>
-      </PreferencesPage>
-    </Labeled>
-  ),
-});
+          </PreferencesGroup>
+          <PreferencesGroup
+            title="Background"
+            action={{ label: "Add Picture…", icon: "add", onClick: noop }}
+          >
+            <BoxedList />
+          </PreferencesGroup>
+        </PreferencesPage>
+      </PaneBody>
+    </SettingsWindow>
+  );
+}
+appearancePage.parameters = { width: 900, height: 420 };
+
+export function komikkuGeneral() {
+  return (
+    <WindowShell size={{ width: 900, height: 700 }}>
+      <PaneBody>
+        <ContentHeader
+          title="Komikku"
+          trailingIcons={["menu", "close"]}
+          view={KOMIKKU_VIEWS}
+          viewValue="general"
+          left={
+            <Button variant="icon" size="icon" icon="search" onClick={noop} />
+          }
+        />
+        <PreferencesPage>
+          <PreferencesGroup title="Appearance">
+            <ComboRow
+              title="Theme"
+              value="Light"
+              options={["Light", "Dark"]}
+              onChange={noop}
+            />
+            <SwitchRow
+              title="Night Light"
+              subtitle="Automatically enable dark theme at night"
+              checked={false}
+              onChange={noop}
+            />
+            <SwitchRow
+              title="Accent Color"
+              subtitle="Use system accent colors"
+              checked={false}
+              onChange={noop}
+            />
+            <ComboRow
+              title="Progress Bars Theme"
+              subtitle="Theme to use for progress bars"
+              value="Accent Color"
+              options={["Accent Color", "Rainbow"]}
+              onChange={noop}
+            />
+            <ComboRow
+              title="Backdrop in Details Page"
+              subtitle="Method used to recolor background to match cover"
+              value="None"
+              options={["None", "Blur", "Solid"]}
+              onChange={noop}
+            />
+          </PreferencesGroup>
+          <PreferencesGroup title="Notifications">
+            <SwitchRow
+              title="Desktop Notifications"
+              subtitle="Use desktop notifications for downloads and library updates"
+              checked={false}
+              onChange={noop}
+            />
+          </PreferencesGroup>
+          <PreferencesGroup title="Tracking">
+            <BoxedList />
+          </PreferencesGroup>
+        </PreferencesPage>
+      </PaneBody>
+    </WindowShell>
+  );
+}
+komikkuGeneral.parameters = { width: 900, height: 700 };
+
+const NEWSFLASH_VIEWS: ViewSwitcherItem[] = [
+  { id: "views", icon: "visibility", label: "Views" },
+  { id: "app", icon: "settings", label: "App" },
+  { id: "keybindings", icon: "textFormat", label: "Keybindings" },
+  { id: "sharing", icon: "share", label: "Sharing" },
+];
+
+function NewsFlashHeader({
+  selected,
+  views = NEWSFLASH_VIEWS,
+}: {
+  selected: string;
+  views?: ViewSwitcherItem[];
+}) {
+  return (
+    <ContentHeader
+      title="NewsFlash"
+      trailingIcons={["close"]}
+      view={views}
+      viewValue={selected}
+    />
+  );
+}
+
+export function feedListPage() {
+  return (
+    <WindowShell size={{ width: 900, height: 470 }}>
+      <PaneBody>
+        <NewsFlashHeader selected="app" />
+        <PreferencesPage>
+          <PreferencesGroup title="Feed List">
+            <ComboRow
+              title="Order"
+              value="Manual"
+              options={["Manual", "Alphabetical"]}
+              onChange={noop}
+            />
+            <SwitchRow
+              title="Only Show Relevant Items"
+              subtitle="Hide feeds and categories without unread/unstarred items"
+              checked={false}
+              onChange={noop}
+            />
+          </PreferencesGroup>
+          <PreferencesGroup title="Article List">
+            <ComboRow
+              title="Order"
+              value="Newest First"
+              options={["Newest First", "Oldest First"]}
+              onChange={noop}
+            />
+            <ComboRow
+              title="Order by"
+              value="Last Updated"
+              options={["Last Updated", "Date Published"]}
+              onChange={noop}
+            />
+          </PreferencesGroup>
+        </PreferencesPage>
+      </PaneBody>
+    </WindowShell>
+  );
+}
+feedListPage.parameters = { width: 900, height: 470 };
+
+export function themeTiles() {
+  const t = useAdwaita();
+  const themes = [
+    "Adwaita",
+    "Spring",
+    "Midnight",
+    "Parchment",
+    "Gruvbox",
+    "Zorin",
+  ];
+  return (
+    <WindowShell size={{ width: 900, height: 300 }}>
+      <PaneBody>
+        <NewsFlashHeader selected="views" views={NEWSFLASH_VIEWS.slice(0, 2)} />
+        <PreferencesPage>
+          <PreferencesGroup title="Appearance">
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: t.space.md,
+                padding: t.space.md,
+              }}
+            >
+              {themes.map((theme) => (
+                <div
+                  key={theme}
+                  onClick={noop}
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: t.space.sm,
+                    minWidth: t.control.themePreviewWidth / 2,
+                    minHeight: t.control.viewSwitcherHeight,
+                    paddingLeft: t.space.lg,
+                    paddingRight: t.space.lg,
+                    borderRadius: t.radius.sm,
+                    borderWidth: theme === "Adwaita" ? 2 : 1,
+                    borderColor:
+                      theme === "Adwaita"
+                        ? t.color.accent.base
+                        : t.color.border.default,
+                    backgroundColor: t.color.surface.input,
+                    cursor: "pointer",
+                  }}
+                >
+                  <T size="body" weight={600} color={t.color.text.primary}>
+                    {theme}
+                  </T>
+                  {theme === "Adwaita" ? (
+                    <Icon name="check" size={16} color={t.color.accent.base} />
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          </PreferencesGroup>
+        </PreferencesPage>
+      </PaneBody>
+    </WindowShell>
+  );
+}
+themeTiles.parameters = { width: 900, height: 300 };
+
+export function keyEditorPage() {
+  return (
+    <WindowShell size={{ width: 900, height: 300 }}>
+      <PaneBody>
+        <ContentHeader
+          title="Icon Theme"
+          trailingIcons={["search", "menu", "close"]}
+        />
+        <PreferencesPage>
+          <BoxedList>
+            <SwitchRow
+              title="Use default value"
+              checked={false}
+              onChange={noop}
+            />
+            <EntryRow title="Custom value" value="Adwaita" onChange={noop} />
+          </BoxedList>
+        </PreferencesPage>
+      </PaneBody>
+    </WindowShell>
+  );
+}
+keyEditorPage.parameters = { width: 900, height: 300 };
+
+function Button({
+  variant,
+  size,
+  icon,
+  onClick,
+}: {
+  variant: "icon";
+  size: "icon";
+  icon: Parameters<typeof Icon>[0]["name"];
+  onClick: () => void;
+}) {
+  const t = useAdwaita();
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: t.control.viewSwitcherHeight,
+        height: t.control.viewSwitcherHeight,
+        borderRadius: t.radius.sm,
+        cursor: "pointer",
+        hover: { backgroundColor: t.color.surface.buttonHover },
+      }}
+    >
+      <Icon name={icon} size={16} color={t.color.text.primary} />
+    </div>
+  );
+}

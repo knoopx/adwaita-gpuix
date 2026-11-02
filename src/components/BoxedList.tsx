@@ -1,14 +1,19 @@
-import { Children, useState, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, hexToRgba, isDarkScheme } from "../theme/adwaita";
-import { T } from "./common";
+import { Children, type ReactNode, useState } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import {
+  type AdwaitaTheme,
+  hexToRgba,
+  isDarkScheme,
+  useAdwaita,
+} from "../theme/adwaita";
+import { T } from "./text";
 import { Icon, type IconName } from "./icons";
 import { Switch } from "./Switch";
 import { Entry } from "./Entry";
 
 export interface BoxedListProps {
   children?: ReactNode;
-  
+
   emptyLabel?: string;
   style?: Partial<StyleDesc>;
 }
@@ -17,29 +22,18 @@ export function BoxedList({ children, emptyLabel, style }: BoxedListProps) {
   const t = useAdwaita();
   const items = Children.toArray(children);
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        borderRadius: t.radii.card,
-        borderWidth: 1,
-        borderColor: t.colors.border,
-        backgroundColor: t.colors.view_bg,
-        overflow: "hidden",
-        ...style,
-      }}
-    >
+    <div style={groupCardStyle(t, style)}>
       {items.length === 0 && emptyLabel !== undefined ? (
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            minHeight: t.spacing.rowHeight,
-            padding: t.spacing.paddingTight,
+            minHeight: t.control.rowHeight,
+            padding: t.space.md,
           }}
         >
-          <T size="caption" color={t.colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             {emptyLabel}
           </T>
         </div>
@@ -48,8 +42,9 @@ export function BoxedList({ children, emptyLabel, style }: BoxedListProps) {
         <div
           key={i}
           style={{
-            borderBottomWidth: i < items.length - 1 ? 1 : 0,
-            borderColor: t.colors.border,
+            borderBottomWidth:
+              i < items.length - 1 ? t.control.dividerThickness : 0,
+            borderColor: t.color.divider.faint,
           }}
         >
           {child}
@@ -62,6 +57,20 @@ export function BoxedList({ children, emptyLabel, style }: BoxedListProps) {
 interface RowShellProps {
   title: string;
   subtitle?: string;
+
+  titleWeight?: number;
+
+  inset?: number;
+
+  background?: string;
+
+  titleColor?: string;
+
+  subtitleColor?: string;
+
+  subtitleSize?: "body" | "caption";
+
+  subtitleWeight?: number;
   prefix?: ReactNode;
   suffix?: ReactNode;
   onClick?: () => void;
@@ -70,9 +79,101 @@ interface RowShellProps {
   height?: number;
 }
 
+function rowHoverTint(t: AdwaitaTheme): string {
+  return t.color.surface.hover;
+}
+
+function rowShellStateStyle(
+  t: AdwaitaTheme,
+  interactive: boolean,
+  disabled: boolean | undefined,
+  selected: boolean | undefined,
+): Partial<StyleDesc> {
+  return {
+    cursor: interactive ? "pointer" : "default",
+    backgroundColor: selected ? t.color.selection.accent : "transparent",
+    opacity: disabled ? 0.5 : 1,
+    pointerEvents: disabled ? "none" : "auto",
+  };
+}
+
+function rowShellHoverStyle(
+  t: AdwaitaTheme,
+  interactive: boolean,
+  selected: boolean | undefined,
+): Partial<StyleDesc> {
+  const enabled = interactive && !selected;
+  return { hover: enabled ? { backgroundColor: rowHoverTint(t) } : undefined };
+}
+
+function RowShellTitle({
+  title,
+  subtitle,
+  weight,
+  titleColor,
+  subtitleColor,
+  subtitleSize,
+  subtitleWeight,
+}: {
+  title: string;
+  subtitle?: string;
+
+  weight?: number;
+
+  titleColor?: string;
+
+  subtitleColor?: string;
+
+  subtitleSize?: "body" | "caption";
+
+  subtitleWeight?: number;
+}) {
+  const t = useAdwaita();
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        flexGrow: 1,
+        minWidth: 0,
+        gap: t.space.xs,
+      }}
+    >
+      <T
+        size="body"
+        color={t.color.text.primary}
+        style={{ whiteSpace: "nowrap", lineClamp: 1, textOverflow: "ellipsis" }}
+      >
+        {title}
+      </T>
+      {subtitle ? (
+        <T
+          size={subtitleSize ?? "caption"}
+          weight={subtitleWeight}
+          color={subtitleColor ?? t.color.text.dim}
+          style={{
+            whiteSpace: "nowrap",
+            lineClamp: 1,
+            textOverflow: "ellipsis",
+          }}
+        >
+          {subtitle}
+        </T>
+      ) : null}
+    </div>
+  );
+}
+
 function RowShell({
   title,
   subtitle,
+  titleWeight,
+  inset,
+  background,
+  titleColor,
+  subtitleColor,
+  subtitleSize,
+  subtitleWeight,
   prefix,
   suffix,
   onClick,
@@ -81,7 +182,6 @@ function RowShell({
   height,
 }: RowShellProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   const interactive = onClick !== undefined && !disabled;
   return (
     <div
@@ -90,42 +190,27 @@ function RowShell({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        gap: spacing.paddingTight,
-        minHeight: height ?? spacing.rowHeight,
-        paddingLeft: spacing.paddingTight,
-        paddingRight: spacing.paddingTight,
-        cursor: interactive ? "pointer" : "default",
-        backgroundColor: selected ? colors.accentTint : "transparent",
-        opacity: disabled ? 0.5 : 1,
-        pointerEvents: disabled ? "none" : "auto",
-        hover: interactive && !selected
-          ? {
-              backgroundColor: hexToRgba(
-                colors.fg,
-                isDarkScheme(t.scheme) ? 0.06 : 0.04,
-              ),
-            }
-          : undefined,
+        gap: t.space.md,
+        minHeight: height ?? t.control.rowMinHeight,
+        paddingLeft: inset ?? t.control.groupRowInset,
+        paddingRight: inset ?? t.control.groupRowInset,
+        paddingTop: t.control.groupRowPaddingY,
+        paddingBottom: t.control.groupRowPaddingY,
+        ...rowShellStateStyle(t, interactive, disabled, selected),
+        ...rowShellHoverStyle(t, interactive, selected),
+        ...(background ? { backgroundColor: background } : {}),
       }}
     >
       {prefix}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          flexGrow: 1,
-          minWidth: 0,
-        }}
-      >
-        <T size="body" color={colors.fg}>
-          {title}
-        </T>
-        {subtitle ? (
-          <T size="caption" color={colors.dim_fg}>
-            {subtitle}
-          </T>
-        ) : null}
-      </div>
+      <RowShellTitle
+        title={title}
+        subtitle={subtitle}
+        weight={titleWeight}
+        titleColor={titleColor}
+        subtitleColor={subtitleColor}
+        subtitleSize={subtitleSize}
+        subtitleWeight={subtitleWeight}
+      />
       {suffix}
     </div>
   );
@@ -151,7 +236,6 @@ export function ActionRow({
   disabled,
 }: ActionRowProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
     <RowShell
       title={title}
@@ -161,12 +245,98 @@ export function ActionRow({
       disabled={disabled}
       prefix={
         prefix ? (
-          <Icon name={prefix} size={18} color={colors.dim_fg} />
+          <Icon name={prefix} size={18} color={t.color.text.dim} />
         ) : undefined
       }
       suffix={
         suffix ? (
-          <Icon name={suffix} size={18} color={colors.dim_fg} />
+          <Icon name={suffix} size={18} color={t.color.text.dim} />
+        ) : undefined
+      }
+    />
+  );
+}
+
+export interface BoxedRowProps {
+  title: string;
+  subtitle?: string;
+
+  titleWeight?: number;
+
+  inset?: number;
+
+  height?: number;
+
+  background?: string;
+
+  titleColor?: string;
+
+  subtitleColor?: string;
+
+  subtitleSize?: "body" | "caption";
+
+  subtitleWeight?: number;
+  prefix?: ReactNode;
+
+  trailing?: ReactNode;
+
+  caption?: string;
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
+export function BoxedRow({
+  title,
+  subtitle,
+  titleWeight,
+  inset,
+  height,
+  background,
+  titleColor,
+  subtitleColor,
+  subtitleSize,
+  subtitleWeight,
+  prefix,
+  trailing,
+  caption,
+  onClick,
+  disabled,
+}: BoxedRowProps) {
+  const t = useAdwaita();
+  return (
+    <RowShell
+      title={title}
+      subtitle={subtitle}
+      titleWeight={titleWeight}
+      inset={inset}
+      height={height}
+      background={background}
+      titleColor={titleColor}
+      subtitleColor={subtitleColor}
+      subtitleSize={subtitleSize}
+      subtitleWeight={subtitleWeight}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      prefix={prefix}
+      suffix={
+        trailing ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              gap: 2,
+              flexShrink: 0,
+              minWidth: 0,
+            }}
+          >
+            {trailing}
+            {caption ? (
+              <T size="caption" color={t.color.text.dim}>
+                {caption}
+              </T>
+            ) : null}
+          </div>
         ) : undefined
       }
     />
@@ -228,11 +398,7 @@ export function SwitchRow({
       subtitle={subtitle}
       disabled={disabled}
       suffix={
-        <Switch
-          checked={checked}
-          onChange={onChange}
-          disabled={disabled}
-        />
+        <Switch checked={checked} onChange={onChange} disabled={disabled} />
       }
     />
   );
@@ -256,7 +422,6 @@ export function SpinRow({
   onChange,
 }: SpinRowProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   const stepBtn = (dir: -1 | 1, disabled: boolean) => (
     <div
       onClick={
@@ -267,17 +432,23 @@ export function SpinRow({
       style={{
         width: 28,
         height: 28,
-        borderRadius: radii.button,
+        borderRadius: t.radius.sm,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: colors.button_bg,
+        backgroundColor: t.color.surface.button,
         cursor: disabled ? "default" : "pointer",
         opacity: disabled ? 0.4 : 1,
-        hover: disabled ? undefined : { backgroundColor: colors.button_hover },
+        hover: disabled
+          ? undefined
+          : { backgroundColor: t.color.surface.buttonHover },
       }}
     >
-      <Icon name={dir === 1 ? "plus" : "minus"} size={16} color={colors.fg} />
+      <Icon
+        name={dir === 1 ? "plus" : "minus"}
+        size={16}
+        color={t.color.text.primary}
+      />
     </div>
   );
   return (
@@ -296,7 +467,7 @@ export function SpinRow({
           <T
             size="body"
             weight={600}
-            color={colors.fg}
+            color={t.color.text.primary}
             style={{ minWidth: 20, textAlign: "center" }}
           >
             {String(value)}
@@ -310,14 +481,26 @@ export function SpinRow({
 
 export interface ComboRowProps {
   title: string;
+  subtitle?: string;
+
+  icon?: IconName;
   value: string;
   options: string[];
   onChange: (value: string) => void;
+
+  trailing?: ReactNode;
 }
 
-export function ComboRow({ title, value, options, onChange }: ComboRowProps) {
+export function ComboRow({
+  title,
+  subtitle,
+  icon,
+  value,
+  options,
+  onChange,
+  trailing,
+}: ComboRowProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   const cycle = () => {
     const i = options.indexOf(value);
     const next = options[(i + 1) % options.length];
@@ -326,30 +509,77 @@ export function ComboRow({ title, value, options, onChange }: ComboRowProps) {
   return (
     <RowShell
       title={title}
+      subtitle={subtitle}
       suffix={
         <div
-          onClick={cycle}
           style={{
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            gap: 6,
-            minHeight: 30,
-            paddingLeft: 10,
-            paddingRight: 8,
-            borderRadius: radii.button,
-            backgroundColor: colors.button_bg,
-            cursor: "pointer",
-            hover: { backgroundColor: colors.button_hover },
+            gap: t.space.sm,
           }}
         >
-          <T size="body" color={colors.fg}>
-            {value}
-          </T>
-          <Icon name="chevronDown" size={16} color={colors.dim_fg} />
+          <ComboPill value={value} icon={icon} onCycle={cycle} />
+          {trailing}
         </div>
       }
     />
+  );
+}
+
+function ComboPill({
+  value,
+  icon,
+  onCycle,
+}: {
+  value: string;
+  icon?: IconName;
+  onCycle: () => void;
+}) {
+  const t = useAdwaita();
+  return (
+    <div
+      onClick={onCycle}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: t.space.sm,
+        minHeight: t.control.comboPillHeight,
+        paddingLeft: t.control.comboPillPaddingX,
+        paddingRight: t.space.md,
+        borderRadius: t.radius.sm,
+        backgroundColor: t.color.surface.active,
+        cursor: "pointer",
+        hover: { backgroundColor: t.color.surface.buttonHover },
+      }}
+    >
+      {icon ? (
+        <Icon name={icon} size={16} color={t.color.text.primary} />
+      ) : null}
+      <div
+        style={{
+          maxWidth: t.control.comboPillMaxWidth,
+          overflow: "hidden",
+          flexGrow: 1,
+          minWidth: 0,
+        }}
+      >
+        <T
+          size="body"
+          weight={700}
+          color={t.color.text.primary}
+          style={{
+            whiteSpace: "nowrap",
+            lineClamp: 1,
+            textOverflow: "ellipsis",
+          }}
+        >
+          {value}
+        </T>
+      </div>
+      <Icon name="expandMore" size={16} color={t.color.text.dim} />
+    </div>
   );
 }
 
@@ -361,7 +591,6 @@ export interface ExpanderRowProps {
 
 export function ExpanderRow({ title, subtitle, children }: ExpanderRowProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   const [open, setOpen] = useState(false);
   return (
     <div>
@@ -373,7 +602,7 @@ export function ExpanderRow({ title, subtitle, children }: ExpanderRowProps) {
           <Icon
             name={open ? "chevronUp" : "chevronDown"}
             size={18}
-            color={colors.dim_fg}
+            color={t.color.text.dim}
           />
         }
       />
@@ -382,9 +611,10 @@ export function ExpanderRow({ title, subtitle, children }: ExpanderRowProps) {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: spacing.gap,
-            padding: spacing.paddingTight,
-            paddingTop: 0,
+            gap: t.space.sm,
+            paddingLeft: t.control.groupRowInset,
+            paddingRight: t.control.groupRowInset,
+            paddingBottom: t.space.md,
           }}
         >
           {children}
@@ -410,9 +640,10 @@ export function ButtonRow({
   onClick,
 }: ButtonRowProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
-  const fg = destructive ? colors.destructive : colors.accent;
-  const hoverBg = destructive ? colors.destructiveTint : colors.accentTint;
+  const fg = destructive ? t.color.functional.destructive : t.color.accent.base;
+  const hoverBg = destructive
+    ? t.color.functional.destructiveTint
+    : t.color.accent.tint;
   return (
     <div
       onClick={disabled ? undefined : onClick}
@@ -421,17 +652,19 @@ export function ButtonRow({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        gap: spacing.paddingTight,
-        minHeight: spacing.rowHeight,
-        paddingLeft: spacing.paddingTight,
-        paddingRight: spacing.paddingTight,
+        gap: t.space.md,
+        minHeight: t.control.rowMinHeight,
+        paddingLeft: t.control.groupRowInset,
+        paddingRight: t.control.groupRowInset,
+        paddingTop: t.space.md,
+        paddingBottom: t.space.md,
         cursor: disabled ? "default" : "pointer",
         opacity: disabled ? 0.5 : 1,
         pointerEvents: disabled ? "none" : "auto",
         hover: disabled ? undefined : { backgroundColor: hoverBg },
       }}
     >
-      <T size="body" color={colors.fg}>
+      <T size="body" color={t.color.text.primary}>
         {title}
       </T>
       <T size="body" weight={600} color={fg}>
@@ -439,4 +672,20 @@ export function ButtonRow({
       </T>
     </div>
   );
+}
+
+export function groupCardStyle(
+  t: AdwaitaTheme,
+  style?: Partial<StyleDesc>,
+): Partial<StyleDesc> {
+  return {
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: t.radius.md,
+    borderWidth: 1,
+    borderColor: t.color.divider.default,
+    backgroundColor: t.color.surface.card,
+    overflow: "hidden",
+    ...style,
+  };
 }
