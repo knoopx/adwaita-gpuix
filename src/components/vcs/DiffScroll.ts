@@ -1,5 +1,5 @@
-import type { NativeRenderer } from "@gpuix/native/host";
-import type { PublicInstance } from "@gpuix/react";
+import { type NativeRenderer } from "@gpuix/native/host";
+import { type PublicInstance } from "@gpuix/react";
 
 export function makeDiffScroller(
   diffRef: { current: PublicInstance | null },

@@ -1,12 +1,12 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../../theme/adwaita";
-import { Labeled } from "../common";
+import { Labeled } from "../text";
 import { Panel } from "../../lib/panel";
 import { Column } from "../Box";
 import { DiffPanel, DiffSummary } from "./DiffPanel";
-import type { TabularSides } from "../../lib/Tabular";
-import { HP_MP_ROWS } from "../.storybook/story-helpers";
+import { type TabularSides } from "../../lib/Tabular";
+import { HP_MP_ROWS } from "../../../.storybook/story-helpers";
 
 const PATCH = `diff --git a/src/main.ts b/src/main.ts
 --- a/src/main.ts
@@ -67,7 +67,7 @@ function Frame({
         display: "flex",
         flexDirection: "column",
         height,
-        borderRadius: t.radii.card,
+        borderRadius: t.radius.sm,
         overflow: "hidden",
       }}
     >

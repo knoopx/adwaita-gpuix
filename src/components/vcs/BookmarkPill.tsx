@@ -1,6 +1,6 @@
-import type { StyleDesc } from "@gpuix/react";
+import { type StyleDesc } from "@gpuix/react";
 import { Icon } from "../icons";
-import { T } from "../common";
+import { T } from "../text";
 import { useAdwaita } from "../../theme/adwaita";
 
 const PILL_H = 22;
@@ -25,10 +25,14 @@ export function BookmarkPill({
   variant?: BookmarkPillVariant;
   style?: Partial<StyleDesc>;
 }) {
-  const { colors, radii } = useAdwaita();
+  const t = useAdwaita();
   const accent = variant === "accent";
-  const fg = dimmed ? colors.dim_fg : accent ? colors.accent : colors.fg;
-  const iconColor = dimmed ? colors.dim_fg : colors.accent;
+  const fg = dimmed
+    ? t.color.text.dim
+    : accent
+      ? t.color.accent.base
+      : t.color.text.primary;
+  const iconColor = dimmed ? t.color.text.dim : t.color.accent.base;
   return (
     <div
       style={{
@@ -39,10 +43,9 @@ export function BookmarkPill({
         height: PILL_H,
         paddingLeft: PILL_PAD_X,
         paddingRight: PILL_PAD_X,
-        borderRadius: radii.pill,
-        borderWidth: 1,
-        borderColor: accent ? colors.accent : colors.border,
-        backgroundColor: accent ? colors.accentTint : colors.button_bg,
+        borderRadius: t.radius.full,
+        borderWidth: 0,
+        backgroundColor: accent ? t.color.accent.tint : t.color.surface.button,
         flexShrink: 1,
         minWidth: PILL_MIN_W,
         ...style,

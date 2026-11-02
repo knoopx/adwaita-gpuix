@@ -1,5 +1,5 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "../common";
+import { Labeled } from "../text";
 import { Row } from "../Box";
 import { BookmarkPill } from "./BookmarkPill";
 

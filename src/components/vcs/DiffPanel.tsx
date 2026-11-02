@@ -1,19 +1,17 @@
-import { useMemo } from "react";
-import type { Ref } from "react";
+import { type Ref, useMemo } from "react";
 import {
-  useGpuixRequired,
   type PublicInstance,
   type StyleDesc,
+  useGpuixRequired,
 } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
 import { nativeDiffTheme } from "../../theme/vcs";
-import { T } from "../common";
+import { T } from "../text";
 import { DataTable } from "../DataTable";
-import { DiffHistogram } from "./FileRow";
-import type { TabularSides } from "../../lib/Tabular";
+import { DiffHistogram } from "./DiffHistogram";
+import { type TabularSides } from "../../lib/Tabular";
 
-
-const MAX_DIFF_LINES = 500;
+const MAX_DIFF_LINES = 5000;
 
 type DiffLineKind = "add" | "del" | "ctx" | "hunk";
 
@@ -36,10 +34,7 @@ interface DiffFile {
 }
 
 function stripSide(path: string): string {
-  if (
-    (path.startsWith("a/") || path.startsWith("b/")) &&
-    path.length > 2
-  ) {
+  if ((path.startsWith("a/") || path.startsWith("b/")) && path.length > 2) {
     return path.slice(2);
   }
   return path;
@@ -178,6 +173,8 @@ export interface DiffPanelProps {
   framed?: boolean;
 
   header?: boolean;
+
+  name?: string | null;
 }
 
 export interface DiffSummaryData {
@@ -187,15 +184,31 @@ export interface DiffSummaryData {
   changed: number;
 }
 
-
 export function summarizePatch(patch: string): DiffSummaryData {
-  const file = parsePatch(patch);
-  return {
-    name: file.name,
-    added: file.added,
-    removed: file.removed,
-    changed: file.added + file.removed,
-  };
+  let added = 0;
+  let removed = 0;
+  let name = "";
+  let start = 0;
+  while (start <= patch.length) {
+    const end = patch.indexOf("\n", start);
+    const stop = end < 0 ? patch.length : end;
+    let line = patch.slice(start, stop);
+    if (line.endsWith("\r")) line = line.slice(0, -1);
+    if (line.startsWith("diff --git ")) {
+      const parts = line.split(" ");
+      name = stripSide(parts[parts.length - 1] ?? "") || name;
+    } else if (line.startsWith("+++ ")) {
+      const side = stripSide(line.slice(4));
+      if (side !== "/dev/null") name = side;
+    } else if (line.startsWith("+") && !line.startsWith("+++")) {
+      added++;
+    } else if (line.startsWith("-") && !line.startsWith("---")) {
+      removed++;
+    }
+    if (end < 0) break;
+    start = end + 1;
+  }
+  return { name, added, removed, changed: added + removed };
 }
 
 export function DiffSummary({
@@ -206,31 +219,36 @@ export function DiffSummary({
   removed: number;
 }) {
   const t = useAdwaita();
-  const { colors, typography } = t;
-  const mono: Partial<StyleDesc> = { fontFamily: typography.fontFamilyMono };
+  const mono: Partial<StyleDesc> = { fontFamily: t.type.fontFamilyMono };
   if (added + removed === 0)
     return (
-      <T size="caption" color={colors.dim_fg}>
+      <T size="caption" color={t.color.text.dim}>
         no changes
       </T>
     );
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
       {added > 0 && (
-        <T size="caption" weight={600} color={colors.success} style={mono}>
+        <T
+          size="caption"
+          weight={600}
+          color={t.color.functional.success}
+          style={mono}
+        >
           {`+${added}`}
         </T>
       )}
       {removed > 0 && (
-        <T size="caption" weight={600} color={colors.destructive} style={mono}>
+        <T
+          size="caption"
+          weight={600}
+          color={t.color.functional.destructive}
+          style={mono}
+        >
           {`-${removed}`}
         </T>
       )}
-      <DiffHistogram
-        insertions={added}
-        deletions={removed}
-        colors={colors}
-      />
+      <DiffHistogram insertions={added} deletions={removed} />
     </div>
   );
 }
@@ -241,19 +259,21 @@ export function DiffPanel({
   diffRef,
   framed = false,
   header = false,
+  name = null,
 }: DiffPanelProps) {
   const t = useAdwaita();
-  const { colors, typography, radii, spacing } = t;
-
   useGpuixRequired();
 
   if (tabular) {
-    return <DataTable sides={tabular} scrollRef={diffRef} />;
+    return <DataTable sides={tabular} scrollRef={diffRef} name={name} />;
   }
 
-  const file = useMemo(() => parsePatch(patch), [patch]);
-  const mono: Partial<StyleDesc> = { fontFamily: typography.fontFamilyMono };
-  const changed = file.added + file.removed;
+  const file = useMemo(
+    () => (header ? parsePatch(patch) : null),
+    [patch, header],
+  );
+  const mono: Partial<StyleDesc> = { fontFamily: t.type.fontFamilyMono };
+  const changed = file ? file.added + file.removed : 0;
 
   return (
     <div
@@ -266,10 +286,9 @@ export function DiffPanel({
         overflow: "hidden",
         ...(framed
           ? {
-              borderRadius: radii.card,
-              borderWidth: 1,
-              borderColor: colors.border,
-              backgroundColor: colors.view_bg,
+              borderRadius: t.radius.sm,
+              borderWidth: 0,
+              backgroundColor: t.color.surface.view,
             }
           : {}),
       }}
@@ -280,18 +299,18 @@ export function DiffPanel({
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            gap: spacing.gap,
-            padding: spacing.paddingTight,
-            backgroundColor: colors.headerbar_bg,
+            gap: t.space.sm,
+            padding: t.space.md,
+            backgroundColor: t.color.surface.headerbar,
             borderBottomWidth: 1,
-            borderColor: colors.border,
+            borderColor: t.color.border.default,
             flexShrink: 0,
           }}
         >
           <T
             size="caption"
             weight={600}
-            color={colors.fg}
+            color={t.color.text.primary}
             style={{
               ...mono,
               flexGrow: 1,
@@ -301,31 +320,27 @@ export function DiffPanel({
               overflow: "hidden",
             }}
           >
-            {file.name || "diff"}
+            {file?.name || "diff"}
           </T>
-          <T size="caption" color={colors.dim_fg} style={{ flexShrink: 0 }}>
+          <T size="caption" color={t.color.text.dim} style={{ flexShrink: 0 }}>
             {`${changed} changed line${changed === 1 ? "" : "s"}`}
           </T>
         </div>
       )}
-      <div
+      {}
+      <diff
         ref={diffRef}
+        patch={patch}
+        wordDiff
+        scroll
+        maxLines={MAX_DIFF_LINES}
+        theme={nativeDiffTheme(t)}
         style={{
-          display: "flex",
-          flexDirection: "column",
           flexGrow: 1,
           minHeight: 0,
           alignSelf: "stretch",
-          overflow: "scroll",
         }}
-      >
-        <diff
-          patch={patch}
-          wordDiff
-          maxLines={MAX_DIFF_LINES}
-          theme={nativeDiffTheme(t)}
-        />
-      </div>
+      />
     </div>
   );
 }
