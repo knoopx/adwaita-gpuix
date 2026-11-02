@@ -1,14 +1,14 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { defineMeta, defineStory } from "storybook";
-import { useAdwaita, SPACE } from "../theme/adwaita";
-import { Labeled, T } from "./common";
+import { SPACE, useAdwaita } from "../theme/adwaita";
+import { Labeled, T } from "./text";
 import { Column } from "./Box";
 import {
+  Blockquote,
   Heading,
+  InlineCode,
   Paragraph,
   Small,
-  Blockquote,
-  InlineCode,
   type TextTone,
 } from "./Typography";
 
@@ -30,7 +30,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
       }}
     >
       <div style={{ width: 96 }}>
-        <T size="caption" color={t.colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           {label}
         </T>
       </div>

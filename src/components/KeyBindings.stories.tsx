@@ -1,14 +1,16 @@
+import { type ReactNode } from "react";
 import { defineMeta } from "storybook";
-import { useAdwaita, SPACE } from "../theme/adwaita";
-import { Labeled, listPanelStyle } from "./common";
+import { SPACE, useAdwaita } from "../theme/adwaita";
+import { Labeled } from "./text";
+import { listPanelStyle } from "./FloatingPanel";
 import { Row } from "./Box";
 import { Kbd as KbdBox } from "./Kbd";
 import {
-  KbdKey,
   KbdBinding,
   KbdBindings,
-  ShortcutRow,
+  KbdKey,
   ShortcutList,
+  ShortcutRow,
   groupHints,
 } from "./KeyBindings";
 import { ShortcutHints } from "./KeyHint";
@@ -51,7 +53,7 @@ const GROUPED_SHORTCUTS: Shortcut[] = [
 export function singleKeys() {
   const t = useAdwaita();
   return (
-    <Row gap={t.spacing.padding} align="center">
+    <Row gap={t.space.lg} align="center">
       <Labeled caption="enter">
         <KbdBox>Enter</KbdBox>
       </Labeled>
@@ -74,7 +76,7 @@ export function singleKeys() {
 export function combos() {
   const t = useAdwaita();
   return (
-    <Row gap={t.spacing.padding} align="center">
+    <Row gap={t.space.lg} align="center">
       <Labeled caption="ctrl+k">
         <KbdBinding binding={["ctrl", "k"]} />
       </Labeled>
@@ -91,9 +93,15 @@ export function combos() {
 export function multipleBindings() {
   const t = useAdwaita();
   return (
-    <Row gap={t.spacing.padding} align="center">
+    <Row gap={t.space.lg} align="center">
       <Labeled caption="open / save / quit">
-        <KbdBindings kbds={[["ctrl", "o"], ["ctrl", "s"], ["ctrl", "q"]]} />
+        <KbdBindings
+          kbds={[
+            ["ctrl", "o"],
+            ["ctrl", "s"],
+            ["ctrl", "q"],
+          ]}
+        />
       </Labeled>
       <Labeled caption="nav arrows">
         <KbdBindings kbds={["up", "down", "left", "right"]} />
@@ -136,7 +144,7 @@ export function longLabels() {
         <div
           style={{
             height: 1,
-            backgroundColor: t.colors.border,
+            backgroundColor: t.color.border.default,
             margin: SPACE.xs,
           }}
         />
@@ -146,57 +154,61 @@ export function longLabels() {
   );
 }
 
-export function mergedBindings() {
+function HintStrip({ children }: { children: ReactNode }) {
   const t = useAdwaita();
   return (
+    <div
+      style={{
+        display: "flex",
+        backgroundColor: t.color.surface.view,
+        padding: t.space.md,
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: t.color.border.default,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function mergedBindings() {
+  return (
     <Labeled caption="same modifiers merge into one slashed key set">
-      <div
-        style={{
-          display: "flex",
-          backgroundColor: t.colors.view_bg,
-          padding: t.spacing.paddingTight,
-          borderTopWidth: 1,
-          borderBottomWidth: 1,
-          borderColor: t.colors.border,
-        }}
-      >
+      <HintStrip>
         <ShortcutHints
           groups={groupHints([
             { id: "nav-up", kbds: ["up"], desc: "nav" },
             { id: "nav-down", kbds: ["down"], desc: "nav" },
             {
               id: "view",
-              kbds: [["ctrl", "left"], ["ctrl", "right"]],
+              kbds: [
+                ["ctrl", "left"],
+                ["ctrl", "right"],
+              ],
               desc: "view",
             },
             {
               id: "zoom",
-              kbds: [["ctrl", "="], ["ctrl", "shift", "-"]],
+              kbds: [
+                ["ctrl", "="],
+                ["ctrl", "shift", "-"],
+              ],
               desc: "zoom",
             },
           ])}
         />
-      </div>
+      </HintStrip>
     </Labeled>
   );
 }
 
 export function hintRow() {
-  const t = useAdwaita();
   return (
     <Labeled caption="hint row (keys tight to their label, hints spaced apart)">
-      <div
-        style={{
-          display: "flex",
-          backgroundColor: t.colors.view_bg,
-          padding: t.spacing.paddingTight,
-          borderTopWidth: 1,
-          borderBottomWidth: 1,
-          borderColor: t.colors.border,
-        }}
-      >
+      <HintStrip>
         <ShortcutHints groups={groupHints(HINT_SHORTCUTS)} />
-      </div>
+      </HintStrip>
     </Labeled>
   );
 }

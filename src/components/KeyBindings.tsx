@@ -1,9 +1,9 @@
 import { Fragment } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { Kbd as KbdBox, KbdGroup, KbdCombo } from "./Kbd";
-import { type Kbd, type Shortcut } from "../lib/shortcuts";
-import { useAdwaita, SPACE } from "../theme/adwaita";
-import { T } from "./common";
+import { type StyleDesc } from "@gpuix/react";
+import { Kbd as KbdBox, KbdCombo, KbdGroup, type KbdColors } from "./Kbd";
+import { isHidden, type Kbd, type Shortcut } from "../lib/shortcuts";
+import { SPACE, useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
 
 const CODE_SYMBOLS: Record<string, string> = {
   up: "↑",
@@ -30,14 +30,13 @@ export function kbdSymbol(code: string): string {
   return CODE_SYMBOLS[code] ?? code;
 }
 
-export function KbdKey({ code }: { code: string }) {
-  return <KbdBox>{kbdSymbol(code)}</KbdBox>;
+export function KbdKey({ code, colors }: { code: string; colors?: KbdColors }) {
+  return <KbdBox colors={colors}>{kbdSymbol(code)}</KbdBox>;
 }
 
 function bindingCodes(binding: Kbd): string[] {
   return Array.isArray(binding) ? binding : [binding];
 }
-
 
 export function compactBindings(kbds: Kbd[]): Kbd[] {
   interface Slot {
@@ -66,23 +65,39 @@ export function compactBindings(kbds: Kbd[]): Kbd[] {
   });
 }
 
-export function KbdBinding({ binding }: { binding: Kbd }) {
+export function KbdBinding({
+  binding,
+  colors,
+}: {
+  binding: Kbd;
+  colors?: KbdColors;
+}) {
   const codes = Array.isArray(binding) ? binding : [binding];
-  if (codes.length === 1) return <KbdKey code={codes[0]} />;
+  if (codes.length === 1) return <KbdKey code={codes[0]} colors={colors} />;
   return (
-    <KbdCombo>
+    <KbdCombo colors={colors}>
       {codes.map((c) => (
-        <KbdKey key={c} code={c} />
+        <KbdKey key={c} code={c} colors={colors} />
       ))}
     </KbdCombo>
   );
 }
 
-export function KbdBindings({ kbds }: { kbds: Kbd[] }) {
+export function KbdBindings({
+  kbds,
+  colors,
+}: {
+  kbds: Kbd[];
+  colors?: KbdColors;
+}) {
   return (
     <KbdGroup>
       {kbds.map((b) => (
-        <KbdBinding key={Array.isArray(b) ? b.join("-") : b} binding={b} />
+        <KbdBinding
+          key={Array.isArray(b) ? b.join("-") : b}
+          binding={b}
+          colors={colors}
+        />
       ))}
     </KbdGroup>
   );
@@ -101,7 +116,6 @@ export interface ShortcutRowProps {
 
 export function ShortcutRow({ label, kbds, style }: ShortcutRowProps) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   return (
     <div
       style={{
@@ -109,7 +123,7 @@ export function ShortcutRow({ label, kbds, style }: ShortcutRowProps) {
         flexDirection: "row",
         alignItems: "center",
         gap: SPACE.sm,
-        minHeight: spacing.rowHeight,
+        minHeight: t.control.rowHeight,
         paddingLeft: SPACE.md,
         paddingRight: SPACE.md,
         ...style,
@@ -117,7 +131,7 @@ export function ShortcutRow({ label, kbds, style }: ShortcutRowProps) {
     >
       <T
         size="body"
-        color={colors.fg}
+        color={t.color.text.primary}
         style={{
           flexGrow: 1,
           minWidth: 0,
@@ -142,7 +156,6 @@ export interface ShortcutListProps {
 
 export function ShortcutList({ shortcuts, style }: ShortcutListProps) {
   const t = useAdwaita();
-  const { colors } = t;
   const groups = groupHints(shortcuts);
   return (
     <div style={{ display: "flex", flexDirection: "column", ...style }}>
@@ -152,7 +165,7 @@ export function ShortcutList({ shortcuts, style }: ShortcutListProps) {
             <div
               style={{
                 height: 1,
-                backgroundColor: colors.border,
+                backgroundColor: t.color.border.default,
                 margin: SPACE.xs,
               }}
             />
@@ -168,6 +181,7 @@ export function groupHints(shortcuts: Shortcut[]): HintGroup[] {
   const groups: HintGroup[] = [];
   const byDesc = new Map<string, HintGroup>();
   for (const s of shortcuts) {
+    if (isHidden(s)) continue;
     const existing = byDesc.get(s.desc);
     if (existing) {
       existing.kbds.push(...s.kbds);

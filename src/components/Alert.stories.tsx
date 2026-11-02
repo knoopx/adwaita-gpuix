@@ -1,7 +1,7 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Column } from "./Box";
-import { Alert, AlertTitle, AlertDescription } from "./Alert";
+import { Alert, AlertDescription, AlertTitle } from "./Alert";
 
 export default defineMeta({
   title: "Adwaita/Alert",
@@ -57,7 +57,9 @@ export const withAction = defineStory({
           action={{ label: "View details", onClick: () => {} }}
         >
           <AlertTitle>Backup failed</AlertTitle>
-          <AlertDescription>The last backup could not be completed.</AlertDescription>
+          <AlertDescription>
+            The last backup could not be completed.
+          </AlertDescription>
         </Alert>
       </Labeled>
     </Column>
@@ -101,9 +103,11 @@ export const noIcon = defineStory({
         </Alert>
       </Labeled>
       <Labeled caption="custom icon">
-        <Alert icon="bell" variant="warning">
+        <Alert icon="notifications" variant="warning">
           <AlertTitle>Reminder</AlertTitle>
-          <AlertDescription>A custom icon overrides the variant icon.</AlertDescription>
+          <AlertDescription>
+            A custom icon overrides the variant icon.
+          </AlertDescription>
         </Alert>
       </Labeled>
     </Column>
@@ -116,7 +120,9 @@ export const sizes = defineStory({
       <Labeled caption="small (tight padding, 16px icon)">
         <Alert size="sm" variant="success">
           <AlertTitle>Saved</AlertTitle>
-          <AlertDescription>Compact padding for dense layouts.</AlertDescription>
+          <AlertDescription>
+            Compact padding for dense layouts.
+          </AlertDescription>
         </Alert>
       </Labeled>
       <Labeled caption="medium (default)">
@@ -136,9 +142,9 @@ export const longText = defineStory({
         <Alert variant="warning">
           <AlertTitle>Disk usage is high</AlertTitle>
           <AlertDescription>
-            Your disk is 94% full. Large projects with many uncommitted
-            changes can fill quickly — consider archiving old files or moving
-            the workspace to a larger volume before the next build.
+            Your disk is 94% full. Large projects with many uncommitted changes
+            can fill quickly — consider archiving old files or moving the
+            workspace to a larger volume before the next build.
           </AlertDescription>
         </Alert>
       </Labeled>

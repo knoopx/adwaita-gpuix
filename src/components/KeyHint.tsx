@@ -1,9 +1,8 @@
-import type { StyleDesc } from "@gpuix/react";
-import { SPACE } from "../theme/adwaita";
-import { T } from "./common";
-import { useAdwaita } from "../theme/adwaita";
+import { type StyleDesc } from "@gpuix/react";
+import { SPACE, useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
 import { type HintGroup, KbdBindings } from "./KeyBindings";
-
+import { type KbdColors } from "./Kbd";
 
 const HINT_LABEL_GAP = SPACE.xs;
 
@@ -12,12 +11,20 @@ const HINT_GROUP_GAP = SPACE.md;
 export interface ShortcutHintProps {
   group: HintGroup;
   style?: Partial<StyleDesc>;
+
+  colors?: KbdColors;
+
+  labelColor?: string;
 }
 
-export function ShortcutHint({ group, style }: ShortcutHintProps) {
+export function ShortcutHint({
+  group,
+  style,
+  colors,
+  labelColor,
+}: ShortcutHintProps) {
   const t = useAdwaita();
-  const label =
-    group.desc.charAt(0).toUpperCase() + group.desc.slice(1);
+  const label = group.desc.charAt(0).toUpperCase() + group.desc.slice(1);
   return (
     <div
       style={{
@@ -29,8 +36,8 @@ export function ShortcutHint({ group, style }: ShortcutHintProps) {
         ...style,
       }}
     >
-      <KbdBindings kbds={group.kbds} />
-      <T size="caption" color={t.colors.dim_fg}>
+      <KbdBindings kbds={group.kbds} colors={colors} />
+      <T size="caption" color={labelColor ?? t.color.text.dim}>
         {label}
       </T>
     </div>
@@ -40,10 +47,18 @@ export function ShortcutHint({ group, style }: ShortcutHintProps) {
 export interface ShortcutHintsProps {
   groups: HintGroup[];
   style?: Partial<StyleDesc>;
+
+  colors?: KbdColors;
+
+  labelColor?: string;
 }
 
-
-export function ShortcutHints({ groups, style }: ShortcutHintsProps) {
+export function ShortcutHints({
+  groups,
+  style,
+  colors,
+  labelColor,
+}: ShortcutHintsProps) {
   return (
     <div
       style={{
@@ -57,7 +72,12 @@ export function ShortcutHints({ groups, style }: ShortcutHintsProps) {
       }}
     >
       {groups.map((g) => (
-        <ShortcutHint key={g.desc} group={g} />
+        <ShortcutHint
+          key={g.desc}
+          group={g}
+          colors={colors}
+          labelColor={labelColor}
+        />
       ))}
     </div>
   );

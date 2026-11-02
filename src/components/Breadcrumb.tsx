@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { T } from "./common";
+import { T, TitleText } from "./text";
 import { Icon, type IconName } from "./icons";
 
 export interface BreadcrumbProps {
@@ -95,10 +95,8 @@ export function BreadcrumbLink({
         ...style,
       }}
     >
-      {icon ? (
-        <Icon name={icon} size={14} color={t.colors.accent} />
-      ) : null}
-      <T size="body" color={t.colors.accent}>
+      {icon ? <Icon name={icon} size={14} color={t.color.accent.base} /> : null}
+      <T size="body" color={t.color.accent.base}>
         {children}
       </T>
     </div>
@@ -111,11 +109,10 @@ export interface BreadcrumbPageProps {
 }
 
 export function BreadcrumbPage({ children, style }: BreadcrumbPageProps) {
-  const t = useAdwaita();
   return (
-    <T size="body" weight={700} color={t.colors.fg} style={style}>
+    <TitleText size="body" style={style}>
       {children}
-    </T>
+    </TitleText>
   );
 }
 
@@ -129,7 +126,7 @@ export function BreadcrumbSeparator({ style }: BreadcrumbSeparatorProps) {
     <Icon
       name="chevronRight"
       size={14}
-      color={t.colors.dim_fg}
+      color={t.color.text.dim}
       style={{ pointerEvents: "none", ...style }}
     />
   );
@@ -140,7 +137,10 @@ export interface BreadcrumbEllipsisProps {
   style?: Partial<StyleDesc>;
 }
 
-export function BreadcrumbEllipsis({ onClick, style }: BreadcrumbEllipsisProps) {
+export function BreadcrumbEllipsis({
+  onClick,
+  style,
+}: BreadcrumbEllipsisProps) {
   const t = useAdwaita();
   return (
     <div
@@ -150,13 +150,13 @@ export function BreadcrumbEllipsis({ onClick, style }: BreadcrumbEllipsisProps) 
         alignItems: "center",
         justifyContent: "center",
         padding: 4,
-        borderRadius: t.radii.button,
+        borderRadius: t.radius.sm,
         cursor: "pointer",
-        hover: { backgroundColor: t.colors.button_hover },
+        hover: { backgroundColor: t.color.surface.buttonHover },
         ...style,
       }}
     >
-      <T size="body" color={t.colors.dim_fg}>
+      <T size="body" color={t.color.text.dim}>
         …
       </T>
     </div>

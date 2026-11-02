@@ -1,21 +1,27 @@
 import { Children, Fragment, type ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, RADIUS, SPACE } from "../theme/adwaita";
-import { T } from "./common";
+import { type StyleDesc } from "@gpuix/react";
+import { RADIUS, SPACE, useAdwaita } from "../theme/adwaita";
+import { T } from "./text";
 
 const KBD_HEIGHT = 16;
 const KBD_MIN_WIDTH = 16;
 const KBD_PAD_X = 3;
 const KBD_GAP = SPACE.xs;
 
+export interface KbdColors {
+  fill?: string;
+  border?: string;
+  color?: string;
+}
+
 export interface KbdProps {
   children: ReactNode;
   style?: Partial<StyleDesc>;
+  colors?: KbdColors;
 }
 
-export function Kbd({ children, style }: KbdProps) {
+export function Kbd({ children, style, colors }: KbdProps) {
   const t = useAdwaita();
-  const { colors, typography } = t;
   return (
     <div
       style={{
@@ -30,8 +36,8 @@ export function Kbd({ children, style }: KbdProps) {
         borderRadius: RADIUS.xs,
         borderWidth: 1,
         borderBottomWidth: 2,
-        borderColor: colors.border,
-        backgroundColor: colors.button_bg,
+        borderColor: colors?.border ?? t.color.border.default,
+        backgroundColor: colors?.fill ?? t.color.surface.button,
         userSelect: "none",
         pointerEvents: "none",
         ...style,
@@ -40,8 +46,8 @@ export function Kbd({ children, style }: KbdProps) {
       <T
         size="micro"
         weight={500}
-        color={colors.dim_fg}
-        style={{ fontFamily: typography.fontFamilyMono }}
+        color={colors?.color ?? t.color.text.dim}
+        style={{ fontFamily: t.type.fontFamilyMono }}
       >
         {children}
       </T>
@@ -72,17 +78,18 @@ export function KbdGroup({ children, style }: KbdGroupProps) {
 export interface KbdComboProps {
   children: ReactNode;
   style?: Partial<StyleDesc>;
+  colors?: KbdColors;
 }
 
-function KbdPlus() {
+function KbdPlus({ colors }: { colors?: KbdColors }) {
   const t = useAdwaita();
   return (
     <T
       size="micro"
-      color={t.colors.dim_fg}
+      color={colors?.color ?? t.color.text.dim}
       style={{
         flexShrink: 0,
-        fontFamily: t.typography.fontFamilyMono,
+        fontFamily: t.type.fontFamilyMono,
       }}
     >
       +
@@ -90,7 +97,7 @@ function KbdPlus() {
   );
 }
 
-export function KbdCombo({ children, style }: KbdComboProps) {
+export function KbdCombo({ children, style, colors }: KbdComboProps) {
   const items = Children.toArray(children).filter(Boolean);
   return (
     <div
@@ -103,7 +110,7 @@ export function KbdCombo({ children, style }: KbdComboProps) {
     >
       {items.map((child, i) => (
         <Fragment key={i}>
-          {i > 0 ? <KbdPlus /> : null}
+          {i > 0 ? <KbdPlus colors={colors} /> : null}
           {child}
         </Fragment>
       ))}

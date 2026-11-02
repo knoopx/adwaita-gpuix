@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { T } from "./common";
+import { T } from "./text";
 
 export interface DescriptionProps {
   children: ReactNode;
@@ -10,12 +10,9 @@ export interface DescriptionProps {
 
 export function Description({ children, style }: DescriptionProps) {
   const t = useAdwaita();
-  const { colors } = t;
   return (
-    <T size="body" color={colors.dim_fg} style={style}>
+    <T size="body" color={t.color.text.dim} style={style}>
       {children}
     </T>
   );
 }
-
-

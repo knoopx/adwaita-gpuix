@@ -1,24 +1,11 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, type AdwaitaColors } from "../theme/adwaita";
-import { T } from "./common";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
+import { type Tone, toneColor, toneTint } from "../theme/tones";
+import { T } from "./text";
 import { Icon, type IconName } from "./icons";
 
-export type StatusPageTone = "accent" | "destructive" | "success" | "warning";
-
-const TONE_TINT: Record<StatusPageTone, keyof AdwaitaColors> = {
-  accent: "accentTint",
-  destructive: "destructiveTint",
-  success: "successTint",
-  warning: "warningTint",
-};
-
-const TONE_COLOR: Record<StatusPageTone, keyof AdwaitaColors> = {
-  accent: "accent",
-  destructive: "destructive",
-  success: "success",
-  warning: "warning",
-};
+export type StatusPageTone = Tone;
 
 export interface StatusPageProps {
   icon?: IconName;
@@ -30,7 +17,7 @@ export interface StatusPageProps {
 }
 
 export function StatusPage({
-  icon = "sparkles",
+  icon = "autoAwesome",
   tone = "accent",
   title,
   description,
@@ -38,7 +25,6 @@ export function StatusPage({
   style,
 }: StatusPageProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   return (
     <div
       style={{
@@ -46,8 +32,8 @@ export function StatusPage({
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: spacing.gap,
-        padding: spacing.padding,
+        gap: t.space.sm,
+        padding: t.space.lg,
         minHeight: 160,
         ...style,
       }}
@@ -56,23 +42,23 @@ export function StatusPage({
         style={{
           width: 72,
           height: 72,
-          borderRadius: radii.pill,
-          backgroundColor: colors[TONE_TINT[tone]],
+          borderRadius: t.radius.full,
+          backgroundColor: toneTint(t, tone),
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           pointerEvents: "none",
         }}
       >
-        <Icon name={icon} size={32} color={colors[TONE_COLOR[tone]]} />
+        <Icon name={icon} size={32} color={toneColor(t, tone)} />
       </div>
-      <T size="title2" weight={700} color={colors.fg}>
+      <T size="title2" weight={700} color={t.color.text.primary}>
         {title}
       </T>
       {description ? (
         <T
           size="body"
-          color={colors.dim_fg}
+          color={t.color.text.dim}
           align="center"
           style={{ maxWidth: 320, whiteSpace: "normal", lineHeight: 20 }}
         >

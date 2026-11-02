@@ -1,24 +1,12 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, type AdwaitaColors } from "../theme/adwaita";
-import { T, GapRow } from "./common";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
+import { type Tone, toneColor } from "../theme/tones";
+import { DescriptionText, TitleText } from "./text";
+import { GapRow } from "./Box";
 import { Icon, type IconName } from "./icons";
 
-export type EmptyTone = "accent" | "destructive" | "success" | "warning";
-
-const TONE_TINT: Record<EmptyTone, keyof AdwaitaColors> = {
-  accent: "accentTint",
-  destructive: "destructiveTint",
-  success: "successTint",
-  warning: "warningTint",
-};
-
-const TONE_COLOR: Record<EmptyTone, keyof AdwaitaColors> = {
-  accent: "accent",
-  destructive: "destructive",
-  success: "success",
-  warning: "warning",
-};
+export type EmptyTone = Tone;
 
 export interface EmptyProps {
   children: ReactNode;
@@ -27,19 +15,16 @@ export interface EmptyProps {
 
 export function Empty({ children, style }: EmptyProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: spacing.paddingTight,
-        padding: spacing.padding,
-        borderRadius: radii.card,
-        borderWidth: 1,
-        borderColor: colors.border,
-        backgroundColor: colors.view_bg,
+        gap: t.space.md,
+        padding: t.space.lg,
+        borderRadius: t.radius.sm,
+        borderWidth: 0,
         ...style,
       }}
     >
@@ -62,14 +47,11 @@ export function EmptyMedia({
   style,
 }: EmptyMediaProps) {
   const t = useAdwaita();
-  const { colors, radii } = t;
   return (
     <div
       style={{
-        width: 48,
-        height: 48,
-        borderRadius: radii.pill,
-        backgroundColor: colors[TONE_TINT[tone]],
+        width: t.control.emptyMediaSize,
+        height: t.control.emptyMediaSize,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -78,7 +60,11 @@ export function EmptyMedia({
       }}
     >
       {icon ? (
-        <Icon name={icon} size={24} color={colors[TONE_COLOR[tone]]} />
+        <Icon
+          name={icon}
+          size={t.control.emptyMediaIconSize}
+          color={tone === "accent" ? t.color.text.dim : toneColor(t, tone)}
+        />
       ) : (
         children
       )}
@@ -92,12 +78,7 @@ export interface EmptyTitleProps {
 }
 
 export function EmptyTitle({ children, style }: EmptyTitleProps) {
-  const t = useAdwaita();
-  return (
-    <T size="title2" weight={700} color={t.colors.fg} style={style}>
-      {children}
-    </T>
-  );
+  return <TitleText style={style}>{children}</TitleText>;
 }
 
 export interface EmptyDescriptionProps {
@@ -106,16 +87,10 @@ export interface EmptyDescriptionProps {
 }
 
 export function EmptyDescription({ children, style }: EmptyDescriptionProps) {
-  const t = useAdwaita();
   return (
-    <T
-      size="body"
-      color={t.colors.dim_fg}
-      align="center"
-      style={style}
-    >
+    <DescriptionText align="center" style={style}>
       {children}
-    </T>
+    </DescriptionText>
   );
 }
 
@@ -138,7 +113,7 @@ function EmptyStack({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: t.spacing.gap,
+        gap: t.space.sm,
         ...style,
       }}
     >

@@ -1,20 +1,15 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import {
-  useAdwaita,
-  accentForeground,
   type AdwaitaTheme,
+  accentForeground,
+  useAdwaita,
 } from "../theme/adwaita";
-import { T } from "./common";
+import { T } from "./text";
 import { Icon, type IconName } from "./icons";
 
 export type BadgeVariant =
-  | "default"
-  | "secondary"
-  | "destructive"
-  | "success"
-  | "warning"
-  | "outline";
+  "default" | "secondary" | "destructive" | "success" | "warning" | "outline";
 
 export type BadgeSize = "sm" | "md";
 
@@ -38,32 +33,43 @@ function resolveVariantTheme(
   variant: BadgeVariant,
   t: AdwaitaTheme,
 ): BadgeVariantTheme {
-  const { colors } = t;
   switch (variant) {
     case "secondary":
-      return { bg: colors.button_bg, fg: colors.fg, border: "transparent" };
+      return {
+        bg: t.color.surface.button,
+        fg: t.color.text.primary,
+        border: "transparent",
+      };
     case "destructive":
       return {
-        bg: colors.destructive,
-        fg: colors.destructive_fg,
+        bg: t.color.functional.destructive,
+        fg: t.color.functional.destructiveFg,
         border: "transparent",
       };
     case "success":
       return {
-        bg: colors.success,
-        fg: accentForeground(colors.success),
+        bg: t.color.functional.success,
+        fg: accentForeground(t.color.functional.success),
         border: "transparent",
       };
     case "warning":
       return {
-        bg: colors.warning,
-        fg: accentForeground(colors.warning),
+        bg: t.color.functional.warning,
+        fg: accentForeground(t.color.functional.warning),
         border: "transparent",
       };
     case "outline":
-      return { bg: "transparent", fg: colors.fg, border: colors.border };
+      return {
+        bg: t.color.selection.muted,
+        fg: t.color.text.primary,
+        border: "transparent",
+      };
     default:
-      return { bg: colors.accent, fg: colors.accent_fg, border: "transparent" };
+      return {
+        bg: t.color.accent.base,
+        fg: t.color.text.onAccent,
+        border: "transparent",
+      };
   }
 }
 
@@ -83,16 +89,14 @@ export function Badge({
 
   if (dot) {
     const d = small ? 8 : 10;
-    const outline = variant === "outline";
     return (
       <div
         style={{
           width: d,
           height: d,
           borderRadius: d / 2,
-          backgroundColor: outline ? "transparent" : theme.bg,
-          borderWidth: outline ? 2 : 0,
-          borderColor: theme.fg,
+          backgroundColor: theme.bg,
+          borderWidth: 0,
           flexShrink: 0,
           opacity,
           ...style,
@@ -111,9 +115,8 @@ export function Badge({
         padding: small ? 3 : 4,
         paddingLeft: small ? 6 : 8,
         paddingRight: small ? 6 : 8,
-        borderRadius: t.radii.pill,
-        borderWidth: theme.border === "transparent" ? 0 : 1,
-        borderColor: theme.border,
+        borderRadius: t.radius.full,
+        borderWidth: 0,
         backgroundColor: theme.bg,
         flexShrink: 0,
         opacity,
@@ -123,7 +126,12 @@ export function Badge({
       {icon ? (
         <Icon name={icon} size={small ? 10 : 12} color={theme.fg} />
       ) : null}
-      <T size="caption" weight={600} color={theme.fg} style={small ? { fontSize: 11 } : undefined}>
+      <T
+        size="caption"
+        weight={600}
+        color={theme.fg}
+        style={small ? { fontSize: 11 } : undefined}
+      >
         {children}
       </T>
     </div>

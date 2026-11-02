@@ -1,7 +1,8 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, type AdwaitaColors } from "../theme/adwaita";
-import { T, CloseButton } from "./common";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../theme/adwaita";
+import { DescriptionText, T, TitleText } from "./text";
+import { CloseButton } from "./overlay";
 import { Button } from "./Button";
 import { Icon, type IconName } from "./icons";
 
@@ -19,9 +20,9 @@ export interface BannerProps {
   tone?: BannerTone;
 
   variant?: BannerVariant;
-  
+
   icon?: IconName;
-  
+
   showIcon?: boolean;
   actionLabel?: string;
   onAction?: () => void;
@@ -37,23 +38,28 @@ interface BannerToneTheme {
   icon: IconName;
 }
 
-function resolveToneTheme(
-  tone: BannerTone,
-  colors: AdwaitaColors,
-): BannerToneTheme {
+function resolveToneTheme(tone: BannerTone, t: AdwaitaTheme): BannerToneTheme {
   switch (tone) {
     case "warning":
-      return { bg: colors.warningTint, fg: colors.warning, icon: "warning" };
+      return {
+        bg: t.color.functional.warningTint,
+        fg: t.color.functional.warning,
+        icon: "warning",
+      };
     case "error":
       return {
-        bg: colors.destructiveTint,
-        fg: colors.destructive,
-        icon: "alert",
+        bg: t.color.functional.destructiveTint,
+        fg: t.color.functional.destructive,
+        icon: "error",
       };
     case "success":
-      return { bg: colors.successTint, fg: colors.success, icon: "success" };
+      return {
+        bg: t.color.functional.successTint,
+        fg: t.color.functional.success,
+        icon: "checkCircle",
+      };
     default:
-      return { bg: colors.accentTint, fg: colors.accent, icon: "info" };
+      return { bg: t.color.accent.tint, fg: t.color.accent.base, icon: "info" };
   }
 }
 
@@ -71,7 +77,6 @@ function BannerBody({
   showIcon?: boolean;
 }) {
   const t = useAdwaita();
-  const { colors, spacing } = t;
   return (
     <div
       style={{
@@ -87,18 +92,18 @@ function BannerBody({
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
-          gap: spacing.gap,
+          gap: t.space.sm,
         }}
       >
         {showIcon === false ? null : (
           <Icon name={icon ?? tone.icon} size={18} color={tone.fg} />
         )}
-        <T size="body" weight={700} color={colors.fg}>
+        <T size="body" weight={700} color={t.color.text.primary}>
           {title}
         </T>
       </div>
       {body ? (
-        <T size="caption" color={colors.dim_fg}>
+        <T size="caption" color={t.color.text.dim}>
           {body}
         </T>
       ) : null}
@@ -112,11 +117,10 @@ export interface BannerTitleProps {
 }
 
 export function BannerTitle({ children, style }: BannerTitleProps) {
-  const t = useAdwaita();
   return (
-    <T size="body" weight={700} color={t.colors.fg} style={style}>
+    <TitleText size="body" style={style}>
       {children}
-    </T>
+    </TitleText>
   );
 }
 
@@ -126,11 +130,51 @@ export interface BannerDescriptionProps {
 }
 
 export function BannerDescription({ children, style }: BannerDescriptionProps) {
-  const t = useAdwaita();
   return (
-    <T size="caption" color={t.colors.dim_fg} style={style}>
+    <DescriptionText size="caption" style={style}>
       {children}
-    </T>
+    </DescriptionText>
+  );
+}
+
+function actionRowJustify(
+  hasAction: boolean,
+  hasClose: boolean,
+): "space-between" | "flex-end" | "flex-start" {
+  if (hasAction && hasClose) return "space-between";
+  if (hasClose) return "flex-end";
+  return "flex-start";
+}
+
+function BannerActions({
+  narrow,
+  action,
+  close,
+}: {
+  narrow?: boolean;
+  action: ReactNode;
+  close: ReactNode;
+}) {
+  if (!narrow)
+    return (
+      <>
+        {action}
+        {close}
+      </>
+    );
+  if (!action && !close) return null;
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: actionRowJustify(!!action, !!close),
+      }}
+    >
+      {action}
+      {close}
+    </div>
   );
 }
 
@@ -148,9 +192,8 @@ export function Banner({
   style,
 }: BannerProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   const resolvedTone = tone ?? (variant ? variantToTone(variant) : "info");
-  const toneTheme = resolveToneTheme(resolvedTone, colors);
+  const toneTheme = resolveToneTheme(resolvedTone, t);
   const close = onClose ? <CloseButton onClick={onClose} /> : null;
   const action = actionLabel ? (
     <Button variant="text" label={actionLabel} onClick={onAction} />
@@ -162,9 +205,9 @@ export function Banner({
         display: "flex",
         flexDirection: narrow ? "column" : "row",
         alignItems: narrow ? "stretch" : "center",
-        gap: spacing.gap,
-        padding: spacing.paddingTight,
-        borderRadius: radii.card,
+        gap: t.space.sm,
+        padding: t.space.md,
+        borderRadius: t.radius.sm,
         backgroundColor: toneTheme.bg,
         ...style,
       }}
@@ -174,38 +217,20 @@ export function Banner({
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
-          gap: spacing.gap,
+          gap: t.space.sm,
           flexGrow: 1,
           minWidth: 0,
         }}
       >
-        <BannerBody title={title} body={body} tone={toneTheme} icon={icon} showIcon={showIcon} />
+        <BannerBody
+          title={title}
+          body={body}
+          tone={toneTheme}
+          icon={icon}
+          showIcon={showIcon}
+        />
       </div>
-      {narrow ? (
-        action || close ? (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent:
-                action && close
-                  ? "space-between"
-                  : close
-                    ? "flex-end"
-                    : "flex-start",
-            }}
-          >
-            {action}
-            {close}
-          </div>
-        ) : null
-      ) : (
-        <>
-          {action}
-          {close}
-        </>
-      )}
+      <BannerActions narrow={narrow} action={action} close={close} />
     </div>
   );
 }

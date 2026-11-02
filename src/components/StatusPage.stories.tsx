@@ -1,5 +1,5 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Column } from "./Box";
 import { Button } from "./Button";
 import { StatusPage } from "./StatusPage";
@@ -16,14 +16,14 @@ export const variants = defineStory({
     <Column gap={16} align="center">
       <Labeled caption="icon + title + description">
         <StatusPage
-          icon="sparkles"
+          icon="autoAwesome"
           title="Nothing here yet"
           description="Your workspace is empty. Create your first item to get started."
         />
       </Labeled>
       <Labeled caption="with content (children)">
         <StatusPage
-          icon="clock"
+          icon="schedule"
           title="Loading"
           description="Please wait while we fetch your data…"
         >
@@ -44,7 +44,7 @@ export const withAction = defineStory({
       title="Your inbox is empty"
       description="Messages you send and receive will show up here."
     >
-      <Button variant="suggested" icon="plus" label="Create message" />
+      <Button variant="suggested" icon="add" label="Create message" />
     </StatusPage>
   ),
 });
@@ -54,7 +54,7 @@ export const tones = defineStory({
     <Column gap={16} align="center">
       <Labeled caption="success">
         <StatusPage
-          icon="success"
+          icon="checkCircle"
           tone="success"
           title="All up to date"
           description="Everything is synchronized and ready to go."
@@ -70,7 +70,7 @@ export const tones = defineStory({
       </Labeled>
       <Labeled caption="destructive">
         <StatusPage
-          icon="alert"
+          icon="error"
           tone="destructive"
           title="Something went wrong"
           description="We could not load your data. Check your connection and try again."

@@ -1,6 +1,6 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled } from "./text";
+import { Column, Row } from "./Box";
 import { Badge } from "./Badge";
 
 export default defineMeta({
@@ -40,17 +40,17 @@ export const withIcons = defineStory({
       <Labeled caption="accent + info / secondary + user / destructive + alert">
         <Row gap={8} align="center">
           <Badge icon="info">Update</Badge>
-          <Badge variant="secondary" icon="user">
+          <Badge variant="secondary" icon="person">
             4 members
           </Badge>
-          <Badge variant="destructive" icon="alert">
+          <Badge variant="destructive" icon="error">
             2 errors
           </Badge>
         </Row>
       </Labeled>
       <Labeled caption="success + success / warning + warning / outline + check">
         <Row gap={8} align="center">
-          <Badge variant="success" icon="success">
+          <Badge variant="success" icon="checkCircle">
             Ready
           </Badge>
           <Badge variant="warning" icon="warning">
@@ -118,7 +118,7 @@ export const sizes = defineStory({
       <Labeled caption="small (tight padding, 11px text, 10px icon)">
         <Row gap={8} align="center">
           <Badge size="sm">Compact</Badge>
-          <Badge size="sm" variant="destructive" icon="alert">
+          <Badge size="sm" variant="destructive" icon="error">
             Errors
           </Badge>
           <Badge size="sm" variant="success">
@@ -132,7 +132,7 @@ export const sizes = defineStory({
       <Labeled caption="medium (default)">
         <Row gap={8} align="center">
           <Badge>Comfortable</Badge>
-          <Badge variant="destructive" icon="alert">
+          <Badge variant="destructive" icon="error">
             Errors
           </Badge>
           <Badge variant="success">42</Badge>

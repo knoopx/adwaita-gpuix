@@ -1,5 +1,5 @@
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Column } from "./Box";
 import { Banner } from "./Banner";
 
@@ -80,7 +80,7 @@ export const icons = defineStory({
           title="New notifications"
           body="Three items are waiting for you."
           tone="info"
-          icon="bell"
+          icon="notifications"
         />
       </Labeled>
       <Labeled caption="no icon">

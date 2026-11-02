@@ -1,15 +1,10 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../theme/adwaita";
-import { T, type TextSize } from "./common";
+import { type TextTone, textToneColor } from "../theme/tones";
+import { T, type TextSize } from "./text";
 
-export type LabelVariant =
-  | "default"
-  | "dim"
-  | "accent"
-  | "destructive"
-  | "success"
-  | "warning";
+export type LabelVariant = TextTone;
 
 export interface LabelProps {
   children: ReactNode;
@@ -34,14 +29,7 @@ export function Label({
   style,
 }: LabelProps) {
   const t = useAdwaita();
-  const color = {
-    default: t.colors.fg,
-    dim: t.colors.dim_fg,
-    accent: t.colors.accent,
-    destructive: t.colors.destructive,
-    success: t.colors.success,
-    warning: t.colors.warning,
-  }[variant];
+  const color = textToneColor(t, variant);
   return (
     <T
       size={size}

@@ -1,6 +1,6 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { T, Labeled } from "./common";
+import { Labeled, T } from "./text";
 import { Column } from "./Box";
 import { Description } from "./Description";
 
@@ -64,7 +64,9 @@ export const stacked = defineStory({
             Storage
           </T>
           <Description>Used space shown for the selected drive.</Description>
-          <Description>Values refresh automatically as files change.</Description>
+          <Description>
+            Values refresh automatically as files change.
+          </Description>
         </Column>
       </Labeled>
     </Column>
@@ -76,7 +78,7 @@ export function styled() {
   return (
     <Column gap={16} align="center">
       <Labeled caption="style prop override (caption size)">
-        <Description style={{ fontSize: t.typography.caption }}>
+        <Description style={{ fontSize: t.type.caption }}>
           The same dim description text rendered at caption size via the style
           prop.
         </Description>

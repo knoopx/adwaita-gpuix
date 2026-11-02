@@ -1,17 +1,17 @@
 import { Fragment } from "react";
 import { defineMeta, defineStory } from "storybook";
-import { Labeled } from "./common";
+import { Labeled } from "./text";
 import { Column } from "./Box";
 import {
   Breadcrumb,
-  BreadcrumbList,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbSeparator,
+  BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbEllipsis,
+  BreadcrumbSeparator,
 } from "./Breadcrumb";
-import type { IconName } from "./icons";
+import { type IconName } from "./icons";
 
 type Crumb = { label: string; icon?: IconName; disabled?: boolean };
 
@@ -100,7 +100,7 @@ export const withIcons = defineStory({
         links={[
           { label: "Home", icon: "home" },
           { label: "Documents", icon: "folder" },
-          { label: "Report", icon: "fileText" },
+          { label: "Report", icon: "article" },
         ]}
         page="Q3"
       />

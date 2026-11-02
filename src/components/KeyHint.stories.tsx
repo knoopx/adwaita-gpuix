@@ -1,7 +1,7 @@
 import { defineMeta, defineStory } from "storybook";
-import { useAdwaita, SPACE } from "../theme/adwaita";
-import { T, Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { SPACE, useAdwaita } from "../theme/adwaita";
+import { Labeled, T } from "./text";
+import { Column, Row } from "./Box";
 import { ShortcutHint } from "./KeyHint";
 import { type HintGroup } from "./KeyBindings";
 
@@ -32,7 +32,13 @@ export const multipleBindings = defineStory({
     <Column gap={SPACE.lg} align="start">
       <Labeled caption="two bindings">
         <ShortcutHint
-          group={{ desc: "edit", kbds: [["ctrl", "z"], ["ctrl", "y"]] }}
+          group={{
+            desc: "edit",
+            kbds: [
+              ["ctrl", "z"],
+              ["ctrl", "y"],
+            ],
+          }}
         />
       </Labeled>
       <Labeled caption="three keys">
@@ -60,9 +66,9 @@ export function inlineRow() {
     <Row
       align="center"
       gap={SPACE.sm}
-      style={{ minHeight: t.spacing.rowHeight }}
+      style={{ minHeight: t.control.rowHeight }}
     >
-      <T size="body" color={t.colors.fg} style={{ flexGrow: 1 }}>
+      <T size="body" color={t.color.text.primary} style={{ flexGrow: 1 }}>
         {label}
       </T>
       <ShortcutHint group={hint} />
@@ -90,7 +96,13 @@ export const longCombo = defineStory({
           group={{ desc: "page down", kbds: [["ctrl", "shift", "pagedown"]] }}
         />
         <ShortcutHint
-          group={{ desc: "edit", kbds: [["ctrl", "z"], ["ctrl", "y"]] }}
+          group={{
+            desc: "edit",
+            kbds: [
+              ["ctrl", "z"],
+              ["ctrl", "y"],
+            ],
+          }}
         />
       </Column>
     </Labeled>

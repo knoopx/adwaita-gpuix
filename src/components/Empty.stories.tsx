@@ -2,12 +2,12 @@ import { defineMeta, defineStory } from "storybook";
 import { Column, Row } from "./Box";
 import {
   Empty,
+  EmptyAction,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-  EmptyDescription,
-  EmptyContent,
-  EmptyHeader,
-  EmptyAction,
 } from "./Empty";
 import { Button } from "./Button";
 
@@ -21,7 +21,7 @@ export const full = defineStory({
   render: () => (
     <Column align="center">
       <Empty>
-        <EmptyMedia icon="sparkles" />
+        <EmptyMedia icon="autoAwesome" />
         <EmptyTitle>No items</EmptyTitle>
         <EmptyDescription>You have nothing to show yet.</EmptyDescription>
         <EmptyContent>
@@ -69,10 +69,10 @@ export const tones = defineStory({
   render: () => (
     <Column align="center">
       <Row gap={24} align="center">
-        <EmptyMedia icon="sparkles" tone="accent" />
-        <EmptyMedia icon="success" tone="success" />
+        <EmptyMedia icon="autoAwesome" tone="accent" />
+        <EmptyMedia icon="checkCircle" tone="success" />
         <EmptyMedia icon="warning" tone="warning" />
-        <EmptyMedia icon="trash" tone="destructive" />
+        <EmptyMedia icon="delete" tone="destructive" />
       </Row>
     </Column>
   ),
@@ -82,7 +82,7 @@ export const destructive = defineStory({
   render: () => (
     <Column align="center">
       <Empty>
-        <EmptyMedia icon="trash" tone="destructive" />
+        <EmptyMedia icon="delete" tone="destructive" />
         <EmptyTitle>Storage full</EmptyTitle>
         <EmptyDescription>
           Free up space to keep syncing your files.

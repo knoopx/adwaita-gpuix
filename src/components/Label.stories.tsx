@@ -1,7 +1,7 @@
 import { defineMeta, defineStory } from "storybook";
 import { SPACE } from "../theme/adwaita";
-import { Labeled, type TextSize } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled, type TextSize } from "./text";
+import { Column, Row } from "./Box";
 import { Label, type LabelVariant } from "./Label";
 
 export default defineMeta({

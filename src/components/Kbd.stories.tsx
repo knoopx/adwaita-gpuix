@@ -1,7 +1,7 @@
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../theme/adwaita";
-import { T, Labeled } from "./common";
-import { Row, Column } from "./Box";
+import { Labeled, T } from "./text";
+import { Column, Row } from "./Box";
 import { Kbd, KbdCombo, KbdGroup } from "./Kbd";
 
 export default defineMeta({
@@ -83,7 +83,7 @@ export function groupNoSeparator() {
           <Kbd>K</Kbd>
         </KbdGroup>
         <Row gap={8} align="center">
-          <T size="caption" color={t.colors.dim_fg}>
+          <T size="caption" color={t.color.text.dim}>
             two independent bindings
           </T>
           <KbdGroup>
@@ -102,12 +102,12 @@ export function inline() {
     <Column gap={12}>
       <Labeled caption="inline in a sentence">
         <Row gap={6} align="center">
-          <T size="body" color={t.colors.fg}>
+          <T size="body" color={t.color.text.primary}>
             Press
           </T>
           <Kbd>⌘</Kbd>
           <Kbd>K</Kbd>
-          <T size="body" color={t.colors.fg}>
+          <T size="body" color={t.color.text.primary}>
             to open the command bar.
           </T>
         </Row>
@@ -119,13 +119,13 @@ export function inline() {
               <Kbd>Ctrl</Kbd>
               <Kbd>P</Kbd>
             </KbdCombo>
-            <T size="body" color={t.colors.dim_fg}>
+            <T size="body" color={t.color.text.dim}>
               Print
             </T>
           </Row>
           <Row gap={8} align="center">
             <Kbd>Esc</Kbd>
-            <T size="body" color={t.colors.dim_fg}>
+            <T size="body" color={t.color.text.dim}>
               Close
             </T>
           </Row>

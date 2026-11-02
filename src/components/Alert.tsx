@@ -1,11 +1,8 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import {
-  useAdwaita,
-  type AdwaitaColors,
-  type AdwaitaTheme,
-} from "../theme/adwaita";
-import { CloseButton, TextPart } from "./common";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { type AdwaitaTheme, useAdwaita } from "../theme/adwaita";
+import { CloseButton } from "./overlay";
+import { TextPart } from "./text";
 import { Button } from "./Button";
 import { Icon, type IconName } from "./icons";
 
@@ -36,30 +33,33 @@ interface AlertVariantTheme {
 
 function resolveVariantTheme(
   variant: AlertVariant,
-  colors: AdwaitaColors,
+  t: AdwaitaTheme,
 ): AlertVariantTheme {
   switch (variant) {
     case "success":
       return {
-        bg: colors.successTint,
-        accent: colors.success,
-        icon: "success",
+        bg: t.color.functional.successTint,
+        accent: t.color.functional.success,
+        icon: "checkCircle",
       };
     case "warning":
       return {
-        bg: colors.warningTint,
-        accent: colors.warning,
+        bg: t.color.functional.warningTint,
+        accent: t.color.functional.warning,
         icon: "warning",
       };
     case "destructive":
-      
       return {
-        bg: colors.destructiveTint,
-        accent: colors.destructive,
+        bg: t.color.functional.destructiveTint,
+        accent: t.color.functional.destructive,
         icon: "warning",
       };
     default:
-      return { bg: colors.accentTint, accent: colors.accent, icon: "info" };
+      return {
+        bg: t.color.accent.tint,
+        accent: t.color.accent.base,
+        icon: "info",
+      };
   }
 }
 
@@ -74,18 +74,18 @@ interface AlertMetrics {
 function resolveMetrics(size: AlertSize, t: AdwaitaTheme): AlertMetrics {
   return size === "sm"
     ? {
-        padding: t.spacing.gap,
-        gap: t.spacing.gap,
+        padding: t.space.sm,
+        gap: t.space.sm,
         iconSize: 16,
         iconTop: 1,
-        radius: t.radii.row,
+        radius: t.radius.sm,
       }
     : {
-        padding: t.spacing.paddingTight,
-        gap: t.spacing.paddingTight,
+        padding: t.space.md,
+        gap: t.space.md,
         iconSize: 18,
         iconTop: 2,
-        radius: t.radii.card,
+        radius: t.radius.sm,
       };
 }
 
@@ -99,9 +99,10 @@ export function Alert({
   style,
 }: AlertProps) {
   const t = useAdwaita();
-  const theme = resolveVariantTheme(variant, t.colors);
+  const theme = resolveVariantTheme(variant, t);
   const m = resolveMetrics(size, t);
-  const iconName: IconName | false = icon === false ? false : icon ?? theme.icon;
+  const iconName: IconName | false =
+    icon === false ? false : (icon ?? theme.icon);
 
   return (
     <div

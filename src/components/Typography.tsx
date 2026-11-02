@@ -1,29 +1,10 @@
-import type { ReactNode } from "react";
-import type { StyleDesc } from "@gpuix/react";
-import { useAdwaita, type AdwaitaTheme } from "../theme/adwaita";
-import { CodeChip, T, type TextSize } from "./common";
+import { type ReactNode } from "react";
+import { type StyleDesc } from "@gpuix/react";
+import { useAdwaita } from "../theme/adwaita";
+import { type TextTone, textToneColor } from "../theme/tones";
+import { CodeChip, T, type TextSize } from "./text";
 
-
-export type TextTone =
-  | "default"
-  | "dim"
-  | "accent"
-  | "destructive"
-  | "success"
-  | "warning";
-
-function toneColor(t: AdwaitaTheme, tone: TextTone): string {
-  const { colors } = t;
-  return {
-    default: colors.fg,
-    dim: colors.dim_fg,
-    accent: colors.accent,
-    destructive: colors.destructive,
-    success: colors.success,
-    warning: colors.warning,
-  }[tone];
-}
-
+export type { TextTone };
 
 const HEADING_LEVEL_SIZES: Record<1 | 2 | 3 | 4 | 5 | 6, TextSize> = {
   1: "title1",
@@ -46,7 +27,7 @@ export function Heading({ level = 2, children, style }: HeadingProps) {
     <T
       size={HEADING_LEVEL_SIZES[level]}
       weight={700}
-      color={t.colors.fg}
+      color={t.color.text.primary}
       style={style}
     >
       {children}
@@ -69,7 +50,7 @@ export function Paragraph({
 }: ParagraphProps) {
   const t = useAdwaita();
   return (
-    <T size="body" color={toneColor(t, tone)} align={align} style={style}>
+    <T size="body" color={textToneColor(t, tone)} align={align} style={style}>
       {children}
     </T>
   );
@@ -84,7 +65,7 @@ export interface SmallProps {
 export function Small({ children, tone = "dim", style }: SmallProps) {
   const t = useAdwaita();
   return (
-    <T size="caption" color={toneColor(t, tone)} style={style}>
+    <T size="caption" color={textToneColor(t, tone)} style={style}>
       {children}
     </T>
   );
@@ -97,22 +78,21 @@ export interface BlockquoteProps {
 
 export function Blockquote({ children, style }: BlockquoteProps) {
   const t = useAdwaita();
-  const { colors, radii, spacing } = t;
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: spacing.gap,
-        padding: spacing.paddingTight,
+        gap: t.space.sm,
+        padding: t.space.md,
         borderLeftWidth: 3,
-        borderColor: colors.accent,
-        backgroundColor: colors.button_bg,
-        borderRadius: radii.button,
+        borderColor: t.color.accent.base,
+        backgroundColor: t.color.surface.button,
+        borderRadius: t.radius.sm,
         ...style,
       }}
     >
-      <T size="body" color={colors.dim_fg} style={{ whiteSpace: "normal" }}>
+      <T size="body" color={t.color.text.dim} style={{ whiteSpace: "normal" }}>
         {children}
       </T>
     </div>
