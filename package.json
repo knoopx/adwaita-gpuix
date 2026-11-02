@@ -6,7 +6,12 @@
     ".": "./src/index.ts",
     "./tokens": "./src/theme/tokens.ts",
     "./ai": "./src/components/ai/index.ts",
-    "./intents": "./src/components/intents/index.ts"
+    "./media": "./src/lib/media.ts",
+    "./shortcuts": "./src/lib/shortcuts.ts",
+    "./keybus": "./src/lib/keybus.ts",
+    "./roving": "./src/lib/roving.ts",
+    "./app": "./src/lib/app.tsx",
+    "./config": "./src/lib/config.ts"
   },
   "private": true,
   "type": "module",
@@ -16,7 +21,8 @@
   "dependencies": {
     "@gpuix/native": "0.10.0",
     "@gpuix/react": "0.10.0",
-    "lucide-static": "^1.57.0",
+    "@iconify-json/material-symbols": "1.2.98",
+    "@iconify/types": "^2.0.0",
     "react": "^19.3.1"
   },
   "devDependencies": {
