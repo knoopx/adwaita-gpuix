@@ -4,16 +4,14 @@ import { useAdwaita } from "../../theme/adwaita";
 import { FILE_HEADER_ROW_HEIGHT, nativeDiffTheme } from "../../theme/vcs";
 import { T } from "../text";
 import { summarizePatch } from "./DiffPanel";
-import { DIFF_METRICS, diffHeightOf } from "./diffRows";
+import { cropPatch, DIFF_METRICS, diffHeightOf } from "./diffRows";
 
-const INLINE_MAX_LINES = 40;
+const MAX_DIFF_LINES = 40;
 
 export interface ToolDiffProps {
   patch: string;
 
   path?: string;
-
-  maxLines?: number;
 
   wordDiff?: boolean;
 
@@ -50,7 +48,6 @@ function cropStyle(style?: Partial<StyleDesc>): Partial<StyleDesc> {
 export function ToolDiff({
   patch,
   path,
-  maxLines = INLINE_MAX_LINES,
   wordDiff = true,
   summary = false,
   fileHeader = false,
@@ -62,6 +59,8 @@ export function ToolDiff({
     t,
     fileHeader ? undefined : { fileHeaderHeight: FILE_HEADER_ROW_HEIGHT },
   );
+
+  const body = useMemo(() => cropPatch(patch, MAX_DIFF_LINES), [patch]);
   const stats = useMemo(
     () => (summary ? summarizePatch(patch) : null),
     [summary, patch],
@@ -69,7 +68,7 @@ export function ToolDiff({
 
   if (!fileHeader) {
     const croppedHeight =
-      diffHeightOf(patch, maxLines, {
+      diffHeightOf(body, 0, {
         ...DIFF_METRICS,
         fileHeaderHeight: FILE_HEADER_ROW_HEIGHT,
       }) - FILE_HEADER_ROW_HEIGHT;
@@ -77,9 +76,8 @@ export function ToolDiff({
     if (croppedHeight <= 0) {
       return (
         <diff
-          patch={patch}
+          patch={body}
           wordDiff={wordDiff}
-          maxLines={maxLines}
           theme={theme}
           style={diffStyle(style)}
         />
@@ -89,9 +87,8 @@ export function ToolDiff({
     return (
       <div style={{ ...cropStyle(style), height: croppedHeight }}>
         <diff
-          patch={patch}
+          patch={body}
           wordDiff={wordDiff}
-          maxLines={maxLines}
           theme={theme}
           style={{ ...diffStyle(), marginTop: -FILE_HEADER_ROW_HEIGHT }}
         />
@@ -102,9 +99,8 @@ export function ToolDiff({
   if (stats === null) {
     return (
       <diff
-        patch={patch}
+        patch={body}
         wordDiff={wordDiff}
-        maxLines={maxLines}
         theme={theme}
         style={diffStyle(style)}
       />
@@ -171,9 +167,8 @@ export function ToolDiff({
         </T>
       </div>
       <diff
-        patch={patch}
+        patch={body}
         wordDiff={wordDiff}
-        maxLines={maxLines}
         theme={theme}
         style={diffStyle()}
       />
