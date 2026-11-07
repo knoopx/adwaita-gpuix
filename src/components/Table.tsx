@@ -100,7 +100,7 @@ export function Table({
   const ctxValue: TableCtxValue =
     density === "compact"
       ? {
-          rowHeight: c.compactRowHeight,
+          rowHeight: c.rowHeight,
           iconSize: c.compactIconSize,
           headerHeight: c.compactHeaderHeight,
           headerSize: "caption",

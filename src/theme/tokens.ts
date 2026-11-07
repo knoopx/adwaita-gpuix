@@ -489,7 +489,7 @@ export const CONTROL = {
   fileTileGap: 10,
   gridPaddingX: 22,
   gridPaddingY: 21,
-  rowHeight: 30,
+  rowHeight: 24,
   statusBarHeight: 32,
   viewSwitcherPadding: 2,
   toggleSegmentHeightSm: 22,
@@ -502,7 +502,6 @@ export const CONTROL = {
   dataRowInsetX: 12,
   dataRowInsetEnd: 20,
 
-  compactRowHeight: 24,
   compactIconSize: 12,
   compactHeaderHeight: 30,
 
