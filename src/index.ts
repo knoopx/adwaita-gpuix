@@ -958,4 +958,84 @@ export {
   type ImageFormat,
 } from "./lib/media";
 
+export {
+  Sparkline,
+  sparklineSource,
+  SPARKLINE_WIDTH,
+  SPARKLINE_HEIGHT,
+  type SparklineProps,
+} from "./components/Sparkline";
+
+export {
+  ContributionHeatmap,
+  monthRegions,
+  HEATMAP_GAP,
+  HEATMAP_CELL,
+  HEATMAP_LABEL_WIDTH,
+  HEATMAP_MONTH_MIN_WEEKS,
+  type ContributionHeatmapProps,
+  type MonthRegion,
+} from "./components/ContributionHeatmap";
+
+export {
+  WEEKS_SHOWN,
+  MONTHS_SHOWN,
+  FEED_COUNT,
+  parseTimestamp,
+  tsToMs,
+  dateKey,
+  weeklyBuckets,
+  bucketWeeks,
+  buildActivityModel,
+  type ActivityChange,
+  type ActivityModel,
+  type ActivityOptions,
+  type ActivityStats,
+  type HeatCell,
+  type HeatWeek,
+  type MonthlyCount,
+} from "./lib/activity";
+
+export { useListWindow, type ListWindow } from "./lib/listWindow";
+
+export {
+  type Change,
+  type FileChange,
+  type Bookmark,
+} from "./lib/vcs/types";
+
+export {
+  extractDiffFiles,
+  filePatchStats,
+  mapConcurrent,
+  changedFiles,
+  type DiffFileEntry,
+  type FileStat,
+} from "./lib/vcs/diff";
+
+export {
+  IMPLICIT_GIT_REMOTE,
+  BOOKMARKS_TEMPLATE,
+  BOOKMARK_LIST_ARGS,
+  parseBookmarkList,
+  bookmarksByChange,
+} from "./lib/vcs/bookmarks";
+
+export {
+  LANG_EXT,
+  LANGUAGE_COLORS,
+  languageColor,
+  PROJECT_SCAN_SKIP_DIRS,
+  isProjectRoot,
+  readTextFile,
+  readDescription,
+  detectLicense,
+  detectLanguage,
+  detectAgentsFile,
+  readScripts,
+  humanizeAgo,
+  formatCount,
+  type ProjectScanOptions,
+} from "./lib/projectMeta";
+
 export * from "./components/ai";
