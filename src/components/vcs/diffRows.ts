@@ -234,6 +234,72 @@ export function diffRowCounts(patch: string, maxLines = 0): DiffRowCounts {
   return counts;
 }
 
+const HUNK_COUNTS = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/;
+
+function reheader(line: string, oldCount: number, newCount: number): string {
+  const header = HUNK_COUNTS.exec(line);
+  if (header === null) return line;
+  return `@@ -${header[1]},${oldCount} +${header[2]},${newCount} @@${line.slice(
+    header[0].length,
+  )}`;
+}
+
+export function cropPatch(patch: string, maxLines: number): string {
+  if (maxLines <= 0) return patch;
+
+  const kept: string[] = [];
+  let lines = 0;
+  let truncated = false;
+
+  let hunk: string | null = null;
+  let hunkAt = -1;
+  let oldCount = 0;
+  let newCount = 0;
+
+  const closeHunk = (): void => {
+    if (hunk !== null && hunkAt >= 0) kept[hunkAt] = reheader(hunk, oldCount, newCount);
+    hunk = null;
+    hunkAt = -1;
+    oldCount = 0;
+    newCount = 0;
+  };
+
+  for (const line of patchLines(patch)) {
+    if (isHunkHeader(line) && hunkHeaderParses(line)) {
+      closeHunk();
+      hunk = line;
+      continue;
+    }
+
+    if (hunk !== null && isBodyLine(line)) {
+      if (lines >= maxLines) {
+        truncated = true;
+        break;
+      }
+      if (hunkAt < 0) {
+        hunkAt = kept.length;
+        kept.push(hunk);
+      }
+      kept.push(line);
+      lines++;
+      if (line.startsWith("-")) oldCount++;
+      else if (line.startsWith("+")) newCount++;
+      else {
+        oldCount++;
+        newCount++;
+      }
+      continue;
+    }
+
+    closeHunk();
+    kept.push(line);
+  }
+
+  if (!truncated) return patch;
+  closeHunk();
+  return kept.join("\n");
+}
+
 export function diffHeightOf(
   patch: string,
   maxLines = 0,

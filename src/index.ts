@@ -923,6 +923,7 @@ export {
   makeDiffScroller,
   ToolDiff,
   type ToolDiffProps,
+  cropPatch,
   DIFF_METRICS,
   diffRowCounts,
   diffHeightOf,

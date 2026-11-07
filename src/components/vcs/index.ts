@@ -9,6 +9,7 @@ export {
 export { makeDiffScroller } from "./DiffScroll";
 export { ToolDiff, type ToolDiffProps } from "./ToolDiff";
 export {
+  cropPatch,
   DIFF_METRICS,
   diffRowCounts,
   diffHeightOf,
