@@ -40,7 +40,7 @@ export type {
   SemanticTokens,
 } from "./theme/adwaita";
 
-export { toneColor, toneTint, textToneColor } from "./theme/tones";
+export { toneColor, toneFill, toneTint, textToneColor } from "./theme/tones";
 export type { Tone, TextTone } from "./theme/tones";
 
 export { T } from "./components/text";

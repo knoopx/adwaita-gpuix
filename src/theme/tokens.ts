@@ -639,6 +639,38 @@ export function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
+function colorTriplet(color: string): [number, number, number] | null {
+  const hex = color.trim().replace("#", "");
+  if (/^[0-9a-f]{6}$/i.test(hex)) {
+    return [
+      parseInt(hex.slice(0, 2), 16),
+      parseInt(hex.slice(2, 4), 16),
+      parseInt(hex.slice(4, 6), 16),
+    ];
+  }
+  const rgb = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i.exec(color);
+  if (!rgb) return null;
+  return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+}
+
+/**
+ * A hue baked into a surface instead of laid over it. `hexToRgba` answers the
+ * same wash translucent, which is right on a page you can see; a surface that
+ * floats over content — a toast, an OSD — has to hide what is under it, so it
+ * wears the hue blended in at that weight.
+ */
+export function tintOnto(surface: string, hue: string, weight: number): string {
+  const w = Math.max(0, Math.min(1, weight));
+  const base = colorTriplet(surface);
+  const tint = colorTriplet(hue);
+  if (!base || !tint) return hexToRgba(hue, w);
+  const chan = (a: number, b: number) => Math.round(a + (b - a) * w);
+  return `rgb(${chan(base[0], tint[0])},${chan(base[1], tint[1])},${chan(
+    base[2],
+    tint[2],
+  )})`;
+}
+
 export function shade(hex: string, pct: number): string {
   const h = hex.replace("#", "");
   let r = parseInt(h.slice(0, 2), 16);

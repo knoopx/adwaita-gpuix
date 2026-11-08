@@ -1,4 +1,5 @@
 import { type AdwaitaTheme } from "./adwaita";
+import { TINT_ALPHA, tintOnto } from "./tokens";
 
 export type Tone = "accent" | "success" | "warning" | "destructive";
 
@@ -18,12 +19,29 @@ const TINT_BY_TONE: Record<Tone, (t: AdwaitaTheme) => string> = {
   destructive: (t) => t.color.functional.destructiveTint,
 };
 
+const ALPHA_BY_TONE: Record<Tone, (t: AdwaitaTheme) => number> = {
+  accent: (t) => TINT_ALPHA[t.scheme].accent,
+  success: (t) => TINT_ALPHA[t.scheme].success,
+  warning: (t) => TINT_ALPHA[t.scheme].warning,
+  destructive: (t) => TINT_ALPHA[t.scheme].destructive,
+};
+
 export function toneColor(t: AdwaitaTheme, tone: Tone): string {
   return BASE_BY_TONE[tone](t);
 }
 
 export function toneTint(t: AdwaitaTheme, tone: Tone): string {
   return TINT_BY_TONE[tone](t);
+}
+
+/**
+ * The tone a surface wears as its own fill. `toneTint` is translucent and sits
+ * on a page surface you can see through; a surface that floats over content —
+ * a toast, an OSD — answers with the same tone at the same weight, baked into
+ * `over`, so nothing shows through it.
+ */
+export function toneFill(t: AdwaitaTheme, tone: Tone, over: string): string {
+  return tintOnto(over, toneColor(t, tone), ALPHA_BY_TONE[tone](t));
 }
 
 export function textToneColor(t: AdwaitaTheme, tone: TextTone): string {
