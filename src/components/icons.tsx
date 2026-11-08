@@ -39,11 +39,28 @@ function kebabOf(name: string): string {
   return name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`);
 }
 
+/**
+ * Names this library says that the icon set spells differently.
+ *
+ * An unknown name falls back to a dot, which is invisible in the wrong way: an
+ * open disclosure's `chevronDown` became a filled bullet, so every expanded row
+ * of a file tree and every open section read as a bullet point. The names the
+ * components read are kept, and this is where they meet the set's spelling.
+ */
+const SET_SPELLING: Record<string, string> = {
+  chevronDown: "expand-more",
+  chevronUp: "expand-less",
+};
+
 function iconEntry(data: IconifyJSON, name: string): IconifyIcon | undefined {
-  const icon = data.icons[name] ?? data.icons[kebabOf(name)];
-  if (icon) return icon;
-  const alias = data.aliases?.[name] ?? data.aliases?.[kebabOf(name)];
-  return alias ? data.icons[alias.parent] : undefined;
+  for (const spelling of [name, kebabOf(name), SET_SPELLING[name] ?? ""]) {
+    if (spelling === "") continue;
+    const icon = data.icons[spelling];
+    if (icon) return icon;
+    const alias = data.aliases?.[spelling];
+    if (alias) return data.icons[alias.parent];
+  }
+  return undefined;
 }
 
 function svgOf(data: IconifyJSON, icon: IconifyIcon): string {
