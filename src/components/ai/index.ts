@@ -58,11 +58,17 @@ export type {
   ContextContentProps,
 } from "./Context";
 
-export { FileTree, FileTreeFolder, FileTreeFile } from "./FileTree";
+export {
+  FileTree,
+  FileTreeFolder,
+  FileTreeFile,
+  fileTreeStats,
+} from "./FileTree";
 
 export type {
   FileTreeNode,
   FileTreeProps,
+  FileTreeVariant,
   FileTreeFolderProps,
   FileTreeFileProps,
 } from "./FileTree";

@@ -60,6 +60,38 @@ const DEEP_TREE: FileTreeNode[] = [
 
 const ALL_EXPANDED_PATHS = ["src", "src/components", "src/ai"];
 
+/** A changeset read as a tree: the paths that moved, with what moved in them. */
+const CHANGE_TREE: FileTreeNode[] = [
+  {
+    name: "packages",
+    type: "folder",
+    children: [
+      {
+        name: "core",
+        type: "folder",
+        children: [
+          {
+            name: "src",
+            type: "folder",
+            children: [
+              { name: "convertMessages.ts", type: "file", added: 24, removed: 6 },
+              { name: "convertMessages.test.ts", type: "file", added: 41 },
+            ],
+          },
+        ],
+      },
+      {
+        name: "ui",
+        type: "folder",
+        children: [
+          { name: "composer.tsx", type: "file", added: 8, removed: 3 },
+          { name: "tidy-pans-shave.md", type: "file", added: 5 },
+        ],
+      },
+    ],
+  },
+];
+
 export default defineMeta({
   title: "Adwaita/FileTree",
   component: FileTree,
@@ -101,6 +133,23 @@ export const collapsed = defineStory({
     <Column gap={16} align="center">
       <Labeled caption="all folders collapsed">
         <FileTree items={STORYBOOK_TREE} onSelect={() => {}} />
+      </Labeled>
+    </Column>
+  ),
+});
+
+export const changeset = defineStory({
+  parameters: { width: 528, height: 300 },
+  render: () => (
+    <Column gap={16} align="center">
+      <Labeled caption="list variant · read, not picked; a path's counts trail the row">
+        <div style={{ width: 460 }}>
+          <FileTree
+            items={CHANGE_TREE}
+            variant="list"
+            defaultExpandedPaths={["packages", "packages/core", "packages/core/src", "packages/ui"]}
+          />
+        </div>
       </Labeled>
     </Column>
   ),

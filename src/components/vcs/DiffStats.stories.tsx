@@ -18,6 +18,29 @@ const meta = defineMeta({
 });
 export default meta;
 
+export const additionsOnly = defineStory({
+  parameters: { width: 300, height: 170 },
+  render: () => (
+    <Column gap={16} align="center">
+      <Labeled
+        caption="hideZero: a path that only grew says so, and does not print -0"
+        style={{ width: "100%" }}
+      >
+        <Column gap={4} style={{ width: "100%" }}>
+          {COUNTS.map(([insertions, deletions], i) => (
+            <DiffStats
+              key={i}
+              insertions={insertions}
+              deletions={deletions}
+              hideZero
+            />
+          ))}
+        </Column>
+      </Labeled>
+    </Column>
+  ),
+});
+
 export const diffStats = defineStory({
   render: () => {
     const files: FileRowData[] = COUNTS.map(([insertions, deletions], i) => ({
