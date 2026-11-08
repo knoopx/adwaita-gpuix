@@ -1,5 +1,5 @@
 import { type AdwaitaTheme } from "./adwaita";
-import { TINT_ALPHA, tintOnto } from "./tokens";
+import { BASE_HUES, TINT_ALPHA, tintOnto } from "./tokens";
 
 export type Tone = "accent" | "success" | "warning" | "destructive";
 
@@ -42,6 +42,34 @@ export function toneTint(t: AdwaitaTheme, tone: Tone): string {
  */
 export function toneFill(t: AdwaitaTheme, tone: Tone, over: string): string {
   return tintOnto(over, toneColor(t, tone), ALPHA_BY_TONE[tone](t));
+}
+
+/**
+ * The sixteen colours an SGR index resolves to, in the scheme's own set: its
+ * BASE16 hues for the six coloured slots and its text roles for the four
+ * neutrals, so a command's red is this theme's red and its "black" is a grey
+ * the box's own fill cannot swallow. The two halves of the list are the same
+ * eight — a terminal's *bright* colour is the same hue asked to read louder,
+ * and the box answers that with weight, which is what a scheme that ships one
+ * shade per hue has to do anyway.
+ *
+ * A scheme with no blue says so: nightsky's blue slot is its yellow `#fad000`,
+ * because that is the hue this theme paints with.
+ */
+export function ansiPalette(t: AdwaitaTheme): readonly string[] {
+  const scale = t.color.scale;
+  const hue = (name: keyof typeof BASE_HUES) => scale[BASE_HUES[name]];
+  const eight = [
+    t.color.text.dim,
+    hue("red"),
+    hue("green"),
+    hue("yellow"),
+    hue("blue"),
+    hue("pink"),
+    hue("teal"),
+    t.color.text.primary,
+  ];
+  return [...eight, ...eight];
 }
 
 export function textToneColor(t: AdwaitaTheme, tone: TextTone): string {

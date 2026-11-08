@@ -33,6 +33,34 @@ export const defaultTone = defineStory({
   ),
 });
 
+export const longLines = defineStory({
+  parameters: { width: 420, height: 140 },
+  render: () => (
+    <OutputDemo
+      text={
+        "$ bun run test --filter transcript\n" +
+        "  ✓ renders the line a shell printed long before the box was wide (12ms)\n" +
+        "  ✓ keeps every other line on its own row"
+      }
+    />
+  ),
+});
+
+export const terminalColours = defineStory({
+  parameters: { width: 420, height: 160 },
+  render: () => (
+    <OutputDemo
+      text={
+        "$ bun run test\n" +
+        "\u001b[1msrc/transcript.test.ts\u001b[0m\n" +
+        "  \u001b[32m✓\u001b[0m paints the colour a command asked for (12ms)\n" +
+        "  \u001b[31m✗\u001b[0m keeps a \u001b[2mdim run\u001b[0m on its own row (3ms)\n" +
+        "\u001b[90m1 failed, 2 passed\u001b[0m"
+      }
+    />
+  ),
+});
+
 export const errorTone = defineStory({
   parameters: { width: 420, height: 140 },
   render: () => (

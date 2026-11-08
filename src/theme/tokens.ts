@@ -65,6 +65,22 @@ export const BASE16: Record<ColorScheme, readonly string[]> = {
   ],
 };
 
+/**
+ * BASE16's upper eight are the hues a scheme paints its content with — the
+ * shades `FUNCTIONAL` spells out again for destructive, success and warning —
+ * in palette order: red, orange, yellow, green, teal, blue, purple, pink.
+ */
+export const BASE_HUES = {
+  red: 8,
+  orange: 9,
+  yellow: 10,
+  green: 11,
+  teal: 12,
+  blue: 13,
+  purple: 14,
+  pink: 15,
+} as const;
+
 export interface ColorRoleBindings {
   surfaceBase: number;
   surfaceRaised: number;
