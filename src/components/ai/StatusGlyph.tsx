@@ -1,3 +1,4 @@
+import { type ReactNode } from "react";
 import { type StyleDesc } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
 import { Icon, type IconName } from "../../components/icons";
@@ -21,6 +22,14 @@ export interface StatusGlyphProps {
   size?: number;
 
   spinnerSize?: SpinnerSize;
+
+  /**
+   * An element to stand in for the ring `Spinner` while the status runs. The
+   * running mark is the one thing of a status glyph an app may want in its own
+   * idiom — a braille cell, a bar, a word — and the icon of the settled states
+   * stays the library's.
+   */
+  spinnerSlot?: ReactNode;
   style?: Partial<StyleDesc>;
 }
 
@@ -30,10 +39,12 @@ export function StatusGlyph({
   color,
   size = 14,
   spinnerSize = 16,
+  spinnerSlot,
   style,
 }: StatusGlyphProps) {
   const t = useAdwaita();
-  if (status === "running")
+  if (status === "running") {
+    if (spinnerSlot !== undefined) return <>{spinnerSlot}</>;
     return (
       <Spinner
         size={spinnerSize}
@@ -41,6 +52,7 @@ export function StatusGlyph({
         style={{ flexShrink: 0, ...style }}
       />
     );
+  }
 
   const functional =
     status === "complete"

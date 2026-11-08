@@ -137,13 +137,20 @@ function ToolHeaderTitle({
   );
 }
 
-function ToolStatusIndicator({ state }: { state: ToolState }) {
+function ToolStatusIndicator({
+  state,
+  spinnerSlot,
+}: {
+  state: ToolState;
+  spinnerSlot?: ReactNode;
+}) {
   const t = useAdwaita();
   return (
     <StatusGlyph
       status={state === "running" ? "running" : "complete"}
       icon={TOOL_STATUS_ICON[state]}
       color={textToneColor(t, TOOL_STATUS_TONE[state])}
+      spinnerSlot={spinnerSlot}
     />
   );
 }
@@ -202,6 +209,9 @@ export interface ToolHeaderProps {
   icon?: GlyphName;
 
   iconTone?: TextTone;
+
+  /** The mark this header wears while the tool runs, in place of the spinner. */
+  spinnerSlot?: ReactNode;
   toolName?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -215,6 +225,7 @@ export function ToolHeader({
   args,
   icon = "terminal",
   iconTone,
+  spinnerSlot,
   toolName,
   open,
   onOpenChange,
@@ -265,7 +276,7 @@ export function ToolHeader({
         </T>
       )}
       <div style={{ flexGrow: 1 }} />
-      <ToolStatusIndicator state={state} />
+      <ToolStatusIndicator state={state} spinnerSlot={spinnerSlot} />
     </div>
   );
 }

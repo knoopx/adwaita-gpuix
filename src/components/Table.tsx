@@ -1,6 +1,20 @@
-import { Children, type ReactNode, createContext, useContext } from "react";
+import {
+  Children,
+  type ReactElement,
+  type ReactNode,
+  createContext,
+  useContext,
+  useMemo,
+} from "react";
 import { type StyleDesc } from "@gpuix/react";
 import { type AdwaitaTheme, hexToRgba, useAdwaita } from "../theme/adwaita";
+import {
+  cellContentWidth,
+  tableColumnWidths,
+  tableRowsOf,
+  type TableNodeRole,
+  withTableColumns,
+} from "../lib/tableColumns";
 import { T, type TextSize } from "./text";
 import { Icon, type IconName } from "./icons";
 
@@ -30,6 +44,9 @@ function TableTextCell({
   weight?: string | number;
   color: string;
   align?: TableCellAlign;
+
+  /** The column's share of the row: every cell is one part unless the table
+   *  says otherwise, so a figure column can stay narrow beside a text column. */
   grow?: number;
   children: ReactNode;
   style?: Partial<StyleDesc>;
@@ -41,7 +58,8 @@ function TableTextCell({
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
-        flexGrow: 1,
+        flexGrow: grow ?? 1,
+        flexBasis: 0,
         minWidth: 0,
         ...alignStyle(align),
         ...style,
@@ -52,7 +70,7 @@ function TableTextCell({
         weight={weight}
         color={color}
         align={align}
-        style={ELLIPSIS}
+        style={{ ...ELLIPSIS, width: "100%" }}
       >
         {children}
       </T>
@@ -63,7 +81,13 @@ function TableTextCell({
 export interface TableCtxValue {
   rowHeight: number;
   iconSize: number;
+
+  /** The header band's own height — its row height is a different measure, and
+   *  a table whose header stood as tall as its rows has a caption in a gap. */
   headerHeight: number;
+
+  /** The air above the header band, inside the frame. */
+  headerPadTop: number;
   insetX: number;
   insetEnd: number;
   headerSize: TextSize;
@@ -84,6 +108,16 @@ export interface TableProps {
 
   density?: "cozy" | "dense" | "compact";
 
+  /**
+   * Whether the table draws its own edge.
+   *
+   * `framed` is a control set in a panel — a box with a header band in it. `bare`
+   * is a table standing on the page it is read on, divided by its rules alone:
+   * what a transcript or a card's body asks for, where a second box inside a box
+   * reads as a card rather than as a table.
+   */
+  frame?: "framed" | "bare";
+
   selection?: "muted" | "accent";
   style?: Partial<StyleDesc>;
 }
@@ -91,6 +125,7 @@ export interface TableProps {
 export function Table({
   children,
   density = "cozy",
+  frame = "framed",
   selection = "muted",
   style,
 }: TableProps) {
@@ -103,6 +138,7 @@ export function Table({
           rowHeight: c.rowHeight,
           iconSize: c.compactIconSize,
           headerHeight: c.compactHeaderHeight,
+          headerPadTop: 0,
           headerSize: "caption",
           valueSize: "body",
 
@@ -119,6 +155,7 @@ export function Table({
             rowHeight: c.dataRowHeight,
             iconSize: c.dataIconSize,
             headerHeight: c.dataHeaderHeight,
+            headerPadTop: c.columnHeaderPaddingTop,
             insetX: c.dataRowInsetX,
             insetEnd: c.dataRowInsetEnd,
             headerSize: "caption",
@@ -133,6 +170,7 @@ export function Table({
             rowHeight: c.listRowHeight,
             iconSize: c.listIconSize,
             headerHeight: c.columnHeaderHeight,
+            headerPadTop: c.columnHeaderPaddingTop,
             insetX: c.listRowInsetX,
             insetEnd: c.listRowInsetEnd,
             headerSize: "list",
@@ -143,22 +181,71 @@ export function Table({
               ? t.color.selection.accent
               : t.color.selection.faint,
           };
+
+  /**
+   * The table's columns, measured across every row and then handed to every
+   * cell. The engine sizes a flex item by what it holds, so left to themselves
+   * the rows each lay out their own columns and the table arrives as a stack of
+   * rows whose columns land anywhere; see `lib/tableColumns.ts`.
+   */
+  const grid = useMemo(() => {
+    const rows = tableRowsOf(children, roleOf);
+    const widths = tableColumnWidths(rows, (cell) =>
+      cellContentWidth(cell, {
+        size: t.type[sizeOfCell(cell, ctxValue)],
+        monoFamily: t.type.fontFamilyMono,
+        extra:
+          cell.type === TableLeadCell
+            ? ctxValue.iconSize + c.listRowGap
+            : 0,
+      }),
+    );
+    return withTableColumns(children, roleOf, widths);
+  }, [children, ctxValue, t, c]);
+
   return (
     <TableCtx.Provider value={ctxValue}>
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          borderWidth: 1,
+          borderWidth: frame === "bare" ? 0 : 1,
           borderColor: t.color.border.default,
           overflow: "hidden",
           ...style,
         }}
       >
-        {children}
+        {grid}
       </div>
     </TableCtx.Provider>
   );
+}
+
+/** Which parts of the tree a `Table` was handed are its rows and its cells, and
+ *  which are the bands that hold rows. A cell is always one of this file's own
+ *  cells: an app's own element is left exactly as it was written. */
+function roleOf(el: ReactElement): TableNodeRole {
+  if (el.type === TableHeader || el.type === TableBody || el.type === TableFooter) {
+    return "group";
+  }
+  if (el.type === TableRow) return "row";
+  if (
+    el.type === TableHead ||
+    el.type === TableCell ||
+    el.type === TableFootCell ||
+    el.type === TableLeadCell ||
+    el.type === TableNodeCell
+  ) {
+    return "cell";
+  }
+  return null;
+}
+
+/** The size a cell's own words print at — the header's caption over the row's value. */
+function sizeOfCell(el: ReactElement, ctx: TableCtxValue): TextSize {
+  if (el.type === TableHead) return ctx.headerSize;
+  if (el.type === TableFootCell) return "body";
+  return ctx.valueSize;
 }
 
 interface ResolvedRowFrame {
@@ -214,8 +301,10 @@ function rowFrameStyle(
     paddingRight: g.cellPaddingX,
     borderRadius: g.rowRadius,
     cursor: onSelect ? "pointer" : "default",
+    // A rule between two rows divides the table's own content, so it wears the
+    // divider role; the frame around the table is the edge, and wears `border`.
     borderBottomWidth: 1,
-    borderColor: t.color.border.default,
+    borderColor: t.color.divider.default,
     backgroundColor: selected ? g.selectionFill : "transparent",
     hover: { backgroundColor: t.color.selection.faint },
   };
@@ -226,7 +315,8 @@ function headerFrameStyle(
   ctx: TableCtxValue | null,
 ): Partial<StyleDesc> {
   const c = t.control;
-  const height = ctx ? ctx.rowHeight : c.columnHeaderHeight;
+  const height = ctx ? ctx.headerHeight : c.columnHeaderHeight;
+  const padTop = ctx ? ctx.headerPadTop : c.columnHeaderPaddingTop;
   const insetX = ctx ? ctx.insetX : c.listRowInsetX;
   const insetEnd = ctx ? ctx.insetEnd : c.listRowInsetEnd;
   const padX = ctx ? ctx.cellPaddingX : t.space.xs;
@@ -236,11 +326,15 @@ function headerFrameStyle(
     alignItems: "center",
     gap: c.listRowGap,
     height,
-    marginTop: c.columnHeaderPaddingTop,
+    marginTop: padTop,
     marginLeft: insetX,
     marginRight: insetEnd,
     paddingLeft: padX,
     paddingRight: padX,
+    // The header is divided from the rows it names, exactly as the rows are
+    // divided from each other; without it a header row floats above the table.
+    borderBottomWidth: 1,
+    borderColor: t.color.divider.default,
   };
 }
 
@@ -299,7 +393,7 @@ export function TableFooter({ children, style }: TableFooterProps) {
         display: "flex",
         flexDirection: "column",
         borderTopWidth: 1,
-        borderColor: t.color.border.default,
+        borderColor: t.color.divider.default,
         backgroundColor: hexToRgba(t.color.text.primary, 0.04),
         ...style,
       }}

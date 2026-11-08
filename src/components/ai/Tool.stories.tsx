@@ -1,4 +1,6 @@
 import { defineMeta, defineStory } from "storybook";
+import { useAdwaita } from "../../theme/adwaita";
+import { T } from "../text";
 import { Tool, ToolContent, ToolHeader } from "./Tool";
 
 export default defineMeta({
@@ -30,6 +32,36 @@ export const running = defineStory({
       <ToolContent input={{ pattern: "useAdwaita", path: "src/**/*.tsx" }} />
     </Tool>
   ),
+});
+
+/**
+ * The app's own running mark: `spinnerSlot` stands in for the ring `Spinner`
+ * while the tool runs, and the settled states keep the library's icon.
+ */
+export const runningMark = defineStory({
+  parameters: { width: 528, height: 130 },
+  render: () => {
+    const t = useAdwaita();
+    return (
+      <Tool open onOpenChange={() => {}}>
+        <ToolHeader
+          state="running"
+          toolName="search"
+          spinnerSlot={
+            <T
+              size="caption"
+              weight={t.type.weight.bold}
+              color={t.color.accent.base}
+              style={{ fontFamily: t.type.fontFamilyMono, flexShrink: 0 }}
+            >
+              working
+            </T>
+          }
+        />
+        <ToolContent input={{ pattern: "useAdwaita", path: "src/**/*.tsx" }} />
+      </Tool>
+    );
+  },
 });
 
 export const failed = defineStory({
