@@ -5,7 +5,7 @@ import {
   useGpuixRequired,
 } from "@gpuix/react";
 import { useAdwaita } from "../../theme/adwaita";
-import { nativeDiffTheme } from "../../theme/vcs";
+import { FILE_HEADER_ROW_HEIGHT, nativeDiffTheme } from "../../theme/vcs";
 import { T } from "../text";
 import { DataTable } from "../DataTable";
 import { DiffHistogram } from "./DiffHistogram";
@@ -175,6 +175,17 @@ export interface DiffPanelProps {
   header?: boolean;
 
   name?: string | null;
+
+  /**
+   * Paint the diff widget's own per-file header row: the path with the chevron
+   * that collapses the file. Off where the file is already named outside the
+   * diff — a file list, a tool row's own label — where the row only repeats
+   * what is already on screen.
+   *
+   * The widget has no switch for it, so the theme names the row's height and
+   * the body is pulled up that far behind a clip.
+   */
+  fileHeader?: boolean;
 }
 
 export interface DiffSummaryData {
@@ -260,6 +271,7 @@ export function DiffPanel({
   framed = false,
   header = false,
   name = null,
+  fileHeader = true,
 }: DiffPanelProps) {
   const t = useAdwaita();
   useGpuixRequired();
@@ -274,6 +286,27 @@ export function DiffPanel({
   );
   const mono: Partial<StyleDesc> = { fontFamily: t.type.fontFamilyMono };
   const changed = file ? file.added + file.removed : 0;
+  const theme = nativeDiffTheme(
+    t,
+    fileHeader ? undefined : { fileHeaderHeight: FILE_HEADER_ROW_HEIGHT },
+  );
+
+  const body = (
+    <diff
+      ref={diffRef}
+      patch={patch}
+      wordDiff
+      scroll
+      maxLines={MAX_DIFF_LINES}
+      theme={theme}
+      style={{
+        flexGrow: 1,
+        minHeight: 0,
+        alignSelf: "stretch",
+        ...(fileHeader ? {} : { marginTop: -FILE_HEADER_ROW_HEIGHT }),
+      }}
+    />
+  );
 
   return (
     <div
@@ -327,20 +360,22 @@ export function DiffPanel({
           </T>
         </div>
       )}
-      {}
-      <diff
-        ref={diffRef}
-        patch={patch}
-        wordDiff
-        scroll
-        maxLines={MAX_DIFF_LINES}
-        theme={nativeDiffTheme(t)}
-        style={{
-          flexGrow: 1,
-          minHeight: 0,
-          alignSelf: "stretch",
-        }}
-      />
+      {fileHeader ? (
+        body
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 1,
+            minHeight: 0,
+            alignSelf: "stretch",
+            overflow: "hidden",
+          }}
+        >
+          {body}
+        </div>
+      )}
     </div>
   );
 }

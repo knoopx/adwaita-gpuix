@@ -95,6 +95,11 @@ export const diffs = defineStory({
           <DiffPanel patch={PATCH} framed header />
         </Frame>
       </Labeled>
+      <Labeled caption="no file header (the path is named outside)">
+        <Frame>
+          <DiffPanel patch={PATCH} fileHeader={false} />
+        </Frame>
+      </Labeled>
       <Labeled caption="tabular diff (DataTable)">
         <Frame height={130}>
           <DiffPanel patch="" tabular={TABULAR} />
