@@ -41,6 +41,12 @@ export type {
 } from "./theme/adwaita";
 
 export { toneColor, toneFill, toneTint, textToneColor } from "./theme/tones";
+export {
+  codePalette,
+  DIFF_ROW_HEIGHT,
+  DIFF_ROW_INSET,
+  DIFF_TEXT_SIZE,
+} from "./theme/code";
 export type { Tone, TextTone } from "./theme/tones";
 
 export { T } from "./components/text";
@@ -920,15 +926,20 @@ export {
   summarizePatch,
   type DiffPanelProps,
   type DiffSummaryData,
+  DiffText,
+  type DiffTextProps,
   makeDiffScroller,
   ToolDiff,
   type ToolDiffProps,
-  cropPatch,
-  DIFF_METRICS,
-  diffRowCounts,
-  diffHeightOf,
-  type DiffMetrics,
-  type DiffRowCounts,
+  diffRowsOf,
+  diffRowsShown,
+  diffHunkRows,
+  type DiffRow,
+  type DiffRowKind,
+  type DiffShown,
+  type DiffVisibility,
+  type DiffToken,
+  type DiffTokenKind,
   DiffCountColumn,
   diffCountColumnWidth,
   DiffHistogram,

@@ -5,6 +5,8 @@ import { Labeled } from "../text";
 import { Panel } from "../../lib/panel";
 import { Column } from "../Box";
 import { DiffPanel, DiffSummary } from "./DiffPanel";
+import { type DiffRow } from "../../lib/vcs/rows";
+import { type DiffToken, type DiffTokenKind } from "../../lib/vcs/tokens";
 import { type TabularSides } from "../../lib/Tabular";
 import { HP_MP_ROWS } from "../../../.storybook/story-helpers";
 
@@ -103,6 +105,50 @@ export const diffs = defineStory({
       <Labeled caption="tabular diff (DataTable)">
         <Frame height={130}>
           <DiffPanel patch="" tabular={TABULAR} />
+        </Frame>
+      </Labeled>
+    </Column>
+  ),
+});
+
+/**
+ * A stand-in for the app's reading of the language.
+ *
+ * The library never parses a language — it asks for kinds and paints them — so
+ * a story says which kinds it wants to see, and this one finds them by shape.
+ */
+const KIND_OF: [RegExp, DiffTokenKind][] = [
+  [/^(import|from|const|export)$/, "keyword"],
+  [/^".*"$/, "string"],
+  [/^\d+$/, "number"],
+];
+
+function standInTokens(text: string): DiffToken[] {
+  const runs: DiffToken[] = [];
+  for (const chunk of text.split(/(\s+)/)) {
+    if (chunk === "") continue;
+    const found = KIND_OF.find(([pattern]) => pattern.test(chunk));
+    runs.push({ text: chunk, kind: found?.[1] ?? "plain" });
+  }
+  return runs;
+}
+
+const standIn = (row: DiffRow): DiffToken[] | undefined =>
+  row.kind === "add" || row.kind === "del"
+    ? standInTokens(row.text)
+    : undefined;
+
+export const coloured = defineStory({
+  render: () => (
+    <Column gap={16} align="center">
+      <Labeled caption="rows coloured by the kinds the app finds in them">
+        <Frame height={130}>
+          <DiffPanel patch={ADDITIONS} tokenize={standIn} />
+        </Frame>
+      </Labeled>
+      <Labeled caption="two unchanged lines kept beside each change">
+        <Frame height={150}>
+          <DiffPanel patch={ADDITIONS} context={2} />
         </Frame>
       </Labeled>
     </Column>

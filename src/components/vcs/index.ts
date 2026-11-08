@@ -6,16 +6,19 @@ export {
   type DiffPanelProps,
   type DiffSummaryData,
 } from "./DiffPanel";
+export { DiffText, type DiffTextProps } from "./DiffText";
 export { makeDiffScroller } from "./DiffScroll";
 export { ToolDiff, type ToolDiffProps } from "./ToolDiff";
 export {
-  cropPatch,
-  DIFF_METRICS,
-  diffRowCounts,
-  diffHeightOf,
-  type DiffMetrics,
-  type DiffRowCounts,
-} from "./diffRows";
+  diffRowsOf,
+  diffRowsShown,
+  diffHunkRows,
+  type DiffRow,
+  type DiffRowKind,
+  type DiffShown,
+  type DiffVisibility,
+} from "../../lib/vcs/rows";
+export type { DiffToken, DiffTokenKind } from "../../lib/vcs/tokens";
 export { DiffCountColumn, diffCountColumnWidth } from "./DiffCountColumn";
 export { DiffHistogram } from "./DiffHistogram";
 export { DiffStats } from "./DiffStats";
