@@ -1,9 +1,63 @@
 import { Fragment } from "react";
 import { type StyleDesc } from "@gpuix/react";
-import { Kbd as KbdBox, KbdCombo, KbdGroup, type KbdColors } from "./Kbd";
-import { isHidden, type Kbd, type Shortcut } from "../lib/shortcuts";
+import { Kbd as KbdBox, KbdCombo, KbdGroup, KBD_GLYPH, type KbdColors } from "./Kbd";
+import {
+  bindingCodes,
+  isHidden,
+  type Kbd,
+  type Shortcut,
+} from "../lib/shortcuts";
 import { SPACE, useAdwaita } from "../theme/adwaita";
 import { T } from "./text";
+import { Icon, type IconName } from "./icons";
+
+/**
+ * The keys a cap draws as the mark on the key rather than as its name.
+ *
+ * A cap is a picture of a key, and the keys whose *word* is what makes a line of
+ * caps wide — the four arrows, the two page keys, Home and End, Enter, Tab,
+ * Escape, the two delete keys, Space and the four modifiers — all carry that mark
+ * on a real keyboard, and the active icon set has each one (`keyboard-return`,
+ * `keyboard-double-arrow-up`, `keyboard-control-key`, `shift`, `space-bar`).
+ * A hint line spelled out is three times the width it needs: the words are what
+ * runs past the edge of a narrow window and gets cut, so the caps are marks.
+ *
+ * A key with no mark — a letter, a digit, a function key, `insert` — keeps the
+ * text in `CODE_SYMBOLS` below.
+ */
+const KEY_ICONS: Record<string, IconName> = {
+  up: "arrowUpward",
+  down: "arrowDownward",
+  left: "arrowBack",
+  right: "arrowForward",
+  pageup: "keyboardDoubleArrowUp",
+  pgup: "keyboardDoubleArrowUp",
+  pagedown: "keyboardDoubleArrowDown",
+  pgdn: "keyboardDoubleArrowDown",
+  pgdown: "keyboardDoubleArrowDown",
+  home: "firstPage",
+  end: "lastPage",
+  enter: "keyboardReturn",
+  return: "keyboardReturn",
+  escape: "close",
+  esc: "close",
+  tab: "keyboardTab",
+  delete: "backspace",
+  backspace: "keyboardBackspace",
+  space: "spaceBar",
+  ctrl: "keyboardControlKey",
+  control: "keyboardControlKey",
+  shift: "shift",
+  alt: "keyboardAlt",
+  option: "keyboardAlt",
+  cmd: "keyboardCommandKey",
+  super: "keyboardCommandKey",
+};
+
+/** The mark a code is drawn with, or nothing when it is drawn as its name. */
+export function keyIcon(code: string): IconName | undefined {
+  return KEY_ICONS[code.toLowerCase()];
+}
 
 const CODE_SYMBOLS: Record<string, string> = {
   up: "↑",
@@ -31,11 +85,19 @@ export function kbdSymbol(code: string): string {
 }
 
 export function KbdKey({ code, colors }: { code: string; colors?: KbdColors }) {
+  const t = useAdwaita();
+  const icon = keyIcon(code);
+  if (icon !== undefined)
+    return (
+      <KbdBox colors={colors}>
+        <Icon
+          name={icon}
+          size={KBD_GLYPH}
+          color={colors?.color ?? t.color.text.dim}
+        />
+      </KbdBox>
+    );
   return <KbdBox colors={colors}>{kbdSymbol(code)}</KbdBox>;
-}
-
-function bindingCodes(binding: Kbd): string[] {
-  return Array.isArray(binding) ? binding : [binding];
 }
 
 export function compactBindings(kbds: Kbd[]): Kbd[] {
@@ -59,9 +121,16 @@ export function compactBindings(kbds: Kbd[]): Kbd[] {
     byPrefix.set(key, created);
     slots.push(created);
   }
-  return slots.map(({ prefix, tails }) => {
+  return slots.flatMap(({ prefix, tails }) => {
+    // Two keys that print as marks stay two caps: a cap cannot hold "⇈/⇊" the
+    // way it can hold "PgUp/PgDn", and a shared prefix is only ever worth
+    // folding when the thing folded is one word.
+    if (tails.some((tail) => keyIcon(tail) !== undefined))
+      return tails.map((tail) =>
+        prefix.length === 0 ? tail : [...prefix, tail],
+      );
     const keys = tails.map(kbdSymbol).join("/");
-    return prefix.length === 0 ? keys : [...prefix, keys];
+    return [prefix.length === 0 ? keys : [...prefix, keys]];
   });
 }
 
@@ -72,7 +141,7 @@ export function KbdBinding({
   binding: Kbd;
   colors?: KbdColors;
 }) {
-  const codes = Array.isArray(binding) ? binding : [binding];
+  const codes = bindingCodes(binding);
   if (codes.length === 1) return <KbdKey code={codes[0]} colors={colors} />;
   return (
     <KbdCombo colors={colors}>

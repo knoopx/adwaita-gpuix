@@ -8,6 +8,17 @@ const KBD_MIN_WIDTH = 16;
 const KBD_PAD_X = 3;
 const KBD_GAP = SPACE.xs;
 
+/**
+ * The mark a key cap prints when the key carries one on the physical keyboard.
+ *
+ * A cap is a picture of a key, so its glyph is sized against the cap, not
+ * against the running text: one step under `KBD_HEIGHT`, which is the same
+ * measure the cap's own micro text is set at — a mark that filled the cap would
+ * read as a tile, and one set at the body measure would push the cap wider than
+ * it is tall.
+ */
+export const KBD_GLYPH = 12;
+
 export interface KbdColors {
   fill?: string;
   border?: string;

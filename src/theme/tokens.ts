@@ -220,13 +220,17 @@ export const NIGHTSKY = {
   border: "#4c3e76",
 
   functional: {
-    destructive: "#ff628c",
+    /** A red, not the scheme's rose: green, yellow, red is the ramp a meter can
+     * be read by, and a rose danger band reads as a warning one hue over. Same
+     * luminance as the rose, so `destructiveFg` and the tint alpha still fit. */
+    destructive: "#ff6262",
 
     destructiveFg: "#191033",
 
     success: "#a5ff90",
 
-    warning: "#f43f5e",
+    /** The scheme's own yellow (BASE16 base0A) — what light and dark take. */
+    warning: "#fad000",
   },
 
   extras: {

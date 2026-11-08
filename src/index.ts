@@ -250,6 +250,7 @@ export {
   KbdBinding,
   KbdBindings,
   kbdSymbol,
+  keyIcon,
   compactBindings,
   groupHints,
   ShortcutRow,
