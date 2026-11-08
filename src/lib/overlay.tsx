@@ -1,15 +1,22 @@
-import { type ReactNode } from "react";
+import {
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from "react";
 import { type StyleDesc, useWindowSize } from "@gpuix/react";
 import { Frame } from "../components/Card";
 import { ShortcutHints } from "../components/KeyHint";
 import { type HintGroup } from "../components/KeyBindings";
 import { rowHoverBg, selectionBg, useAdwaita } from "../theme/adwaita";
+import { canonicalKey } from "./keybus";
+import { matchShortcut, type Shortcut } from "./shortcuts";
 
 const DIM_BG = "rgba(0,0,0,0.45)";
 
-// The shared fill of a text entry / textarea: bordered surface in the window
-// color, body type, primary text. Overlays in `changes` and `mu` both
-// rest on this.
+
+
+
 export function fieldSurfaceStyle(t: ReturnType<typeof useAdwaita>): StyleDesc {
   return {
     borderRadius: t.radius.sm,
@@ -174,4 +181,106 @@ export function windowCandidates(
   const end = Math.min(start + maxVisible, candidates.length);
   start = Math.max(end - maxVisible, 0);
   return { activeIdx, start, end };
+}
+
+export interface CandidatePicker {
+  value: string;
+  setValue: (next: string) => void;
+  activeIndex: number;
+  setActiveIndex: Dispatch<SetStateAction<number>>;
+  /** Typing a new query: the value changes and the cursor returns to the top. */
+  onQuery: (next: string) => void;
+  /** Wire this to `OverlayInput`'s `onKeyDown`. */
+  onKeyDown: (event: { key?: string }) => void;
+}
+
+/**
+ * The state of a picker dialog: a query, the cursor into the candidates, and
+ * the keys that move it. Up and down are answered here; `apply`, `cancel` and
+ * `forget` are answered by whatever ids the app's shortcut set gives them, and
+ * any other id falls through to `onAction`.
+ */
+export function useCandidatePicker({
+  shortcuts,
+  count,
+  onApply,
+  onCancel,
+  onForget,
+  onAction,
+}: {
+  shortcuts: Shortcut[];
+  /** How many candidates there are now — a getter while they are derived. */
+  count: number | (() => number);
+  onApply?: () => void;
+  onCancel?: () => void;
+  onForget?: () => void;
+  onAction?: (id: string) => void;
+}): CandidatePicker {
+  const [value, setValue] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const countOf = typeof count === "function" ? count : () => count;
+  return {
+    value,
+    setValue,
+    activeIndex,
+    setActiveIndex,
+    onQuery: (next: string) => {
+      setValue(next);
+      setActiveIndex(0);
+    },
+    onKeyDown: (event: { key?: string }) => {
+      const match = matchShortcut(shortcuts, canonicalKey(event.key ?? ""));
+      if (match === null) return;
+      if (match.id === "nav-up") {
+        setActiveIndex((i) => Math.max(0, i - 1));
+        return;
+      }
+      if (match.id === "nav-down") {
+        const rows = countOf();
+        setActiveIndex((i) => Math.min(i + 1, Math.max(rows - 1, 0)));
+        return;
+      }
+      if (match.id === "apply") onApply?.();
+      else if (match.id === "cancel") onCancel?.();
+      else if (match.id === "forget") onForget?.();
+      else onAction?.(match.id);
+    },
+  };
+}
+
+/**
+ * The candidates for a name being typed: the names that contain the query, and
+ * the typed value itself when nothing answers it exactly. A name the user can
+ * create is a candidate, never a miss.
+ */
+export function nameCandidates(
+  names: readonly string[],
+  query: string,
+): string[] {
+  const q = query.trim().toLowerCase();
+  if (q.length === 0) return [...names];
+  const filtered = names.filter((n) => n.toLowerCase().includes(q));
+  if (names.some((n) => n.toLowerCase() === q)) return filtered;
+  return [...filtered, query.trim()];
+}
+
+/**
+ * The candidates among labelled revsets: a query matches the human label or the
+ * revset itself, and a revset is offered once however many times it is defined.
+ */
+export function labeledCandidates<T extends { label: string; revset: string }>(
+  rows: readonly T[],
+  query: string,
+): T[] {
+  const q = query.trim().toLowerCase();
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    if (seen.has(row.revset)) return false;
+    seen.add(row.revset);
+    return (
+      q.length === 0 ||
+      row.label.toLowerCase().includes(q) ||
+      row.revset.toLowerCase().includes(q)
+    );
+  });
 }
