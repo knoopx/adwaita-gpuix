@@ -1,8 +1,10 @@
+import { type ReactNode } from "react";
 import { type StyleDesc } from "@gpuix/react";
 import { defineMeta, defineStory } from "storybook";
 import { useAdwaita } from "../../theme/adwaita";
 import { Labeled, T } from "../text";
 import { Column, Row } from "../Box";
+import { Icon } from "../icons";
 import { Toaster, type ToasterPosition } from "./Toaster";
 import { type ToastType } from "./Toast";
 import { Stage } from "../../../.storybook/story-helpers";
@@ -13,12 +15,15 @@ function ToastStage({
   width = 360,
   height = 160,
   captionPos = "top-left",
+  content = null,
 }: {
   toasts: { message: string; type?: ToastType; actionLabel?: string }[];
   position?: ToasterPosition;
   width?: number;
   height?: number;
   captionPos?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+
+  content?: ReactNode;
 }) {
   const t = useAdwaita();
   const captionStyle: StyleDesc = {
@@ -38,6 +43,7 @@ function ToastStage({
           App window
         </T>
       </div>
+      {content}
       <Toaster
         toasts={toasts.map((toast, i) => ({ id: `story-${i}`, ...toast }))}
         position={position}
@@ -157,6 +163,82 @@ export const empty = defineStory({
     <Column gap={16} align="center">
       <Labeled caption="no toasts (region is transparent and inert)">
         <ToastStage width={360} height={120} toasts={[]} />
+      </Labeled>
+    </Column>
+  ),
+});
+
+
+function DownloadRows() {
+  const t = useAdwaita();
+  const rows: [string, string][] = [
+    ["backup-2026-04.tar", "1.2 GB"],
+    ["clip-rough-cut.mp4", "224 MB"],
+    ["report.pdf", "2.4 MB"],
+    ["photo-export.png", "816 KB"],
+    ["invoice-0411.pdf", "88 KB"],
+    ["notes.md", "4 KB"],
+  ];
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: t.space.xs,
+        padding: t.space.sm,
+      }}
+    >
+      {rows.map(([name, size], i) => (
+        <div
+          key={name}
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: t.space.sm,
+            height: t.control.listRowHeight,
+            paddingLeft: t.space.sm,
+            paddingRight: t.space.sm,
+            borderRadius: t.radius.xs,
+            backgroundColor: i === 2 ? t.color.selection.muted : "transparent",
+          }}
+        >
+          <Icon
+            name="description"
+            size={t.control.listIconSize}
+            color={t.color.text.dim}
+          />
+          <T
+            size="list"
+            color={i === 2 ? t.color.text.primary : t.color.text.dim}
+            style={{ flexGrow: 1, minWidth: 0 }}
+          >
+            {name}
+          </T>
+          <T
+            size="list"
+            color={t.color.text.dim}
+            style={{ fontFamily: t.type.fontFamilyMono }}
+          >
+            {size}
+          </T>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export const overContent = defineStory({
+  render: () => (
+    <Column gap={16} align="center">
+      <Labeled caption="typed toast over content (the tone fill hides it)">
+        <ToastStage
+          width={440}
+          height={252}
+          captionPos="top-right"
+          content={<DownloadRows />}
+          toasts={[{ message: "Upload failed", type: "error" }]}
+        />
       </Labeled>
     </Column>
   ),

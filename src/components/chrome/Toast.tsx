@@ -1,5 +1,6 @@
 import { type StyleDesc } from "@gpuix/react";
-import { type AdwaitaTheme, useAdwaita } from "../../theme/adwaita";
+import { useAdwaita } from "../../theme/adwaita";
+import { type Tone, toneColor, toneFill } from "../../theme/tones";
 import { CloseButton } from "../overlay";
 import { T } from "../text";
 import { Button } from "../Button";
@@ -14,27 +15,29 @@ export type ToastType =
   | "destructive"
   | "loading";
 
+/**
+ * A type is wear, not a badge: the tone fills the toast and its base colour
+ * draws the glyph. A toast floats over content, so the fill is the tone baked
+ * into the surface rather than the translucent `*Tint` an inline `Alert` wears.
+ */
 interface ToastTypeTheme {
   icon: IconName;
-  color: string;
+  tone: Tone;
 }
 
-function resolveTypeTheme(
-  type: Exclude<ToastType, "default">,
-  t: AdwaitaTheme,
-): ToastTypeTheme {
+function resolveTypeTheme(type: Exclude<ToastType, "default">): ToastTypeTheme {
   switch (type) {
     case "success":
-      return { icon: "checkCircle", color: t.color.functional.success };
+      return { icon: "checkCircle", tone: "success" };
     case "info":
-      return { icon: "info", color: t.color.accent.base };
+      return { icon: "info", tone: "accent" };
     case "warning":
-      return { icon: "warning", color: t.color.functional.warning };
+      return { icon: "warning", tone: "warning" };
     case "error":
     case "destructive":
-      return { icon: "error", color: t.color.functional.destructive };
+      return { icon: "error", tone: "destructive" };
     case "loading":
-      return { icon: "refresh", color: t.color.accent.base };
+      return { icon: "refresh", tone: "accent" };
   }
 }
 
@@ -62,7 +65,8 @@ export function Toast({
   style,
 }: ToastProps) {
   const t = useAdwaita();
-  const typeTheme = type === "default" ? null : resolveTypeTheme(type, t);
+  const typeTheme = type === "default" ? null : resolveTypeTheme(type);
+  const surface = t.color.surface.headerbar;
   return (
     <div
       style={{
@@ -73,12 +77,19 @@ export function Toast({
         padding: t.space.md,
         borderRadius: t.radius.sm,
         borderWidth: 0,
-        backgroundColor: t.color.surface.headerbar,
+        // An untyped toast is a plain surface; a typed one wears its type.
+        backgroundColor: typeTheme
+          ? toneFill(t, typeTheme.tone, surface)
+          : surface,
         ...style,
       }}
     >
       {typeTheme ? (
-        <Icon name={typeTheme.icon} size={14} color={typeTheme.color} />
+        <Icon
+          name={typeTheme.icon}
+          size={14}
+          color={toneColor(t, typeTheme.tone)}
+        />
       ) : null}
       <div
         style={{
