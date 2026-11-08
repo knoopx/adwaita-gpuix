@@ -32,5 +32,11 @@ export {
   type FileRowStats,
 } from "./FileRowData";
 export { FILE_STATUS_ICONS } from "./FileStatusIcons";
+export {
+  ChangeRow,
+  CHANGE_ROW_HEIGHT,
+  type ChangeRowData,
+  type ChangeRowProps,
+} from "./ChangeRow";
 
 export { MONO, FILE_HEADER_ROW_HEIGHT, nativeDiffTheme } from "../../theme/vcs";
