@@ -205,3 +205,45 @@ export function timeSeries() {
     </Column>
   );
 }
+
+const ROUTE_DATA: ChartDataPoint[] = [
+  { label: "start", value: 2 },
+  { label: "8 min", value: 5 },
+  { label: "14 min", value: 7 },
+];
+
+const RUN_DATA: ChartDataPoint[] = Array.from({ length: 14 }, (_, i) => ({
+  label: `d${String(i + 1)}`,
+  value: 8 + i * 2 + (i % 3 === 0 ? 6 : 0),
+}));
+
+export function dash() {
+  return (
+    <Column gap={16} align="center">
+      <Labeled
+        caption="line · dashed, with the point the reader stands at"
+        style={{ flexGrow: 1 }}
+      >
+        <Chart
+          data={ROUTE_DATA}
+          type="line"
+          height={110}
+          grid
+          dash={7}
+          emphasis={1}
+        />
+      </Labeled>
+      <Labeled caption="line · area fill, last point emphasised" style={{ flexGrow: 1 }}>
+        <Chart
+          data={RUN_DATA}
+          type="line"
+          height={110}
+          fill
+          markers={false}
+          labels={false}
+          emphasis={RUN_DATA.length - 1}
+        />
+      </Labeled>
+    </Column>
+  );
+}

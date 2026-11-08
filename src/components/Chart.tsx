@@ -37,6 +37,19 @@ interface ChartStyleOptions {
   fillTop?: number;
 
   fillBottom?: number;
+
+  /**
+   * Break the line into dashes of this many pixels. A plotted run is a fact;
+   * a dashed one is a plan, an expectation, or the part of a route still
+   * between two known points — and the dash is what says so.
+   */
+  dash?: number;
+
+  /**
+   * Which point is the one the reader is standing at — now, the selected row,
+   * the far end of a route. Its marker is drawn bigger than the rest.
+   */
+  emphasis?: number;
 }
 
 export interface ChartProps extends ChartStyleOptions {
@@ -75,6 +88,8 @@ export function Chart({
   barWidth,
   fillTop,
   fillBottom,
+  dash,
+  emphasis,
 }: ChartProps) {
   const t = useAdwaita();
 
@@ -127,6 +142,8 @@ export function Chart({
         width={width}
         fillTop={fillTop}
         fillBottom={fillBottom}
+        dash={dash}
+        emphasis={emphasis}
       />
     );
   }
@@ -362,6 +379,10 @@ function BarGrid({ plotHeight, color }: { plotHeight: number; color: string }) {
   );
 }
 
+/** A plot's markers, and the one the reader is standing at. */
+const MARKER = 3;
+const MARKER_EMPHASIS = 5;
+
 function makeLinePointAt(
   count: number,
   maxValue: number,
@@ -387,6 +408,7 @@ function buildLineSvgSeries(params: {
   axisColor?: string;
   gridLines?: string;
   area?: { top: number; bottom: number };
+  dash?: number;
 }): string {
   const {
     width,
@@ -398,6 +420,7 @@ function buildLineSvgSeries(params: {
     axisColor,
     gridLines,
     area,
+    dash,
   } = params;
   const defs =
     area !== undefined
@@ -415,12 +438,16 @@ function buildLineSvgSeries(params: {
     area !== undefined && points.length > 0
       ? `<polygon points="0,${height} ${points} ${width},${height}" fill="url(#band)"/>`
       : "";
+  const dashMark =
+    dash !== undefined && dash > 0
+      ? ` stroke-dasharray="${dash} ${dash}" stroke-linecap="round"`
+      : "";
   const svgSource = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
     ${defs}${grad}${gradEnd}
     ${gridLines ?? ""}
     ${band}
     ${axisColor !== undefined ? `<line x1="0" y1="${height - padding}" x2="${width}" y2="${height - padding}" stroke="${axisColor}" stroke-width="1"/>` : ""}
-    <polyline points="${points}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+    <polyline points="${points}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"${dashMark}/>
     ${dots}
   </svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svgSource)}`;
@@ -643,6 +670,8 @@ function LineChart({
   width = 480,
   fillTop,
   fillBottom,
+  dash,
+  emphasis,
 }: ChartRendererProps) {
   const t = useAdwaita();
   const maxValue = Math.max(...data.map((d) => d.value), 1);
@@ -668,7 +697,12 @@ function LineChart({
     ? data
         .map((d, i) => {
           const p = pointAt(i, d.value);
-          return `<circle cx="${p.x}" cy="${p.y}" r="3" fill="${color}"/>`;
+          const here = i === emphasis;
+          const r = here ? MARKER_EMPHASIS : MARKER;
+          const ring = here
+            ? `<circle cx="${p.x}" cy="${p.y}" r="${r + 3}" fill="${color}" fill-opacity="0.25"/>`
+            : "";
+          return `${ring}<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${color}"/>`;
         })
         .join("")
     : "";
@@ -690,6 +724,7 @@ function LineChart({
           bottom: fillBottom ?? t.color.chart.fillBottom,
         }
       : undefined,
+    dash,
   });
 
   return (
