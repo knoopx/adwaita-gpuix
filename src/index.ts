@@ -66,6 +66,19 @@ export type { AdwaitaInputBaseProps } from "./components/input-base";
 export { listPanelStyle, menuPanelStyle } from "./components/FloatingPanel";
 export { PANEL_SHADOW } from "./components/overlay";
 export {
+  DialogHeading,
+  type DialogHeadingProps,
+} from "./components/DialogHeading";
+export {
+  CandidateRow,
+  CANDIDATE_ROW_HEIGHT,
+  type CandidateRowProps,
+} from "./components/CandidateRow";
+export {
+  CandidateList,
+  type CandidateListProps,
+} from "./components/CandidateList";
+export {
   activeIconSet,
   DEFAULT_ICON_SET,
   Icon,
@@ -953,6 +966,10 @@ export {
   type FileRowData,
   type FileRowStats,
   FILE_STATUS_ICONS,
+  ChangeRow,
+  CHANGE_ROW_HEIGHT,
+  type ChangeRowData,
+  type ChangeRowProps,
   MONO,
   FILE_HEADER_ROW_HEIGHT,
   nativeDiffTheme,
@@ -987,6 +1004,31 @@ export {
   type ContributionHeatmapProps,
   type MonthRegion,
 } from "./components/ContributionHeatmap";
+
+export {
+  Timeline,
+  timelineTimeWidth,
+  TIMELINE_MARK_WIDTH,
+  type TimelineItem,
+  type TimelineProps,
+  type TimelineStatus,
+} from "./components/Timeline";
+
+export {
+  Trace,
+  traceFigureWidth,
+  traceLabelWidth,
+  traceTotal,
+  type TraceProps,
+  type TraceSpan,
+} from "./components/Trace";
+
+export {
+  SegmentBar,
+  segmentRamp,
+  type Segment,
+  type SegmentBarProps,
+} from "./components/SegmentBar";
 
 export {
   WEEKS_SHOWN,
@@ -1029,6 +1071,7 @@ export {
   BOOKMARKS_TEMPLATE,
   BOOKMARK_LIST_ARGS,
   parseBookmarkList,
+  bookmarkNames,
   bookmarksByChange,
 } from "./lib/vcs/bookmarks";
 
