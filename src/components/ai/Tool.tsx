@@ -212,6 +212,15 @@ export interface ToolHeaderProps {
 
   /** The mark this header wears while the tool runs, in place of the spinner. */
   spinnerSlot?: ReactNode;
+
+  /**
+   * What the call ran with, riding the right end of the header line beside its
+   * status mark: the title and args text give way when the row runs out of room,
+   * these do not. They stand at the end because a chip is read against the next
+   * row's chip, not against the name of this one — a column of figures only lines
+   * up when it ends in one place.
+   */
+  chipsSlot?: ReactNode;
   toolName?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -226,6 +235,7 @@ export function ToolHeader({
   icon = "terminal",
   iconTone,
   spinnerSlot,
+  chipsSlot,
   toolName,
   open,
   onOpenChange,
@@ -275,7 +285,8 @@ export function ToolHeader({
           {toolHeaderText(children, toolName, TOOL_STATE_PREFIX[state])}
         </T>
       )}
-      <div style={{ flexGrow: 1 }} />
+      <div style={{ flexGrow: 1, minWidth: t.space.sm }} />
+      {chipsSlot}
       <ToolStatusIndicator state={state} spinnerSlot={spinnerSlot} />
     </div>
   );
