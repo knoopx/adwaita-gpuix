@@ -57,6 +57,13 @@ export interface ChartProps extends ChartStyleOptions {
   type?: "bar" | "line";
   color?: string;
   colors?: string[];
+
+  /**
+   * Bars stacked instead of side by side: each series is one band of the
+   * column, so the column's height is the total and the bands are its parts.
+   * Only a bar chart stacks — a line has nothing to stack.
+   */
+  stacked?: boolean;
 }
 
 function isMultiSeriesData(data: ChartData): data is ChartSeriesPoint[] {
@@ -90,6 +97,7 @@ export function Chart({
   fillBottom,
   dash,
   emphasis,
+  stacked = false,
 }: ChartProps) {
   const t = useAdwaita();
 
@@ -123,6 +131,8 @@ export function Chart({
         hideZeroLabels={hideZeroLabels}
         labels={labels}
         grid={grid}
+        stacked={stacked}
+        barWidth={barWidth}
       />
     );
   }
@@ -568,6 +578,14 @@ function barHeightAt(
     : Math.max(4, Math.round((value / maxValue) * plotHeight));
 }
 
+/** The whole a stacked column is: the sum of its bands, never its tallest one. */
+function stackedValue(data: ChartSeriesPoint[]): number {
+  return Math.max(
+    ...data.map((d) => d.values.reduce((sum, v) => sum + Math.max(0, v.value), 0)),
+    1,
+  );
+}
+
 function MultiBarChart({
   data,
   palette,
@@ -576,6 +594,8 @@ function MultiBarChart({
   hideZeroLabels = false,
   labels = true,
   grid = false,
+  stacked = false,
+  barWidth,
 }: {
   data: ChartSeriesPoint[];
   palette: string[];
@@ -584,10 +604,91 @@ function MultiBarChart({
   hideZeroLabels?: boolean;
   labels?: boolean;
   grid?: boolean;
+  stacked?: boolean;
+  barWidth?: number;
 }) {
   const t = useAdwaita();
   const plotHeight = barPlotHeight(height);
-  const maxValue = maxSeriesValue(data);
+  const maxValue = stacked ? stackedValue(data) : maxSeriesValue(data);
+
+  if (stacked) {
+    // One column per label, one band per series: the first series sits at the
+    // bottom and the column's height is the total, which is the figure written
+    // over it. A band is the column's width because the bands are the same
+    // column, not a run of thin bars standing beside each other.
+    const bandWidth = barWidth ?? "60%";
+    return (
+      <BarPlot
+        style={style}
+        height={height}
+        plotHeight={plotHeight}
+        gap={8}
+        grid={grid}
+      >
+        {data.map((d, i) => {
+          const total = d.values.reduce((sum, v) => sum + Math.max(0, v.value), 0);
+          return (
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                flexGrow: 1,
+                gap: 4,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  height: plotHeight,
+                  gap: 2,
+                }}
+              >
+                {labels && !(hideZeroLabels && total === 0) ? (
+                  <T size="caption" color={t.color.text.dim}>
+                    {total}
+                  </T>
+                ) : null}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width: bandWidth,
+                    gap: 2,
+                  }}
+                >
+                  {d.values
+                    .map((value, order) => ({ value, order }))
+                    .reverse()
+                    .map(({ value: v, order }) => (
+                      <div
+                        key={order}
+                        style={{
+                          width: "100%",
+                          minHeight: v.value === 0 ? 0 : 4,
+                          height: barHeightAt(v.value, maxValue, plotHeight),
+                          borderRadius: 2,
+                          backgroundColor: seriesColor(palette, order),
+                        }}
+                      />
+                    ))}
+                </div>
+              </div>
+              {labels ? (
+                <T size="caption" color={t.color.text.dim} align="center">
+                  {d.label}
+                </T>
+              ) : null}
+            </div>
+          );
+        })}
+      </BarPlot>
+    );
+  }
 
   return (
     <BarPlot
