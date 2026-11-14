@@ -167,6 +167,21 @@ export function tableColumnWidths(
   return widths.map((width) => Math.max(MIN_COLUMN, Math.ceil(width)));
 }
 
+/**
+ * A rebuilt tree is a dynamic list to React even where it was written as static
+ * JSX children, and a clone arrives with no key and no memory of ever having
+ * been checked — so React warns and matches the child by position anyway. This
+ * hands it the position it stands at, which is the identity React was going to
+ * use. A key the caller wrote is kept, because that is the one they chose.
+ */
+function keyedAt(node: ReactElement, at: number): ReactElement {
+  return node.key === null || node.key === undefined
+    ? cloneElement(node as ReactElement<CellProps>, {
+        key: `tcol-${String(at)}`,
+      })
+    : node;
+}
+
 /** Give every cell the width of its column, so every row draws one table. */
 export function withTableColumns(
   children: ReactNode,
@@ -193,24 +208,31 @@ export function withTableColumns(
 
   const paintRow = (row: ReactElement): ReactElement => {
     let at = 0;
-    const cells = asList((row.props as CellProps).children).map((child) => {
-      if (isValidElement(child) && roleOf(child) === "cell") return sized(child, widths[at++]);
-      return child;
-    });
+    const cells = asList((row.props as CellProps).children).map(
+      (child, position) => {
+        if (isValidElement(child) && roleOf(child) === "cell")
+          return keyedAt(sized(child, widths[at++]), position);
+        return child;
+      },
+    );
     return cloneElement(row as ReactElement<CellProps>, {}, ...cells);
   };
 
   const walk = (node: ReactNode): ReactNode => {
     let at = 0;
-    return asList(node).map((child) => {
+    return asList(node).map((child, position) => {
       if (!isValidElement(child)) return child;
       const role = roleOf(child);
-      if (role === "cell") return sized(child, widths[at++]);
+      if (role === "cell") return keyedAt(sized(child, widths[at++]), position);
       at = 0;
-      if (role === "row") return paintRow(child);
-      if (role !== "group" && child.type !== "div") return child;
+      if (role === "row") return keyedAt(paintRow(child), position);
+      if (role !== "group" && child.type !== "div")
+        return keyedAt(child, position);
       const inner = walk((child.props as CellProps).children);
-      return cloneElement(child as ReactElement<CellProps>, {}, inner);
+      return keyedAt(
+        cloneElement(child as ReactElement<CellProps>, {}, inner),
+        position,
+      );
     });
   };
 
