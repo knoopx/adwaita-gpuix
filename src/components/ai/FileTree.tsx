@@ -201,21 +201,23 @@ export function FileTree({
       const path = pathOf(parent, node.name);
       if (node.type === "folder") {
         const isExpanded = expanded.has(path);
+        const contents =
+          node.children && node.children.length > 0
+            ? renderNodes(node.children, path)
+            : null;
         return (
           <FileTreeFolder
             key={path}
             name={node.name}
             expanded={isExpanded}
-            onToggle={() => toggle(path)}
+            onToggle={contents === null ? undefined : () => toggle(path)}
             selected={selectedPath === path}
             added={node.added}
             removed={node.removed}
             stats={stats}
             variant={variant}
           >
-            {node.children && node.children.length > 0
-              ? renderNodes(node.children, path)
-              : null}
+            {contents}
           </FileTreeFolder>
         );
       }
@@ -265,6 +267,27 @@ export interface FileTreeFolderProps {
   style?: Partial<StyleDesc>;
 }
 
+/** A folder with nothing under it: the gutter stays, the chevron does not. */
+function FolderGutter({
+  t,
+  expanded,
+  empty,
+}: {
+  t: AdwaitaTheme;
+  expanded: boolean;
+  empty: boolean;
+}) {
+  if (empty) return <div style={{ width: CHEVRON_SIZE, flexShrink: 0 }} />;
+  return (
+    <Icon
+      name={expanded ? "chevronDown" : "chevronRight"}
+      size={CHEVRON_SIZE}
+      color={t.color.text.dim}
+      style={{ flexShrink: 0 }}
+    />
+  );
+}
+
 export function FileTreeFolder({
   name,
   expanded,
@@ -279,7 +302,12 @@ export function FileTreeFolder({
 }: FileTreeFolderProps) {
   const t = useAdwaita();
   const isSelected = selected === true;
-  const interactive = onToggle !== undefined;
+  // A folder that names nothing has nothing to open, so it takes no click and
+  // prints no chevron: an open mark over a run of rows below it is read as those
+  // rows standing inside it, which is the one thing a flat listing must not say.
+  const hasContents =
+    children !== null && children !== undefined && children !== false;
+  const interactive = onToggle !== undefined && hasContents;
   return (
     <div style={{ display: "flex", flexDirection: "column", ...style }}>
       <div
@@ -294,12 +322,7 @@ export function FileTreeFolder({
         }
         style={rowStyle(t, isSelected, interactive, variant)}
       >
-        <Icon
-          name={expanded ? "chevronDown" : "chevronRight"}
-          size={CHEVRON_SIZE}
-          color={t.color.text.dim}
-          style={{ flexShrink: 0 }}
-        />
+        <FolderGutter t={t} expanded={expanded} empty={!hasContents} />
         <FileTreeRowContents
           icon="folder"
           name={name}
@@ -308,7 +331,7 @@ export function FileTreeFolder({
         />
         <FileTreeStats added={added} removed={removed} stats={stats} />
       </div>
-      {expanded ? (
+      {expanded && hasContents ? (
         <div style={{ paddingLeft: t.space.md }}>{children}</div>
       ) : null}
     </div>

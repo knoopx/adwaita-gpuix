@@ -155,6 +155,27 @@ export const changeset = defineStory({
   ),
 });
 
+/** One level of a folder: the shape a listing answers with, nothing to open. */
+const FLAT_LISTING: FileTreeNode[] = [
+  { name: "src", type: "folder" },
+  { name: "docs", type: "folder" },
+  { name: "README.md", type: "file" },
+  { name: "package.json", type: "file" },
+];
+
+export const flatListing = defineStory({
+  parameters: { width: 528, height: 180 },
+  render: () => (
+    <Column gap={16} align="center">
+      <Labeled caption="a folder naming nothing: its gutter stays empty, so no row under it reads as its child">
+        <div style={{ width: 460 }}>
+          <FileTree items={FLAT_LISTING} variant="list" />
+        </div>
+      </Labeled>
+    </Column>
+  ),
+});
+
 export const deepNesting = defineStory({
   parameters: { width: 528, height: 360 },
   render: () => (
