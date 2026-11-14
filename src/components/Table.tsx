@@ -144,7 +144,7 @@ export function Table({
 
           insetX: 0,
           insetEnd: 0,
-          rowRadius: 0,
+          rowRadius: t.radius.sm,
           cellPaddingX: t.space.sm,
           selectionFill: accent
             ? t.color.selection.accent
