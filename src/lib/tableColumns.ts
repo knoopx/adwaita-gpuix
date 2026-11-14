@@ -16,6 +16,8 @@
 
 import { cloneElement, type ReactElement, type ReactNode, isValidElement } from "react";
 import { type StyleDesc } from "@gpuix/react";
+import { Icon } from "../components/icons";
+import { T, type TextSize } from "../components/text";
 
 /** How far one character of the proportional font advances, as a fraction of the
  *  size it is set at — the sibling of the mono advance, and the reason a column
@@ -46,59 +48,121 @@ interface CellProps {
   style?: Partial<StyleDesc>;
 }
 
-/** The plain words a cell holds, joined. A cell whose content is an icon, a chip
- *  or an input has no words and contributes nothing to its column's measure. */
-export function cellText(node: ReactNode): string {
-  if (node === null || node === undefined || typeof node === "boolean") return "";
-  if (typeof node === "string") return node;
-  if (typeof node === "number") return String(node);
-  if (Array.isArray(node)) return node.map(cellText).join("");
-  if (isValidElement(node)) return cellText((node.props as CellProps).children);
-  return "";
+/** What a cell's words are measured against, and what a mark inside one costs. */
+export interface CellMeasureArgs {
+  /** The size the table draws this kind of cell at — the fallback for words in
+   *  the cell that ask for no size of their own. */
+  size: number;
+
+  /** The theme's type scale, so a cell that asks for `"caption"` is measured at
+   *  the size it asks for rather than the size the table's density names. */
+  sizes: Partial<Record<TextSize, number>>;
+
+  monoFamily: string;
+  iconSize: number;
+  gap: number;
 }
 
-/** Whether anything in a cell asks for the mono family and whether anything asks
- *  for a bold weight — the two things that change how wide its words print. */
-function cellPaint(node: ReactNode, monoFamily: string): { mono: boolean; bold: boolean } {
-  let mono = false;
-  let bold = false;
-  const walk = (n: ReactNode): void => {
-    if (Array.isArray(n)) {
-      for (const child of n) walk(child);
-      return;
-    }
-    if (!isValidElement(n)) return;
-    const props = n.props as CellProps;
-    const style = props.style;
-    if (style) {
-      if (style.fontFamily === monoFamily) mono = true;
-      const weight = style.fontWeight;
-      if (weight === "bold" || (typeof weight === "number" && weight >= 600)) bold = true;
-    }
-    walk(props.children);
+/** The ink a piece of a cell prints in: a size, a family, a weight. All three are
+ *  inherited, and all three can be asked for by the element that stands there. */
+interface Ink {
+  size: number;
+  mono: boolean;
+  bold: boolean;
+}
+
+const advanceOf = (ink: Ink): number =>
+  (ink.mono ? MONO_ADVANCE : PROPORTIONAL_ADVANCE) *
+  ink.size *
+  (ink.bold ? BOLD_FACTOR : 1);
+
+/** How one element changes the ink its content prints in. */
+function inkOf(node: ReactElement, ink: Ink, args: CellMeasureArgs): Ink {
+  const props = node.props as CellProps & {
+    size?: string;
+    weight?: string | number;
   };
-  walk(node);
-  return { mono, bold };
+  const style = props.style;
+  const asked =
+    typeof style?.fontSize === "number"
+      ? style.fontSize
+      : node.type === T && typeof props.size === "string"
+        ? (args.sizes as Partial<Record<TextSize, number>>)[
+            props.size as TextSize
+          ] ?? 0
+        : 0;
+  const weight =
+    style?.fontWeight ??
+    (node.type === T ? props.weight : undefined);
+  return {
+    size: asked === 0 ? ink.size : asked,
+    mono: style?.fontFamily === args.monoFamily ? true : ink.mono,
+    bold:
+      weight === "bold" || (typeof weight === "number" && weight >= 600)
+        ? true
+        : ink.bold,
+  };
 }
 
-/** How wide one cell's own content prints, at the size the table draws that kind
- *  of cell in. A cell that wrote its own pixel width keeps it: a column of
- *  switches or meters says how wide it is, and that beats a guess from its words.
- *  `extra` is the room a cell's own furniture takes beside its words — the icon
- *  of a lead cell, say. */
+/** How wide one node's content prints, at the size and family it is drawn in.
+ *
+ *  Two shapes of child, two answers. Children standing beside each other cost
+ *  the sum of their parts — the mark, the air, the digits — so a cell that leads
+ *  with an icon is that icon wider than its words. Children stacked in a column
+ *  cost the widest of them: a cell that says a name over where the name came from
+ *  is as wide as its longer line, not as wide as both lines read end to end, and
+ *  that is what keeps a stacked cell from pushing the rest of the table off the
+ *  row.
+ *
+ *  An icon is not a word, so it is never measured in characters: it costs the
+ *  size the table draws marks at, plus the gap a row keeps beside them. */
+function contentWidth(node: ReactNode, ink: Ink, args: CellMeasureArgs): number {
+  if (typeof node === "string") return node.length * advanceOf(ink);
+  if (typeof node === "number") return String(node).length * advanceOf(ink);
+  if (node === null || node === undefined || typeof node === "boolean") return 0;
+  if (!isValidElement(node)) return 0;
+
+  const props = node.props as CellProps;
+  const inner = inkOf(node, ink, args);
+  const group = groupWidth(props.children, inner, args, props.style?.flexDirection);
+  return node.type === Icon ? group + args.iconSize + args.gap : group;
+}
+
+/** What a cell's children cost side by side — or, stacked, the widest of them. */
+function groupWidth(
+  children: ReactNode,
+  ink: Ink,
+  args: CellMeasureArgs,
+  direction: string | undefined,
+): number {
+  const parts: ReactNode[] = Array.isArray(children)
+    ? children
+    : children === null || children === undefined
+      ? []
+      : [children];
+  if (direction !== "column")
+    return parts.reduce<number>((sum, child) => sum + contentWidth(child, ink, args), 0);
+  return parts.reduce<number>(
+    (widest, child) => Math.max(widest, contentWidth(child, ink, args)),
+    0,
+  );
+}
+
+/** How wide one cell's own content prints, measured at the size and family each
+ *  word is actually drawn at. A cell that wrote its own pixel width keeps it: a
+ *  column of switches or meters says how wide it is, and that beats a measure
+ *  taken from its words. */
 export function cellContentWidth(
   cell: ReactElement,
-  args: { size: number; monoFamily: string; extra?: number },
+  args: CellMeasureArgs,
 ): number {
   const props = cell.props as CellProps;
   const declared = typeof props.style?.width === "number" ? props.style.width : 0;
-  const paint = cellPaint(cell, args.monoFamily);
-  const advance =
-    (paint.mono ? MONO_ADVANCE : PROPORTIONAL_ADVANCE) *
-    args.size *
-    (paint.bold ? BOLD_FACTOR : 1);
-  const words = cellText(props.children).length * advance + (args.extra ?? 0);
-  return Math.max(declared, words);
+  const ink: Ink = { size: args.size, mono: false, bold: false };
+  return Math.max(
+    declared,
+    groupWidth(props.children, ink, args, props.style?.flexDirection),
+  );
 }
 
 /** Every row of cells in the tree a `Table` was handed, each row its cells in

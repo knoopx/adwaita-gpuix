@@ -485,8 +485,14 @@ export {
   TableLeadCell,
   TableNodeCell,
   TableCaption,
+
+  /** The table's own measures: the size it draws marks at, the size a cell's
+   *  words print at, the row's height. A cell built outside this file draws its
+   *  furniture at these numbers or the column the table measured is wrong. */
+  useTable,
 } from "./components/Table";
 export type {
+  TableCtxValue,
   TableProps,
   TableHeaderProps,
   TableBodyProps,

@@ -193,11 +193,10 @@ export function Table({
     const widths = tableColumnWidths(rows, (cell) =>
       cellContentWidth(cell, {
         size: t.type[sizeOfCell(cell, ctxValue)],
+        sizes: t.type,
         monoFamily: t.type.fontFamilyMono,
-        extra:
-          cell.type === TableLeadCell
-            ? ctxValue.iconSize + c.listRowGap
-            : 0,
+        iconSize: ctxValue.iconSize,
+        gap: c.listRowGap,
       }),
     );
     return withTableColumns(children, roleOf, widths);
@@ -428,6 +427,11 @@ export interface TableRowProps {
   children: ReactNode;
   selected?: boolean;
   onSelect?: () => void;
+
+  /** A list whose cursor the pointer moves as well as the keyboard: the row that
+   *  is stood under the mouse is the row the list answers, so the row says so. */
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   style?: Partial<StyleDesc>;
 }
 
@@ -435,6 +439,8 @@ export function TableRow({
   children,
   selected,
   onSelect,
+  onMouseEnter,
+  onMouseLeave,
   style,
 }: TableRowProps) {
   const t = useAdwaita();
@@ -442,6 +448,8 @@ export function TableRow({
   return (
     <div
       onClick={onSelect}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       style={{ ...rowFrameStyle(t, ctx, selected, onSelect), ...style }}
     >
       {children}
