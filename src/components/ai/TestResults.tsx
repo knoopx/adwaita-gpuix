@@ -26,6 +26,17 @@ export interface TestResultData {
 export interface TestSuiteData {
   name: string;
   tests: TestResultData[];
+
+  /**
+   * How many tests the suite ran, when the caller knows a figure larger than the tests
+   * it can name.
+   *
+   * A runner that prints a line only for what failed — vitest's default, jest without
+   * `--verbose` — states `2 tests | 1 failed` for a file and names one test. Printing
+   * `1 test` there would be a wrong figure, not a short list, so the stated count rides
+   * with the data and the list stays a list of what was named.
+   */
+  total?: number;
 }
 
 export interface TestResultsProps {
@@ -102,9 +113,12 @@ export function TestResults({
   void duration;
 
   const allTests = suites.flatMap((suite) => suite.tests);
-  const total = allTests.length;
+  const total = suites.reduce(
+    (sum, suite) => sum + Math.max(suite.total ?? 0, suite.tests.length),
+    0,
+  );
   const failed = allTests.filter((test) => test.status === "failed").length;
-  const passed = total - failed;
+  const passed = Math.max(0, total - failed);
   const hasFailures = failed > 0;
 
   return (
@@ -142,7 +156,12 @@ export function TestResults({
       />
       <TestListBody open={isOpen} hasFailures={hasFailures}>
         {suites.map((suite) => (
-          <TestSuite key={suite.name} name={suite.name} tests={suite.tests} />
+          <TestSuite
+            key={suite.name}
+            name={suite.name}
+            tests={suite.tests}
+            {...(suite.total === undefined ? {} : { total: suite.total })}
+          />
         ))}
       </TestListBody>
     </Collapsible>
@@ -152,6 +171,8 @@ export function TestResults({
 export interface TestSuiteProps {
   name: string;
   tests: TestResultData[];
+  /** The suite's own test count, when the runner stated more than it named. */
+  total?: number;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -161,12 +182,14 @@ export interface TestSuiteProps {
 export function TestSuite({
   name,
   tests,
+  total,
   open,
   defaultOpen,
   onOpenChange,
   style,
 }: TestSuiteProps) {
   const t = useAdwaita();
+  const ran = Math.max(total ?? 0, tests.length);
   const failedCount = tests.filter((test) => test.status === "failed").length;
   const suiteFailed = failedCount > 0;
   const { open: isOpen, setOpen } = useControllableOpen(
@@ -197,7 +220,7 @@ export function TestSuite({
               {name}
             </T>
             <T size="caption" color={t.color.text.dim}>
-              {`, ${tests.length} tests`}
+              {`, ${ran} ${ran === 1 ? "test" : "tests"}`}
             </T>
             {suiteFailed ? (
               <T size="caption" color={t.color.functional.destructive}>
@@ -208,6 +231,8 @@ export function TestSuite({
         }
         open={isOpen}
         onToggle={() => setOpen(!isOpen)}
+        /* A file the runner named no tests in has nothing to open, so it wears no toggle. */
+        chevron={tests.length > 0}
       />
       <TestListBody open={isOpen} hasFailures={suiteFailed}>
         {tests.map((test) => (
