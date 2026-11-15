@@ -1065,10 +1065,12 @@ export {
 } from "./lib/vcs/types";
 
 export {
+  diffBlocks,
   extractDiffFiles,
   filePatchStats,
   mapConcurrent,
   changedFiles,
+  type DiffBlock,
   type DiffFileEntry,
   type FileStat,
 } from "./lib/vcs/diff";
