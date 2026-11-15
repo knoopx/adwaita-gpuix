@@ -70,6 +70,17 @@ function rowFill(t: AdwaitaTheme, kind: DiffRowKind): string | undefined {
   return undefined;
 }
 
+/**
+ * One row of the patch.
+ *
+ * The row states the list's width rather than taking its own. A virtual list
+ * measures each row at its content, and a diff row's content is one unwrapped
+ * line: left to measure itself the row is as wide as the longest line of the
+ * patch, so its tint runs past the pane, its text is never given the chance to
+ * give the room back, and the row that changed and the row that did not stop
+ * sharing an edge. Naming the width is what makes `flexShrink` on the text run
+ * mean anything, and what keeps every row of one patch the same shape.
+ */
 function rowStyle(t: AdwaitaTheme, kind: DiffRowKind): StyleDesc {
   const fill = rowFill(t, kind);
   return {
@@ -78,6 +89,8 @@ function rowStyle(t: AdwaitaTheme, kind: DiffRowKind): StyleDesc {
     alignItems: "center",
     height: DIFF_ROW_HEIGHT,
     flexShrink: 0,
+    width: "100%",
+    maxWidth: "100%",
     minWidth: 0,
     overflow: "hidden",
     paddingLeft: DIFF_ROW_INSET,
@@ -105,15 +118,24 @@ function headerRow(
       <T
         size="caption"
         color={row.kind === "file" ? t.color.text.secondary : palette.comment}
-        style={{ ...base, minWidth: 0, flexShrink: 1 }}
+        style={{ ...base, flexGrow: 1, minWidth: 0, flexShrink: 1 }}
       >
         {row.text}
       </T>
       {row.kind === "file" ? (
+        // The two counts belong to the file named on the row, but they are its
+        // figure, not a continuation of its name: they stand at the row's end,
+        // where every other row of the panel puts its figure, with the air the
+        // gap buys between a path and a number.
         <T
           size="caption"
           color={t.color.text.dim}
-          style={{ ...base, flexShrink: 0, textAlign: "right" }}
+          style={{
+            ...base,
+            marginLeft: t.space.sm,
+            flexShrink: 0,
+            textAlign: "right",
+          }}
         >
           {`+${row.additions} −${row.deletions}`}
         </T>
@@ -231,7 +253,14 @@ export function DiffText({
           {drawn.map((entry) => diffRow(t, palette, entry, tokenize))}
         </virtual-list>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            minWidth: 0,
+          }}
+        >
           {drawn.map((entry) => diffRow(t, palette, entry, tokenize))}
         </div>
       )}
