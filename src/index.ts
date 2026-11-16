@@ -979,6 +979,7 @@ export {
   type ChangeRowProps,
   MONO,
   FILE_HEADER_ROW_HEIGHT,
+  diffHeaderFill,
   nativeDiffTheme,
 } from "./components/vcs";
 

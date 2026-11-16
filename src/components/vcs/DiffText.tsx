@@ -7,6 +7,7 @@ import {
   DIFF_TEXT_SIZE,
   codePalette,
 } from "../../theme/code";
+import { diffHeaderFill } from "../../theme/vcs";
 import { T } from "../text";
 import { useListWindow } from "../../lib/listWindow";
 import {
@@ -61,12 +62,13 @@ function listStyle(): StyleDesc {
 /**
  * The row's fill: a changed line wears the tint of what happened to it, because
  * a diff row is told apart by its colour and not by a `+` or `-` stamped in
- * front of it. A header is a band of the surface the pane is drawn on.
+ * front of it. A header is one rung off the surface the patch is drawn on — see
+ * `diffHeaderFill`, which is why it is measured and not a surface role.
  */
 function rowFill(t: AdwaitaTheme, kind: DiffRowKind): string | undefined {
   if (kind === "add") return t.color.functional.successTint;
   if (kind === "del") return t.color.functional.destructiveTint;
-  if (kind === "file" || kind === "hunk") return t.color.surface.headerbar;
+  if (kind === "file" || kind === "hunk") return diffHeaderFill(t);
   return undefined;
 }
 
