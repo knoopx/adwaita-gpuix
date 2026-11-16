@@ -28,6 +28,31 @@ const RAGGED_COUNTS: FileRowData[] = [
   { status: "D", path: "src/legacy/old.ts", insertions: 0, deletions: 884 },
 ];
 
+/** A diff stat's own column: `jj diff --stat` states one total per file and draws the
+ *  split as a bar, so the row prints the total bare and draws the histogram from the bar. */
+const STAT: FileRowData[] = [
+  {
+    status: "",
+    path: "src/screens/ChangesView.tsx",
+    insertions: 0,
+    deletions: 0,
+    stat: { changed: 66, additions: 8, deletions: 22 },
+  },
+  {
+    status: "",
+    path: "src/lib/keymap.ts",
+    insertions: 0,
+    deletions: 0,
+    stat: { changed: 31, additions: 3, deletions: 11 },
+  },
+  {
+    status: "",
+    path: "docs/screens/plugins.png",
+    insertions: 0,
+    deletions: 0,
+  },
+];
+
 const UNMODIFIED: FileRowData[] = [
   {
     status: "M",
@@ -130,6 +155,20 @@ export const noChanges = defineStory({
         style={{ width: "100%" }}
       >
         <RowList files={UNMODIFIED} />
+      </Labeled>
+    </Column>
+  ),
+});
+
+export const statTotals = defineStory({
+  parameters: { width: 460, height: 160 },
+  render: () => (
+    <Column gap={16} align="center">
+      <Labeled
+        caption="diff stat — one total, no sign, histogram from the bar's own glyphs; a binary file states no figure"
+        style={{ width: "100%" }}
+      >
+        <RowList files={STAT} />
       </Labeled>
     </Column>
   ),

@@ -3,6 +3,7 @@ import { type StyleDesc } from "@gpuix/react";
 import { type AdwaitaTheme, useAdwaita } from "../../theme/adwaita";
 import { T } from "../text";
 import { Icon, type IconName } from "../../components/icons";
+import { getFileIcon, getFileIconColor } from "../../components/FileIcons";
 import { DiffStats } from "../../components/vcs/DiffStats";
 import type { FileRowStats } from "../../components/vcs/FileRowData";
 import { isActivateKey } from "../../lib/roving";
@@ -92,11 +93,16 @@ function rowLabelStyle(t: AdwaitaTheme, color: string): Partial<StyleDesc> {
 
 function FileTreeRowContents({
   icon,
+  iconColor,
   name,
   selected,
   variant,
 }: {
   icon: IconName;
+
+  /** the colour the file type is read by anywhere else in the kit (`getFileIconColor`)
+   *  — a tree whose rows are files wears the same marks as a file row does */
+  iconColor?: string;
   name: string;
   selected: boolean;
   variant: FileTreeVariant;
@@ -111,9 +117,7 @@ function FileTreeRowContents({
         color={
           selected
             ? t.color.accent.base
-            : flat
-              ? t.color.text.secondary
-              : t.color.text.dim
+            : (iconColor ?? (flat ? t.color.text.secondary : t.color.text.dim))
         }
       />
       <T
@@ -158,7 +162,10 @@ function FileTreeStats({
  * measure — the same trick the changes panel plays with `fileRowStats`.
  */
 export function fileTreeStats(items: readonly FileTreeNode[]): FileRowStats {
-  const walk = (nodes: readonly FileTreeNode[], max: FileRowStats): FileRowStats =>
+  const walk = (
+    nodes: readonly FileTreeNode[],
+    max: FileRowStats,
+  ): FileRowStats =>
     nodes.reduce((soFar, node) => {
       const next: FileRowStats = {
         insertions: Math.max(soFar.insertions, node.added ?? 0),
@@ -382,7 +389,8 @@ export function FileTreeFile({
     >
       <div style={{ width: CHEVRON_SIZE, flexShrink: 0 }} />
       <FileTreeRowContents
-        icon="article"
+        icon={getFileIcon(name)}
+        iconColor={getFileIconColor(name) ?? undefined}
         name={name}
         selected={isSelected}
         variant={variant}

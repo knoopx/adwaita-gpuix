@@ -19,17 +19,27 @@ export {
   type DiffVisibility,
 } from "../../lib/vcs/rows";
 export type { DiffToken, DiffTokenKind } from "../../lib/vcs/tokens";
-export { DiffCountColumn, diffCountColumnWidth } from "./DiffCountColumn";
+export {
+  DiffCountColumn,
+  diffCountColumnWidth,
+  type DiffCountSign,
+} from "./DiffCountColumn";
 export { DiffHistogram } from "./DiffHistogram";
 export { DiffStats } from "./DiffStats";
 export { FileChangeRow } from "./FileChangeRow";
 export { FileIconCell } from "./FileIconCell";
 export { FilePathCell } from "./FilePathCell";
-export { FileStatusCell, fileStatusColor } from "./FileStatusCell";
+export {
+  FileStatusCell,
+  fileStatusColor,
+  fileStatusNamed,
+} from "./FileStatusCell";
 export {
   fileRowStats,
+  fileRowHasFigures,
   type FileRowData,
   type FileRowStats,
+  type FileRowStat,
 } from "./FileRowData";
 export { FILE_STATUS_ICONS } from "./FileStatusIcons";
 export {
