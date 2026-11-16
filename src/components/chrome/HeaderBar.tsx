@@ -23,23 +23,30 @@ export function HeaderBar({
   style,
 }: HeaderBarProps) {
   const t = useAdwaita();
+  const title = centerMode === "title";
 
-  const spacer: Partial<StyleDesc> = {
-    display: "flex",
-    flexDirection: "row",
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
-    minWidth: 0,
-  };
-
+  /*
+   * The ends balance, so the middle stands on the window's axis.
+   *
+   * A centred title is centred on the *window*, which is what a GNOME header bar does: GTK
+   * gives the title box a minimum of twice the wider end, so the two ends hold equal weight
+   * and the buttons on them cannot slide the title sideways. The flex form of that rule is an
+   * end that **grows** by an equal share of what the middle leaves. Two fixed spacers — the
+   * first shape of this — centred the middle in the space the ends left over, so a long figure
+   * at the trailing end moved the title off the axis by half of its own width, and the axis
+   * moved again with every button added.
+   *
+   * A `location` middle is the opposite request: a field wants everything the two ends leave,
+   * so there the ends stay content-sized and the middle grows.
+   */
   const group = (justify: "flex-start" | "flex-end"): Partial<StyleDesc> => ({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
     gap: t.control.headerActionGap,
-    flexGrow: 0,
+    flexGrow: title ? 1 : 0,
     flexShrink: 1,
+    ...(title ? { flexBasis: 0 } : {}),
     minWidth: 0,
     justifyContent: justify,
   });
@@ -61,7 +68,6 @@ export function HeaderBar({
       }}
     >
       <div style={group("flex-start")}>{left}</div>
-      {centerMode === "title" ? <div style={spacer} /> : null}
       <div
         style={{
           display: "flex",
@@ -69,11 +75,11 @@ export function HeaderBar({
           alignItems: "center",
           justifyContent: "flex-start",
 
-          flexGrow: centerMode === "title" ? 0 : 1,
+          flexGrow: title ? 0 : 1,
           flexShrink: 1,
-          flexBasis: centerMode === "title" ? undefined : 0,
+          flexBasis: title ? undefined : 0,
           minWidth: 0,
-          maxWidth: t.control.headerBarCenterMaxWidth,
+          maxWidth: title ? t.control.headerBarCenterMaxWidth : undefined,
           gap: t.control.headerGroupGap,
           overflow: "hidden",
           ...centerStyle,
@@ -81,7 +87,6 @@ export function HeaderBar({
       >
         {center}
       </div>
-      {centerMode === "title" ? <div style={spacer} /> : null}
       <div style={group("flex-end")}>{right}</div>
     </div>
   );
