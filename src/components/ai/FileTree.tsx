@@ -1,15 +1,37 @@
 import { type ReactNode, useState } from "react";
 import { type StyleDesc } from "@gpuix/react";
 import { type AdwaitaTheme, useAdwaita } from "../../theme/adwaita";
-import { T } from "../text";
+import { T, type TextSize } from "../text";
 import { Icon, type IconName } from "../../components/icons";
 import { getFileIcon, getFileIconColor } from "../../components/FileIcons";
 import { DiffStats } from "../../components/vcs/DiffStats";
 import type { FileRowStats } from "../../components/vcs/FileRowData";
 import { isActivateKey } from "../../lib/roving";
 
-const ICON_SIZE = 14;
 const CHEVRON_SIZE = 12;
+
+/**
+ * The mark a row wears, at the measure that row's name is printed at.
+ *
+ * A folder's mark is the thing the eye runs down a long listing by, so it is not
+ * one fixed pixel size: at the kit's row measure it is the nav icon, at a dense
+ * measure the compact one. A 14px mark beside a 12px name is a row whose icon is
+ * the loudest part of it.
+ */
+const iconSizeOf = (t: AdwaitaTheme, size: TextSize): number =>
+  t.type[size] >= t.type.list
+    ? t.control.navIconSize
+    : t.control.compactIconSize;
+
+/**
+ * The measure a tree wears when its consumer says nothing.
+ *
+ * A picker's rows are chosen, so they stand at the kit's caption; a list is read,
+ * so it stands at the kit's own row measure. A tree standing inside a denser
+ * surface overrides both — see `FileTreeProps.size`.
+ */
+const defaultRowSize = (variant: FileTreeVariant): TextSize =>
+  variant === "list" ? "list" : "caption";
 
 export interface FileTreeNode {
   name: string;
@@ -41,6 +63,19 @@ export interface FileTreeProps {
   onSelect?: (path: string) => void;
 
   variant?: FileTreeVariant;
+
+  /**
+   * The measure of the rows' names.
+   *
+   * A tree that fills a pane stands at the kit's row measure. A tree that stands
+   * _inside_ another surface — a log, a dense panel, a table cell — takes that
+   * surface's measure, because otherwise its rows shout over the rows beside
+   * them: a hundred folder names a point larger than every line around them read
+   * as a headline repeated, and the listing takes three scrolls to see. The mark
+   * shrinks with the name, so the row stays a row.
+   */
+  size?: TextSize;
+
   style?: Partial<StyleDesc>;
 }
 
@@ -95,6 +130,7 @@ function FileTreeRowContents({
   icon,
   iconColor,
   name,
+  size,
   selected,
   variant,
 }: {
@@ -104,6 +140,7 @@ function FileTreeRowContents({
    *  — a tree whose rows are files wears the same marks as a file row does */
   iconColor?: string;
   name: string;
+  size: TextSize;
   selected: boolean;
   variant: FileTreeVariant;
 }) {
@@ -113,7 +150,7 @@ function FileTreeRowContents({
     <>
       <Icon
         name={icon}
-        size={ICON_SIZE}
+        size={iconSizeOf(t, size)}
         color={
           selected
             ? t.color.accent.base
@@ -121,7 +158,7 @@ function FileTreeRowContents({
         }
       />
       <T
-        size={flat ? "list" : "caption"}
+        size={size}
         style={rowLabelStyle(
           t,
           selected || flat ? t.color.text.primary : t.color.text.dim,
@@ -184,9 +221,11 @@ export function FileTree({
   selectedPath,
   onSelect,
   variant = "picker",
+  size,
   style,
 }: FileTreeProps) {
   const t = useAdwaita();
+  const rowSize = size ?? defaultRowSize(variant);
   const [internalExpanded, setInternalExpanded] = useState<Set<string>>(
     () => new Set(defaultExpandedPaths ?? []),
   );
@@ -223,6 +262,7 @@ export function FileTree({
             removed={node.removed}
             stats={stats}
             variant={variant}
+            size={rowSize}
           >
             {contents}
           </FileTreeFolder>
@@ -237,6 +277,7 @@ export function FileTree({
           removed={node.removed}
           stats={stats}
           variant={variant}
+          size={rowSize}
           onSelect={onSelect === undefined ? undefined : () => onSelect(path)}
         />
       );
@@ -269,6 +310,9 @@ export interface FileTreeFolderProps {
   stats?: FileRowStats;
 
   variant?: FileTreeVariant;
+
+  /** The measure of this row's name — see `FileTreeProps.size`. */
+  size?: TextSize;
 
   children?: ReactNode;
   style?: Partial<StyleDesc>;
@@ -304,6 +348,7 @@ export function FileTreeFolder({
   removed,
   stats,
   variant = "picker",
+  size,
   children,
   style,
 }: FileTreeFolderProps) {
@@ -333,6 +378,7 @@ export function FileTreeFolder({
         <FileTreeRowContents
           icon="folder"
           name={name}
+          size={size ?? defaultRowSize(variant)}
           selected={isSelected}
           variant={variant}
         />
@@ -358,6 +404,9 @@ export interface FileTreeFileProps {
 
   variant?: FileTreeVariant;
 
+  /** The measure of this row's name — see `FileTreeProps.size`. */
+  size?: TextSize;
+
   style?: Partial<StyleDesc>;
 }
 
@@ -369,6 +418,7 @@ export function FileTreeFile({
   removed,
   stats,
   variant = "picker",
+  size,
   style,
 }: FileTreeFileProps) {
   const t = useAdwaita();
@@ -392,6 +442,7 @@ export function FileTreeFile({
         icon={getFileIcon(name)}
         iconColor={getFileIconColor(name) ?? undefined}
         name={name}
+        size={size ?? defaultRowSize(variant)}
         selected={isSelected}
         variant={variant}
       />

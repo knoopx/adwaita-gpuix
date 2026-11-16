@@ -155,6 +155,33 @@ export const changeset = defineStory({
   ),
 });
 
+/**
+ * The same listing at a denser measure — the shape a tree takes when it stands
+ * inside a surface whose other rows are already caption-sized (a log, a dense
+ * panel), where the kit's row measure would be the loudest text on the screen.
+ */
+export const dense = defineStory({
+  parameters: { width: 528, height: 300 },
+  render: () => (
+    <Column gap={16} align="center">
+      <Labeled
+        caption={
+          'size="caption": the name and its mark both drop to the measure the rows around it wear'
+        }
+      >
+        <div style={{ width: 460 }}>
+          <FileTree
+            items={CHANGE_TREE}
+            variant="list"
+            size="caption"
+            defaultExpandedPaths={["packages", "packages/core", "packages/core/src", "packages/ui"]}
+          />
+        </div>
+      </Labeled>
+    </Column>
+  ),
+});
+
 /** One level of a folder: the shape a listing answers with, nothing to open. */
 const FLAT_LISTING: FileTreeNode[] = [
   { name: "src", type: "folder" },
