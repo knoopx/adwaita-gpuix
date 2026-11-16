@@ -38,6 +38,13 @@ export interface DiffPanelProps {
   /** How the text of each row is coloured — the app's reading of its language. */
   tokenize?: (row: DiffRow) => DiffToken[] | undefined;
 
+  /**
+   * The band the patch's `@@` rows wear, for a patch drawn on a plate of the app's
+   * own. See `DiffTextProps.headerFill` — a header measured off the page is a strip
+   * of the page across the middle of the diff.
+   */
+  headerFill?: string;
+
   /** Unchanged lines kept beside each change. None, unless asked for. */
   context?: number;
 
@@ -123,6 +130,7 @@ export function DiffPanel({
   fileHeader = true,
   rows,
   tokenize,
+  headerFill,
   context = 0,
   maxRows = 0,
 }: DiffPanelProps) {
@@ -198,6 +206,7 @@ export function DiffPanel({
         patch={patch}
         rows={rows}
         tokenize={tokenize}
+        headerFill={headerFill}
         scroll
         fileHeader={fileHeader}
         context={context}

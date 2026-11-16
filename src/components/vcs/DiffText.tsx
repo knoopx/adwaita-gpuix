@@ -36,6 +36,18 @@ export interface DiffTextProps extends DiffVisibility {
   tokenize?: (row: DiffRow) => DiffToken[] | undefined;
 
   /**
+   * The band the patch's `@@` and per-file rows wear.
+   *
+   * Absent, the header is measured off the app's page — `diffHeaderFill` — which is
+   * right for a patch drawn on the page itself. An app that draws a patch on a plate
+   * of its own has to name that plate, because a header measured off the page arrives
+   * as a strip of the page running across the middle of the diff, and one measured
+   * *toward the ink* arrives as a slab standing above the rows it labels — louder than
+   * the added and taken rows, which is the one thing a patch's header may not be.
+   */
+  headerFill?: string;
+
+  /**
    * Own a scroller. On in a pane of bounded height, where a long patch is
    * virtualised; off inline in a log, where the log is the scroller and a row
    * cap is what keeps the body short.
@@ -62,13 +74,18 @@ function listStyle(): StyleDesc {
 /**
  * The row's fill: a changed line wears the tint of what happened to it, because
  * a diff row is told apart by its colour and not by a `+` or `-` stamped in
- * front of it. A header is one rung off the surface the patch is drawn on — see
- * `diffHeaderFill`, which is why it is measured and not a surface role.
+ * front of it. A header is a rung off the surface the patch is drawn on: the app
+ * names that surface with `headerFill`, and `diffHeaderFill` measures the page's own
+ * case — which is why a header is measured and never a surface role.
  */
-function rowFill(t: AdwaitaTheme, kind: DiffRowKind): string | undefined {
+function rowFill(
+  t: AdwaitaTheme,
+  kind: DiffRowKind,
+  headerFill: string,
+): string | undefined {
   if (kind === "add") return t.color.functional.successTint;
   if (kind === "del") return t.color.functional.destructiveTint;
-  if (kind === "file" || kind === "hunk") return diffHeaderFill(t);
+  if (kind === "file" || kind === "hunk") return headerFill;
   return undefined;
 }
 
@@ -83,8 +100,12 @@ function rowFill(t: AdwaitaTheme, kind: DiffRowKind): string | undefined {
  * sharing an edge. Naming the width is what makes `flexShrink` on the text run
  * mean anything, and what keeps every row of one patch the same shape.
  */
-function rowStyle(t: AdwaitaTheme, kind: DiffRowKind): StyleDesc {
-  const fill = rowFill(t, kind);
+function rowStyle(
+  t: AdwaitaTheme,
+  kind: DiffRowKind,
+  headerFill: string,
+): StyleDesc {
+  const fill = rowFill(t, kind, headerFill);
   return {
     display: "flex",
     flexDirection: "row",
@@ -189,9 +210,10 @@ function diffRow(
   palette: Palette,
   entry: DiffRow,
   tokenize: ((row: DiffRow) => DiffToken[] | undefined) | undefined,
+  headerFill: string,
 ): JSX.Element {
   return (
-    <div key={entry.id} style={rowStyle(t, entry.kind)}>
+    <div key={entry.id} style={rowStyle(t, entry.kind, headerFill)}>
       {entry.kind === "file" || entry.kind === "hunk"
         ? headerRow(t, palette, entry)
         : textRow(t, palette, entry, tokenize)}
@@ -210,6 +232,7 @@ export function DiffText({
   patch,
   rows,
   tokenize,
+  headerFill,
   scroll = false,
   listRef,
   style,
@@ -219,6 +242,7 @@ export function DiffText({
 }: DiffTextProps) {
   const t = useAdwaita();
   const palette = codePalette(t);
+  const header = headerFill ?? diffHeaderFill(t);
   const parsed = useMemo(() => rows ?? diffRowsOf(patch), [rows, patch]);
   const view = useMemo(
     () => diffRowsShown(parsed, { context, maxRows, fileHeader }),
@@ -252,7 +276,7 @@ export function DiffText({
           onVisibleRange={win.onVisibleRange}
           style={listStyle()}
         >
-          {drawn.map((entry) => diffRow(t, palette, entry, tokenize))}
+          {drawn.map((entry) => diffRow(t, palette, entry, tokenize, header))}
         </virtual-list>
       ) : (
         <div
@@ -263,11 +287,11 @@ export function DiffText({
             minWidth: 0,
           }}
         >
-          {drawn.map((entry) => diffRow(t, palette, entry, tokenize))}
+          {drawn.map((entry) => diffRow(t, palette, entry, tokenize, header))}
         </div>
       )}
       {view.hidden > 0 ? (
-        <div style={rowStyle(t, "ctx")}>
+        <div style={rowStyle(t, "ctx", header)}>
           <T size="caption" color={t.color.text.dim} style={mono()}>
             {`${view.hidden} more line${view.hidden === 1 ? "" : "s"} not shown`}
           </T>
