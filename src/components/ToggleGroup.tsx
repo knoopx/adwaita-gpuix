@@ -26,6 +26,16 @@ interface ToggleGroupBaseProps {
   variant?: ToggleGroupVariant;
 
   size?: ToggleGroupSize;
+
+  /**
+   * The measure of a segment's label. Left out, it follows `size`, which is what
+   * `sm` means: a small segment carries the caption measure, the same measure the
+   * compact rows around it print at. A caller that names one says so here.
+   */
+  labelSize?: TextSize;
+
+  /** The size of a segment's icon; left out, it follows `size`. */
+  iconSize?: number;
   style?: Partial<StyleDesc>;
 }
 
@@ -49,6 +59,8 @@ export function ToggleGroup(props: ToggleGroupProps) {
     spacing = 0,
     variant = "default",
     size = "default",
+    labelSize,
+    iconSize,
     style,
   } = props;
   const vertical = direction === "vertical";
@@ -59,6 +71,18 @@ export function ToggleGroup(props: ToggleGroupProps) {
     lg: t.control.toggleSegmentHeightLg,
   };
   const minHeight = segmentHeight[size];
+
+  // The box is the segment plus its padding, and nothing more. It stood at
+  // `viewSwitcherHeight` whatever `size` said, so a `sm` group painted a 34px well
+  // around 22px segments: a caller asking for the compact density got a control
+  // taller than the rows it was set beside.
+  const groupHeight = minHeight + 2 * t.control.toggleGroupPadding;
+
+  // The measure a segment's words and mark are set at follows the density: a `sm`
+  // group prints at the caption, the measure a compact list already prints its rows at.
+  const labelMeasure: TextSize =
+    labelSize ?? (size === "sm" ? "caption" : "body");
+  const markSize = iconSize ?? (size === "sm" ? t.control.compactIconSize : 16);
 
   const checkedBg = t.color.surface.raised;
   const hoverBg = t.color.surface.hover;
@@ -101,7 +125,7 @@ export function ToggleGroup(props: ToggleGroupProps) {
         display: "flex",
         alignItems: "stretch",
         padding: t.control.toggleGroupPadding,
-        minHeight: t.control.viewSwitcherHeight,
+        minHeight: groupHeight,
         borderRadius: t.radius.sm,
         borderWidth: 0,
         backgroundColor: t.color.surface.input,
@@ -169,7 +193,9 @@ export function ToggleGroup(props: ToggleGroupProps) {
                 <SegmentedOptionCell
                   active={isActive}
                   icon={opt.icon}
+                  iconSize={markSize}
                   label={opt.label}
+                  labelSize={labelMeasure}
                   iconActiveColor={t.color.text.primary}
                   labelActiveColor={t.color.text.primary}
                 />
