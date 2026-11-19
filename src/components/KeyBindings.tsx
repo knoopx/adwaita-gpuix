@@ -1,6 +1,12 @@
 import { Fragment } from "react";
 import { type StyleDesc } from "@gpuix/react";
-import { Kbd as KbdBox, KbdCombo, KbdGroup, KBD_GLYPH, type KbdColors } from "./Kbd";
+import {
+  Kbd as KbdBox,
+  KbdCombo,
+  KbdGroup,
+  KBD_GLYPH,
+  type KbdColors,
+} from "./Kbd";
 import {
   bindingCodes,
   isHidden,
@@ -80,8 +86,18 @@ const CODE_SYMBOLS: Record<string, string> = {
   cmd: "Cmd",
 };
 
+/** The name a cap prints for a key that carries no mark of its own.
+ *
+ *  A single letter is upper-cased, because a cap is a picture of a key and the
+ *  legend pressed onto that key is capital: a binding is written in lower case
+ *  (`ctrl+t`) and a cap that copies the binding's spelling prints half a key.
+ *  Everything longer than one character — `f13`, an insert key's `Ins` — is a name
+ *  already spelled the way the key says it, and is printed as it arrives.
+ */
 export function kbdSymbol(code: string): string {
-  return CODE_SYMBOLS[code] ?? code;
+  const named = CODE_SYMBOLS[code];
+  if (named !== undefined) return named;
+  return code.length === 1 ? code.toUpperCase() : code;
 }
 
 export function KbdKey({ code, colors }: { code: string; colors?: KbdColors }) {
