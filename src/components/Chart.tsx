@@ -325,6 +325,7 @@ function BarPlot({
   plotHeight,
   gap,
   grid,
+  maxValue,
   children,
 }: {
   labels?: ChartData;
@@ -333,6 +334,8 @@ function BarPlot({
   plotHeight: number;
   gap: number;
   grid: boolean;
+
+  maxValue: number;
   children: ReactNode;
 }) {
   const t = useAdwaita();
@@ -340,7 +343,12 @@ function BarPlot({
     <ChartFrame labels={labels} style={style}>
       <div style={{ position: "relative" }}>
         {grid ? (
-          <BarGrid plotHeight={plotHeight} color={t.color.border.default} />
+          <BarGrid
+            plotHeight={plotHeight}
+            color={t.color.border.default}
+            ink={t.color.text.dim}
+            maxValue={maxValue}
+          />
         ) : null}
         <BarRow height={height} gap={gap}>
           {children}
@@ -350,7 +358,19 @@ function BarPlot({
   );
 }
 
-function BarGrid({ plotHeight, color }: { plotHeight: number; color: string }) {
+// The rules are worth drawing only when they say a number: a reader who cannot
+// measure a bar by eye reads the tick at its end instead.
+function BarGrid({
+  plotHeight,
+  color,
+  ink,
+  maxValue,
+}: {
+  plotHeight: number;
+  color: string;
+  ink: string;
+  maxValue: number;
+}) {
   return (
     <div
       style={{
@@ -363,17 +383,29 @@ function BarGrid({ plotHeight, color }: { plotHeight: number; color: string }) {
       }}
     >
       {[0.25, 0.5, 0.75].map((f) => (
-        <div
-          key={f}
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: f * plotHeight,
-            height: 1,
-            backgroundColor: color,
-          }}
-        />
+        <div key={f}>
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: f * plotHeight,
+              height: 1,
+              backgroundColor: color,
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              right: 0,
+              bottom: f * plotHeight + 2,
+            }}
+          >
+            <T size="micro" color={ink}>
+              {String(Math.round(maxValue * f))}
+            </T>
+          </div>
+        </div>
       ))}
       <div
         style={{
@@ -520,6 +552,7 @@ function BarChart({
       plotHeight={plotHeight}
       gap={gap}
       grid={grid}
+      maxValue={maxValue}
     >
       {data.map((d, i) => {
         const barHeight =
@@ -581,7 +614,9 @@ function barHeightAt(
 /** The whole a stacked column is: the sum of its bands, never its tallest one. */
 function stackedValue(data: ChartSeriesPoint[]): number {
   return Math.max(
-    ...data.map((d) => d.values.reduce((sum, v) => sum + Math.max(0, v.value), 0)),
+    ...data.map((d) =>
+      d.values.reduce((sum, v) => sum + Math.max(0, v.value), 0),
+    ),
     1,
   );
 }
@@ -624,9 +659,13 @@ function MultiBarChart({
         plotHeight={plotHeight}
         gap={8}
         grid={grid}
+        maxValue={maxValue}
       >
         {data.map((d, i) => {
-          const total = d.values.reduce((sum, v) => sum + Math.max(0, v.value), 0);
+          const total = d.values.reduce(
+            (sum, v) => sum + Math.max(0, v.value),
+            0,
+          );
           return (
             <div
               key={i}
@@ -697,6 +736,7 @@ function MultiBarChart({
       plotHeight={plotHeight}
       gap={8}
       grid={grid}
+      maxValue={maxValue}
     >
       {data.map((d, i) => (
         <div
